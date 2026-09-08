@@ -20,8 +20,8 @@
     <UserSecretsId>526df2c2-0ede-4069-94f1-c6e8fe4cb6c5</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.0" />
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.3.0" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.5.3" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.5.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AgentHelm.Bridge\AgentHelm.Bridge.csproj" />
