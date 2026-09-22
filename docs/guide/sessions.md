@@ -55,7 +55,7 @@ Type in the composer at the bottom and press ++ctrl+enter++ or **Send**. While t
 - tool calls appear as `tool` entries, and permission requests as banners ([Permissions & policies](permissions.md));
 - the status badge reads `running`, and **Send** is disabled — one turn at a time per session.
 
-When the turn ends, the streamed text becomes a permanent `assistant` entry and the status returns to `idle`. **Stop** asks the agent to cancel the turn (ACP `session/cancel`); the agent decides how quickly it stops.
+When the turn ends, the streamed text becomes a permanent `assistant` entry and the status returns to `idle`. If the Bridge refuses a prompt — it cannot be reached, or the attachments are too large — the reason appears above the composer and your prompt stays in it. **Stop** asks the agent to cancel the turn (ACP `session/cancel`); the agent decides how quickly it stops.
 
 ### What the transcript records
 
@@ -80,7 +80,7 @@ Click the **📎** in the composer to attach files to the next prompt:
 The capability chips in the header show what the agent advertised: `images` and `files`. If it advertised neither, the paperclip's tooltip warns that the agent may reject attachments.
 
 > [!NOTE]
-> The Bridge also caps a whole prompt's attachments at 8,000,000 characters of encoded data (images are base64-encoded, which adds about a third) and refuses larger prompts with HTTP 413. Four images close to the 2 MB limit exceed that cap, and the UI does not report the refusal — keep large images to two or three per prompt.
+> The Bridge also caps a whole prompt's attachments at 8,000,000 characters of encoded data (images are base64-encoded, which adds about a third) and refuses larger prompts with HTTP 413. Four images close to the 2 MB limit exceed that cap. The UI then says *The attachments are too large for one prompt* and keeps your text and attachments, so you can remove some and send again.
 
 ## Renaming
 

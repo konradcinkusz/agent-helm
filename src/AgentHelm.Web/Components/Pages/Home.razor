@@ -168,7 +168,7 @@
                 <div class="session-head-actions">
                     <button class="btn" @onclick="ToggleScopeAsync" title="Quality scores from CopilotScope (time-based match)">Scope</button>
                     <button class="btn" @onclick="ToggleHandoff" title="Continue this conversation with a different agent">Handoff</button>
-                    <select class="policy-select" value="@_detail.Policy" @onchange="OnPolicyChangeAsync"
+                    <select class="policy-select" @key="_policySelectVersion" value="@_detail.Policy" @onchange="OnPolicyChangeAsync"
                             title="Permission policy — every auto-decision is still audited in the transcript">
                         <option value="ask">Ask every tool</option>
                         <option value="auto_read">Auto-allow reads</option>
@@ -307,6 +307,10 @@
                 {
                     <div class="error-note pad">@_attachError</div>
                 }
+                @if (_sendError is not null)
+                {
+                    <div class="error-note pad">@_sendError</div>
+                }
 
                 <div class="composer">
                     <label class="attach-label" title="@AttachTitle()">
@@ -377,7 +381,9 @@
                                @onkeydown="OnTerminalKeyAsync" />
                         <button class="btn" @onclick="InsertOutputIntoPromptAsync" title="Append recent terminal output to the chat composer">→ Prompt</button>
                     </div>
-                    <div class="term-note">shell pipe (no PTY): command output streams here; full-screen TUI apps won't render</div>
+                    <div class="term-note">@(_termIsPty
+                        ? "PTY: prompts, colours and line editing work; input is sent a line at a time"
+                        : "shell pipe (no PTY): command output streams here; full-screen TUI apps won't render")</div>
                 </div>
             }
         }

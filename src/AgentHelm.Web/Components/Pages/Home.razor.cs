@@ -45,11 +45,16 @@ public partial class Home : IDisposable
 
     // M1: permission policy (YOLO needs explicit confirmation)
     private bool _yoloConfirmPending;
+    // Bumped to re-create the policy <select>: after the user picks YOLO and
+    // does not confirm, the element still shows "YOLO" while the policy never
+    // changed, and Blazor has no value change to render it back.
+    private int _policySelectVersion;
 
     // M2: tabs / attachments / git / terminal
     private string _activeTab = "chat";
     private readonly List<AttachmentDto> _attachments = [];
     private string? _attachError;
+    private string? _sendError;
     private bool _gitIsRepo = true;
     private List<GitFileChangeDto> _gitChanges = [];
     private GitFileDiffDto? _diff;
@@ -167,7 +172,9 @@ public partial class Home : IDisposable
     {
         _archived = null;
         _showHistory = false;
+        if (_yoloConfirmPending) _policySelectVersion++;
         _yoloConfirmPending = false;
+        _sendError = null;
         _activeTab = "chat";
         _attachments.Clear();
         _attachError = null;
@@ -264,7 +271,11 @@ public partial class Home : IDisposable
         _prompt = "";
         _attachments.Clear();
         _attachError = null;
-        await Bridge.PromptAsync(_detail.Id, text, attachments, _pageCts.Token);
+        _sendError = await Bridge.PromptAsync(_detail.Id, text, attachments, _pageCts.Token);
+        if (_sendError is null) return;
+        // Not sent: hand the prompt and its attachments back along with the reason.
+        _prompt = text;
+        if (attachments is not null) _attachments.AddRange(attachments);
     }
 
     // ----------------------------------------------------------- attachments
@@ -629,7 +640,11 @@ public partial class Home : IDisposable
         await ApplyPolicyAsync("yolo");
     }
 
-    private void CancelYolo() => _yoloConfirmPending = false;
+    private void CancelYolo()
+    {
+        _yoloConfirmPending = false;
+        _policySelectVersion++;
+    }
 
     private static string PolicyLabel(string policy) => policy switch
     {
