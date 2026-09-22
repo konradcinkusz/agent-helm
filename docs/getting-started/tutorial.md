@@ -175,7 +175,7 @@ The **Terminal** tab gives you a shell in the session's working directory, rende
 3. Click **→ Prompt** to append the most recent terminal output to the chat composer. This lets you hand a test failure, a build error or any command output to the agent without copy-pasting.
 
 > [!NOTE]
-> On Linux, where util-linux `script` is available, the terminal runs inside a real PTY — prompts and colours work. On Windows it is a plain pipe: commands run and their output streams, but interactive full-screen programs do not render. See [Terminal](../guide/terminal.md).
+> On Linux, where util-linux `script` is available, the terminal runs inside a real PTY — prompts and colours work. On Windows and macOS it is a plain pipe: commands run and their output streams, but interactive full-screen programs do not render. See [Terminal](../guide/terminal.md).
 
 ---
 

@@ -57,7 +57,7 @@ A record of the choices that shape AgentHelm and why they were made, in the spir
 ## 9. Terminal: a pipe first, a PTY where it is cheap
 
 **Context.** A real cross-platform PTY in .NET means ConPTY/forkpty interop or a native package.<br>
-**Decision.** Start with a shell pipe; on Unix, get a real PTY from util-linux `script -qfe -c bash /dev/null`. ConPTY for Windows is deferred until it can be built and tested on Windows.<br>
+**Decision.** Start with a shell pipe; where util-linux `script` is available (Linux), get a real PTY from `script -qfe -c bash /dev/null`. The binary must identify itself as util-linux, because the `script` of macOS and BusyBox takes other options. ConPTY for Windows is deferred until it can be built and tested on Windows.<br>
 **Consequences.** The main use — run commands next to the session and feed their output to the agent — works everywhere; interactive full-screen programs do not.
 
 ## 10. Persistence as snapshots, with graceful degradation

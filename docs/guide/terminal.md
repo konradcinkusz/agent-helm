@@ -20,7 +20,7 @@ The **Terminal** tab is a shell next to the conversation, running in the session
 
 | | PTY mode | Pipe mode |
 |---|---|---|
-| When | Linux with util-linux `script` at `/usr/bin/script` or `/bin/script` | Windows (`cmd.exe`), or Unix without `script` (`/bin/bash`) |
+| When | a `script` at `/usr/bin/script` or `/bin/script` that identifies itself as util-linux's — i.e. Linux | Windows (`cmd.exe`); macOS, BusyBox and other systems without util-linux `script` (`/bin/bash`) |
 | How | `script -qfe -c /bin/bash /dev/null`, `TERM=xterm-256color` | the shell's standard streams directly |
 | Programs see | a real terminal (`isatty` is true) | a pipe |
 | Colours, prompts, line editing | work | many tools switch colours off |
@@ -28,7 +28,7 @@ The **Terminal** tab is a shell next to the conversation, running in the session
 | Hint under the terminal | *PTY: prompts, colours and line editing work…* | *shell pipe (no PTY)…* |
 
 > [!NOTE]
-> macOS also has a `/usr/bin/script`, so the Bridge picks PTY mode there too — but it is the BSD `script`, whose options differ from util-linux's. The terminal has not been verified on macOS.
+> macOS and BusyBox also ship a `script`, but not util-linux's: it rejects the options above. The Bridge asks the binary for its version once and uses PTY mode only for util-linux, so on those systems the terminal runs in pipe mode rather than failing to start.
 
 Even in PTY mode, input is sent **a line at a time** from the input box. Full-screen programs (`vim`, `htop`, `less`) therefore cannot be used, and there is no way to send ++ctrl+c++ — a command that never finishes keeps the shell busy until you delete the session. Prefer commands that exit on their own (for example `git --no-pager log`, `pytest -x`).
 

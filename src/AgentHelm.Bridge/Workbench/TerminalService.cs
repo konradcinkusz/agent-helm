@@ -6,14 +6,14 @@ using AgentHelm.Bridge.Sessions;
 
 namespace AgentHelm.Bridge.Workbench;
 
-// Integrated terminal, M2 scope. Honest design note: this is a SHELL PIPE,
-// not a PTY. A real cross-platform PTY in .NET means ConPTY/forkpty interop
-// or a native package — deliberately out of scope for zero-dependency M2.
-// Consequences: full-screen TUI apps (vim, htop) won't work, and some tools
-// detect the missing TTY and disable colors. What DOES work is the actual
-// Cockpit use case: run commands next to the agent session and attach their
-// output to prompts. xterm.js on the UI side still renders ANSI sequences
-// that most CLIs emit. PTY upgrade is a candidate for M3+.
+// Integrated terminal. Honest design note: M2 shipped a SHELL PIPE, not a
+// PTY — a real cross-platform PTY in .NET means ConPTY/forkpty interop or a
+// native package, deliberately out of scope for zero dependencies. Through a
+// pipe, full-screen TUI apps (vim, htop) won't work and some tools detect the
+// missing TTY and disable colors; the actual use case — run commands next to
+// the agent session and attach their output to prompts — works. M3 added a
+// real PTY where util-linux script(1) is available (see IsPty); everywhere
+// else, including Windows and macOS, the pipe remains.
 
 public sealed class TerminalSession : IDisposable
 {
@@ -24,20 +24,55 @@ public sealed class TerminalSession : IDisposable
     private const int BufferCap = 64_000;
 
     /// <summary>
-    /// True when the shell runs inside a real pseudo-terminal. On Unix this is
+    /// True when the shell runs inside a real pseudo-terminal. This is
     /// achieved with util-linux `script -qfe -c bash /dev/null`, which
     /// allocates a PTY and bridges it to our pipes: isatty() is true inside,
     /// so interactive prompts, colors and line editing work, and the PTY
-    /// echoes input (the UI must NOT locally echo in this mode). Windows
-    /// stays on the plain pipe (ConPTY interop is a deliberate non-goal for
-    /// zero-dependency M3).
+    /// echoes input (the UI must NOT locally echo in this mode). Without
+    /// util-linux script — Windows, macOS, BusyBox — the plain pipe is used
+    /// (ConPTY interop is a deliberate non-goal for zero dependencies).
     /// </summary>
     public bool IsPty { get; }
 
+    /// <summary>
+    /// util-linux's script(1), or null. PTY mode passes util-linux options
+    /// (-q -f -e -c); the `script` of macOS and BusyBox rejects them, and the
+    /// shell would die on start. So the binary must identify itself as
+    /// util-linux before it is trusted. Probed once per process.
+    /// </summary>
+    internal static readonly Lazy<string?> UtilLinuxScript = new(FindUtilLinuxScript);
+
+    internal static bool IsUtilLinux(string versionOutput) =>
+        versionOutput.Contains("util-linux", StringComparison.OrdinalIgnoreCase);
+
+    private static string? FindUtilLinuxScript()
+    {
+        if (OperatingSystem.IsWindows()) return null;
+        foreach (var path in new[] { "/usr/bin/script", "/bin/script" })
+        {
+            if (!File.Exists(path)) continue;
+            try
+            {
+                using var probe = Process.Start(new ProcessStartInfo(path, "--version")
+                {
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                });
+                if (probe is null) continue;
+                var stdout = probe.StandardOutput.ReadToEndAsync();
+                var stderr = probe.StandardError.ReadToEndAsync();
+                if (!probe.WaitForExit(3000)) { probe.Kill(entireProcessTree: true); continue; }
+                if (IsUtilLinux(stdout.Result + stderr.Result)) return path;
+            }
+            catch { /* not runnable here — try the next one */ }
+        }
+        return null;
+    }
+
     public TerminalSession(string cwd)
     {
-        var scriptPath = OperatingSystem.IsWindows() ? null
-            : new[] { "/usr/bin/script", "/bin/script" }.FirstOrDefault(File.Exists);
+        var scriptPath = UtilLinuxScript.Value;
         IsPty = scriptPath is not null;
 
         var psi = new ProcessStartInfo
