@@ -1010,3 +1010,78 @@ public class SpecExpansionTests
         Assert.Equal("run", args[0]);   // untouched args stay untouched
     }
 }
+
+/// <summary>
+/// The built-in echo agent as a real child process, driven by the real ACP
+/// client — the path a first-time user takes. Scripted transports cannot see
+/// the bytes on the wire or the agent's own concurrency; these tests can.
+/// </summary>
+public class EchoAgentEndToEndTests
+{
+    private static readonly string EchoAgentDll =
+        Path.Combine(AppContext.BaseDirectory, "AgentHelm.EchoAgent.dll");
+
+    private static AcpClient StartEcho()
+    {
+        var cwd = Path.GetTempPath();
+        var client = new AcpClient(new ProcessTransport("dotnet", [EchoAgentDll], cwd), cwd, NullLogger.Instance);
+        client.Start();
+        return client;
+    }
+
+    [Fact]
+    public async Task HandshakeCompletes()
+    {
+        using var client = StartEcho();
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+
+        await client.InitializeAsync(timeout.Token);
+        var sessionId = await client.NewSessionAsync(timeout.Token);
+
+        Assert.True(client.Capabilities.LoadSession);
+        Assert.StartsWith("echo-", sessionId);
+    }
+
+    [Theory]
+    [InlineData("allow", "completed", "Tool ran with your blessing.")]
+    [InlineData(null, "failed", "Tool was rejected")]
+    public async Task PermissionDecisionLetsTheTurnFinish(string? answer, string toolStatus, string closingText)
+    {
+        using var client = StartEcho();
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        var updates = new ConcurrentQueue<AcpUpdate>();
+        client.OnUpdate += updates.Enqueue;
+        client.PermissionHandler = _ => Task.FromResult(answer);
+
+        await client.InitializeAsync(timeout.Token);
+        var sessionId = await client.NewSessionAsync(timeout.Token);
+        var stopReason = await client.PromptAsync(sessionId, "please use a tool", null, timeout.Token);
+
+        Assert.Equal("end_turn", stopReason);
+        Assert.Contains(updates, u => u.Kind == "tool_call_update"
+            && u.Payload["status"]?.GetValue<string>() == toolStatus);
+        var reply = string.Concat(updates
+            .Where(u => u.Kind == "agent_message_chunk")
+            .Select(u => u.Payload["content"]?["text"]?.GetValue<string>()));
+        Assert.Contains(closingText, reply);
+    }
+}
+
+public class ProcessTransportTests
+{
+    [Fact]
+    public async Task WritesNoByteOrderMark()
+    {
+        if (OperatingSystem.IsWindows()) return;   // relies on sh, head and od
+
+        // Print the first three bytes received, in hex, then keep reading so the
+        // writer never hits a closed pipe.
+        using var transport = new ProcessTransport("sh",
+            ["-c", "head -c 3 | od -An -tx1; cat > /dev/null"], Path.GetTempPath());
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        await transport.WriteLineAsync("""{"jsonrpc":"2.0"}""", timeout.Token);
+        var firstBytes = await transport.ReadLineAsync(timeout.Token);
+
+        Assert.Equal("7b 22 6a", firstBytes?.Trim());   // `{"j`, not EF BB BF
+    }
+}

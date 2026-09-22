@@ -9,7 +9,7 @@ The [Agent Client Protocol](https://agentclientprotocol.com) (ACP) standardises 
 ## Transport
 
 - One **child process** per session, started by `ProcessTransport` with the session's working directory (see [how agents are started](../configuration/agent-catalog.md#how-an-agent-process-is-started)).
-- **JSON-RPC 2.0**, one message per line (newline-delimited JSON) on the agent's standard input and output.
+- **JSON-RPC 2.0**, one message per line (newline-delimited JSON) on the agent's standard input and output, encoded as UTF-8 **without a byte-order mark** — a BOM in front of `initialize` is enough for some agents to ignore it.
 - The agent's standard error is drained continuously, so a chatty agent can never block on a full pipe, and logged at `Debug`.
 - Transports implement `IAcpTransport` (`ReadLineAsync` / `WriteLineAsync`); the tests drive the client with a scripted in-memory transport instead of a process.
 
