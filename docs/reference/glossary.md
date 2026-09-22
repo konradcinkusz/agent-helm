@@ -44,7 +44,7 @@ Native session id
 :   The agent's own id for a session (from `session/new`), stored with the snapshot and used by `session/load` to resume.
 
 Path guard
-:   The rule that file requests an agent sends to the Bridge, and the git endpoints, may only touch paths inside the session's working directory.
+:   The rule that file requests an agent sends to the Bridge, and the git endpoints, may only touch paths inside the session's working directory — checked as written and after following symbolic links.
 
 Permission policy
 :   How a session answers permission requests: `ask`, `auto_read` or `yolo`. Policies can only allow automatically. See [Permissions & policies](../guide/permissions.md).

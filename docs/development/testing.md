@@ -35,6 +35,7 @@ A few tests start real processes — `git`, a shell, `script(1)`, the echo agent
 | `SessionTitleTests` | Title validation, publication and persistence in the session. |
 | `SpecExpansionTests` | `${AGENTHELM_DIR}` expansion in commands and arguments. |
 | `ProcessTransportTests` | The bytes the Bridge writes to an agent's standard input: JSON, with no byte-order mark. |
+| `WorkingDirectoryGuardTests` | The path guard against symbolic links: to files, to directories, relative, dangling (for writes) and cyclic links leading out are refused, links staying inside and a working directory reached through a link keep working; the git guard does the same; a failing file request still gets an answer. |
 | `EchoAgentEndToEndTests` | The real echo agent as a child process: the handshake, and a prompt whose permission request is allowed or denied and whose turn then finishes. |
 
 The suite once caught a real bug: the configuration binder silently dropped agents declared without `Args`; `AgentSpec.Args` became an init property with a default as a result.

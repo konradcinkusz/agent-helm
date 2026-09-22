@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using AgentHelm.Bridge.Security;
 
 namespace AgentHelm.Bridge.Agents.Acp;
 
@@ -344,13 +345,22 @@ public sealed class AcpClient : IDisposable
             var response = new JsonObject { ["jsonrpc"] = "2.0", ["id"] = id, ["result"] = result };
             await _transport.WriteLineAsync(response.ToJsonString(), ct);
         }
-        catch (AcpException ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
+            // Every request gets an answer: an agent waiting for one that never
+            // comes hangs its turn. A missing file is "resource not found";
+            // anything else that is not a protocol error is an internal error.
+            var (code, message) = ex switch
+            {
+                AcpException acp => (acp.Code, acp.Message),
+                FileNotFoundException or DirectoryNotFoundException => (-32002, ex.Message),
+                _ => (-32603, ex.Message)
+            };
             var response = new JsonObject
             {
                 ["jsonrpc"] = "2.0",
                 ["id"] = id,
-                ["error"] = new JsonObject { ["code"] = ex.Code, ["message"] = ex.Message }
+                ["error"] = new JsonObject { ["code"] = code, ["message"] = message }
             };
             await _transport.WriteLineAsync(response.ToJsonString(), ct);
         }
@@ -407,16 +417,16 @@ public sealed class AcpClient : IDisposable
         return new JsonObject();
     }
 
-    /// <summary>The agent may only touch files under the session cwd. Non-negotiable.</summary>
+    /// <summary>
+    /// The agent may only touch files under the session cwd — also where the
+    /// path would leave it through a symbolic link. Non-negotiable.
+    /// </summary>
     internal string GuardPath(string? raw)
     {
         if (string.IsNullOrWhiteSpace(raw))
             throw new AcpException(-32602, "path is required");
-        var full = Path.GetFullPath(Path.IsPathRooted(raw) ? raw : Path.Combine(_cwd, raw));
-        var root = _cwd.EndsWith(Path.DirectorySeparatorChar) ? _cwd : _cwd + Path.DirectorySeparatorChar;
-        if (!full.StartsWith(root, StringComparison.Ordinal) && full != _cwd)
-            throw new AcpException(-32602, $"Access outside the session working directory is not allowed: {raw}");
-        return full;
+        return PathGuard.Resolve(_cwd, raw, allowRoot: true)
+            ?? throw new AcpException(-32602, $"Access outside the session working directory is not allowed: {raw}");
     }
 
     private static string Truncate(string s) => s.Length > 200 ? s[..200] + "…" : s;
