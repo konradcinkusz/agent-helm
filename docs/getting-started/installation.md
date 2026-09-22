@@ -49,7 +49,7 @@ The zip contains `bridge/`, `web/` and `echo-agent/` (the published applications
 The launchers also set `COPILOT_OTEL_ENABLED=true` and the OTLP protocol variables, so every agent the Bridge starts inherits them. Without a database the zip runs **memory-only**: sessions work normally but are gone when the Bridge stops. To keep history, point the Bridge at a PostgreSQL database with `ConnectionStrings__helmdb` (see [configuration](../configuration/index.md#bridge-settings)).
 
 > [!WARNING]
-> **Known issue (releases up to v1.0.5):** the launchers start both applications from the zip's top-level folder, so the Bridge does not find its `appsettings.json` (the UI shows *connecting…* and no agents) and the UI does not find its styles. Until a fixed release is out, start the two processes yourself — see [Troubleshooting → Known issues](../project/troubleshooting.md#known-issues).
+> **Releases v1.0.0 to v1.0.5:** their launchers start both applications from the zip's top-level folder, so the Bridge does not find its `appsettings.json` (the UI shows *connecting…* and no agents) and the UI does not find its styles. This is fixed for the next release; with one of these zips, start the two processes yourself — see [Troubleshooting → Known issues](../project/troubleshooting.md#the-release-zip-starts-without-agents-and-without-styles).
 
 ## From source with Aspire
 

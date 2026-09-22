@@ -6,11 +6,11 @@ description: Known issues, fixes for common problems with installation, agents, 
 
 ## Known issues
 
-Defects confirmed in the current code, with workarounds where one exists. Each entry should be removed by the change that fixes it.
+Defects confirmed in the current code or in the latest release, with workarounds where one exists. Each entry should be removed by the change that fixes it — or, for released artifacts, once a release with the fix is out.
 
 ### The release zip starts without agents and without styles
 
-**Affects:** the `run.sh` / `run.ps1` launchers in releases up to v1.0.5.
+**Affects:** the `run.sh` / `run.ps1` launchers in releases v1.0.0 to v1.0.5. The launchers on `master` are fixed, and CI now starts the release layout on every pull request; the next release ships the fix.
 
 **Symptoms:** the UI is unstyled and says *connecting…*; the new-session form has no agents; the Bridge's startup banner shows an empty `Agents :` line and the Web UI logs *The WebRootPath was not found*.
 
