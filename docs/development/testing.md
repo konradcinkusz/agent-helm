@@ -14,7 +14,7 @@ dotnet test --filter "FullyQualifiedName~PolicyEngine"  # one area
 dotnet test --logger "console;verbosity=normal"         # what CI prints
 ```
 
-A few tests start real processes — `git`, a shell, `script(1)` — so they need `git` and a POSIX shell; the PTY test only runs its PTY assertions where `script` is available.
+A few tests start real processes — `git`, a shell, `script(1)`, the echo agent through `dotnet` — so they need `git`, a POSIX shell and `dotnet` on the `PATH`; the PTY test only runs its PTY assertions where `script` is available. The test project references the echo agent, so building the tests builds it too.
 
 ## What the suite covers
 
@@ -34,6 +34,8 @@ A few tests start real processes — `git`, a shell, `script(1)` — so they nee
 | `ScopeIntegrationTests` | Tolerant parsing of CopilotScope's JSON shapes; time-window correlation. |
 | `SessionTitleTests` | Title validation, publication and persistence in the session. |
 | `SpecExpansionTests` | `${AGENTHELM_DIR}` expansion in commands and arguments. |
+| `ProcessTransportTests` | The bytes the Bridge writes to an agent's standard input: JSON, with no byte-order mark. |
+| `EchoAgentEndToEndTests` | The real echo agent as a child process: the handshake, and a prompt whose permission request is allowed or denied and whose turn then finishes. |
 
 The suite once caught a real bug: the configuration binder silently dropped agents declared without `Args`; `AgentSpec.Args` became an init property with a default as a result.
 

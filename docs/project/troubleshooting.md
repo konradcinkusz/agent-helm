@@ -36,22 +36,6 @@ Defects confirmed in the current code, with workarounds where one exists. Each e
 
 This skips the OpenTelemetry variables the launchers export; set them yourself if you use [CopilotScope](../guide/copilotscope.md).
 
-### Echo sessions stay on "Starting…"
-
-**Symptoms:** starting a session with the echo agent never finishes; the form stays on *Starting…*.
-
-**Cause:** the Bridge writes to an agent's standard input with an encoding that emits a UTF-8 byte-order mark, so the first JSON-RPC message (`initialize`) begins with the bytes `EF BB BF`. The echo agent cannot parse that line and ignores it, and the Bridge waits for the reply indefinitely. Observed on Linux with the .NET 8 runtime; agents that tolerate a leading byte-order mark are not affected.
-
-**Workaround:** none without a code change; restart the Bridge to clear the stuck start. The fix is to give `ProcessTransport` a UTF-8 encoding without a byte-order mark (`new UTF8Encoding(false)`).
-
-### The echo agent's turn never ends after a permission decision
-
-**Symptoms:** after you **Allow** or **Reject** the echo agent's `write_demo_file` request, the decision is recorded but no reply follows; the session stays `running`, **Send** stays disabled and **Stop** has no effect.
-
-**Cause:** the echo agent reads messages in a single loop and waits for the permission answer *inside* that loop — so the answer, which only that loop could read, is never read.
-
-**Workaround:** delete the session and start a new one. Everything up to and including the permission decision works as documented.
-
 ### Minor
 
 - After you pick **YOLO** and then **Cancel** the confirmation, the policy drop-down keeps showing *YOLO*. The policy has not changed — the session card in the rail shows the real one (`ask`).
@@ -111,7 +95,7 @@ The operating system could not start the command — usually because it is not o
 
 ### A session stays on "Starting…"
 
-The agent process started but never answered the ACP handshake, and the Bridge does not time out. Common causes: the arguments do not switch the CLI into ACP mode (check `gemini --help`, for example), the CLI is waiting for an interactive login, or — for the echo agent — the [known issue](#echo-sessions-stay-on-starting) above. Enable the agent's standard-error log with `Logging__LogLevel__agent=Debug` and restart the Bridge to see what the agent says.
+The agent process started but never answered the ACP handshake, and the Bridge does not time out. Common causes: the arguments do not switch the CLI into ACP mode (check `gemini --help`, for example), or the CLI is waiting for an interactive login. Enable the agent's standard-error log with `Logging__LogLevel__agent=Debug` and restart the Bridge to see what the agent says.
 
 ### "Agent error: …" or "Agent connection closed."
 

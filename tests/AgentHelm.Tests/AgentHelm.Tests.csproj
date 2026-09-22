@@ -12,5 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AgentHelm.Bridge\AgentHelm.Bridge.csproj" />
+    <!-- Built and copied next to the tests so EchoAgentEndToEndTests can run the
+         real demo agent as a child process. -->
+    <ProjectReference Include="..\..\tools\AgentHelm.EchoAgent\AgentHelm.EchoAgent.csproj" />
   </ItemGroup>
 </Project>

@@ -6,9 +6,6 @@ description: Run a first AgentHelm session with the built-in echo agent — prom
 
 AgentHelm ships with a built-in **echo agent**: a tiny program that speaks the Agent Client Protocol just like a real agent. It needs nothing installed and lets you see the whole loop — prompt, streamed reply, permission request, audit trail — in about a minute.
 
-> [!WARNING]
-> Two [known issues](../project/troubleshooting.md#known-issues) in the current code affect exactly this walkthrough: the echo session can hang at *Starting…*, and after you allow the echo agent's tool call its turn does not finish. The steps below describe the intended behaviour.
-
 ## 1. Start a session
 
 1. Open the UI (see [Installation](installation.md) for the URL of your setup).

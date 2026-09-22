@@ -32,7 +32,10 @@ public sealed class ProcessTransport : IAcpTransport
             RedirectStandardError = true,
             UseShellExecute = false,
             StandardOutputEncoding = System.Text.Encoding.UTF8,
-            StandardInputEncoding = System.Text.Encoding.UTF8,
+            // No byte-order mark: Encoding.UTF8 would prefix the first message
+            // (initialize) with EF BB BF, and an agent whose JSON parser rejects
+            // that line never answers the handshake.
+            StandardInputEncoding = new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
         };
         foreach (var a in args) psi.ArgumentList.Add(a);
         foreach (var (k, v) in environment ?? new Dictionary<string, string>()) psi.Environment[k] = v;
