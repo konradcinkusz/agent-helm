@@ -19,3 +19,20 @@ jobs:
         run: dotnet build AgentHelm.sln -c Release
       - name: Test
         run: dotnet test tests/AgentHelm.Tests -c Release --no-build --logger "console;verbosity=normal"
+
+  # Builds the release zip's layout with the script release.yml uses, starts it
+  # with its own launcher the way a user does, and checks that the Bridge has
+  # its agents, the UI has its assets and the echo agent finishes a turn — the
+  # things a broken launcher loses without any error.
+  release-layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 8.0.x
+      - name: Build the release layout
+        run: bash scripts/build-release-layout.sh dist
+      - name: Smoke-test the launcher
+        run: bash scripts/smoke-release-layout.sh dist

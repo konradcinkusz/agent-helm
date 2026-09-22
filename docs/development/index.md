@@ -50,7 +50,7 @@ src/
     wwwroot/                app.css, terminal.js (xterm.js host, folder picker)
 tests/AgentHelm.Tests/      xUnit tests (CoreTests.cs)
 tools/AgentHelm.EchoAgent/  the built-in demo ACP agent
-scripts/                    run.sh / run.ps1 — release launchers
+scripts/                    run.sh / run.ps1 — release launchers; build- and smoke-release-layout.sh
 docs/                       this wiki (MkDocs) and working notes
 Dockerfile, Dockerfile.web  container images; docker-compose*.yml
 ```

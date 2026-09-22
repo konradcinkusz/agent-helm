@@ -23,24 +23,13 @@ jobs:
 
       # Portable (framework-dependent) publish: ONE zip for every OS with the
       # .NET 8 / ASP.NET Core runtime. Agents need their own runtimes anyway,
-      # so requiring dotnet is not an extra burden for this audience.
-      - name: Publish
-        run: |
-          dotnet publish src/AgentHelm.Bridge -c Release -o dist/bridge
-          dotnet publish src/AgentHelm.Web -c Release -o dist/web
-          dotnet publish tools/AgentHelm.EchoAgent -c Release -o dist/echo-agent
-
-      - name: Point the echo agent at the published layout
-        run: |
-          jq '(.AgentHelm.Agents[] | select(.Id=="echo") | .Args) = ["${AGENTHELM_DIR}../echo-agent/AgentHelm.EchoAgent.dll"]' \
-            dist/bridge/appsettings.json > /tmp/appsettings.json
-          mv /tmp/appsettings.json dist/bridge/appsettings.json
+      # so requiring dotnet is not an extra burden for this audience. The
+      # layout comes from the same script ci.yml smoke-tests on every PR.
+      - name: Build the release layout
+        run: bash scripts/build-release-layout.sh dist
 
       - name: Assemble zip
-        run: |
-          cp scripts/run.sh scripts/run.ps1 README.md LICENSE CONTRIBUTING.md docker-compose.ghcr.yml dist/
-          chmod +x dist/run.sh
-          cd dist && zip -rq ../agenthelm-${GITHUB_REF_NAME}.zip .
+        run: cd dist && zip -rq ../agenthelm-${GITHUB_REF_NAME}.zip .
 
       - name: GitHub Release
         uses: softprops/action-gh-release@v3
