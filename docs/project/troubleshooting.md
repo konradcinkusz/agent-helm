@@ -116,7 +116,7 @@ The working directory is not inside a git work tree, or `git` is not on the Brid
 
 ### Full-screen programs, Ctrl+C or colours in the Terminal
 
-Input is sent a line at a time, so full-screen programs and ++ctrl+c++ are not available, and on Windows (pipe mode) many tools disable colours. See [Terminal](../guide/terminal.md).
+Input is sent a line at a time, so full-screen programs and ++ctrl+c++ are not available, and in pipe mode (Windows, macOS) many tools disable colours. See [Terminal](../guide/terminal.md).
 
 ### "CopilotScope is not reachable"
 
@@ -148,7 +148,7 @@ AgentHelm itself only talks to the agents it starts, to PostgreSQL if configured
 Any agent that speaks ACP over stdio. GitHub Copilot CLI, Claude Code (through Zed's adapter) and Gemini CLI are preconfigured.
 
 **Which operating systems?**
-Windows, Linux and macOS — anywhere .NET 8 runs. The terminal has a real PTY on Linux and is a pipe on Windows; it has not been verified on macOS.
+Windows, Linux and macOS — anywhere .NET 8 runs. The terminal has a real PTY on Linux and is a pipe on Windows and macOS.
 
 **Can a team share one AgentHelm?**
 Not safely. AgentHelm is a single-user tool: it has no user accounts, only a shared token, and every agent runs as the user running the Bridge.

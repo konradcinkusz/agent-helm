@@ -950,8 +950,7 @@ public class PtyTerminalTests
     [Fact]
     public async Task PtyModeEchoRoundtripWhenScriptAvailable()
     {
-        if (OperatingSystem.IsWindows()) return;
-        if (!File.Exists("/usr/bin/script") && !File.Exists("/bin/script")) return;
+        if (TerminalSession.UtilLinuxScript.Value is null) return;   // no util-linux script here
 
         using var terminal = new TerminalSession(Path.GetTempPath());
         Assert.True(terminal.IsPty);
@@ -1232,5 +1231,30 @@ public class WorkingDirectoryGuardTests
         Assert.Contains("escapes",
             Record.Exception(() => GitService.GuardPath(cwd, "leak.txt"))!.Message);
         GitService.GuardPath(cwd, "alias.txt");   // a link that stays inside is fine
+    }
+}
+
+public class ScriptDetectionTests
+{
+    [Theory]
+    [InlineData("script from util-linux 2.39.3", true)]
+    [InlineData("usage: script [-adeFkpqr] [-t time] [file [command ...]]", false)]   // macOS / BSD
+    [InlineData("script: unrecognized option '--version'\nBusyBox v1.36.1 multi-call binary.", false)]
+    public void OnlyUtilLinuxScriptIsTrustedForPtyMode(string versionOutput, bool trusted) =>
+        Assert.Equal(trusted, TerminalSession.IsUtilLinux(versionOutput));
+
+    [Fact]
+    public void ThisMachinesScriptIsDetectedWhenItIsUtilLinux()
+    {
+        if (OperatingSystem.IsWindows()) { Assert.Null(TerminalSession.UtilLinuxScript.Value); return; }
+        var candidate = new[] { "/usr/bin/script", "/bin/script" }.FirstOrDefault(File.Exists);
+        if (candidate is null) { Assert.Null(TerminalSession.UtilLinuxScript.Value); return; }
+
+        var probe = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(candidate, "--version")
+            { RedirectStandardOutput = true, RedirectStandardError = true })!;
+        var output = probe.StandardOutput.ReadToEnd() + probe.StandardError.ReadToEnd();
+        probe.WaitForExit();
+
+        Assert.Equal(TerminalSession.IsUtilLinux(output) ? candidate : null, TerminalSession.UtilLinuxScript.Value);
     }
 }

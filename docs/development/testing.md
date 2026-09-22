@@ -29,6 +29,7 @@ A few tests start real processes — `git`, a shell, `script(1)`, the echo agent
 | `HelmSessionPolicyTests` | YOLO auto-allowing without a pending request but with an audit entry; `ask` still surfacing requests; policy validation and de-duplication. |
 | `GitServiceTests` | Porcelain parsing including rename tokens, diff counting, the path guard, reject semantics (checkout vs delete), and an end-to-end run against a real git repository. |
 | `TerminalServiceTests`, `PtyTerminalTests` | Real shell round-trips in pipe and PTY mode. |
+| `ScriptDetectionTests` | PTY mode only trusts a `script` that identifies itself as util-linux's — not macOS's or BusyBox's. |
 | `AgentFactoryTests` | Clear errors for unknown adapter types and for `copilot-sdk` without the build flag. |
 | `HandoffTests` | Handoff context attribution and front-trimming of long transcripts. |
 | `ScopeIntegrationTests` | Tolerant parsing of CopilotScope's JSON shapes; time-window correlation. |
