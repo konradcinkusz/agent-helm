@@ -67,7 +67,7 @@ They also export `COPILOT_OTEL_ENABLED=true`, `COPILOT_OTEL_EXPORTER_TYPE=otlp-h
 
 | Image | Built-in settings |
 |---|---|
-| `agenthelm-bridge` ([`Dockerfile`](https://github.com/konradcinkusz/agent-helm/blob/master/Dockerfile)) | `AgentHelm__Urls=http://0.0.0.0:5199`, `ASPNETCORE_ENVIRONMENT=Production`; the echo agent's path is rewritten to `/app/echo-agent/AgentHelm.EchoAgent.dll`. |
+| `agenthelm-bridge` ([`Dockerfile`](https://github.com/konradcinkusz/agent-helm/blob/master/Dockerfile)) | `AgentHelm__Urls=http://0.0.0.0:5199`, `ASPNETCORE_ENVIRONMENT=Production`; the echo agent's path is rewritten to `/app/echo-agent/AgentHelm.EchoAgent.dll`. A health check calls `/api/health` every 30 seconds and sends `AgentHelm__ApiToken` as `x-helm-token` when it is set. |
 | `agenthelm-web` ([`Dockerfile.web`](https://github.com/konradcinkusz/agent-helm/blob/master/Dockerfile.web)) | `ASPNETCORE_URLS=http://0.0.0.0:8080`, `ASPNETCORE_ENVIRONMENT=Production`. |
 
 The compose files add `ConnectionStrings__helmdb`, `AgentHelm__ApiToken` and, for the UI, `Bridge__BaseUrl=http://bridge:5199` and `Bridge__ApiToken`. PostgreSQL runs as `postgres:16` with database `helmdb`, user `helm` and the password `helm-dev`, and is not published to the host.
