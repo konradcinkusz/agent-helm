@@ -63,7 +63,7 @@ When `session/load` replays a stored conversation, the replay arrives as ordinar
 | `fs/write_text_file` | Writes a file inside the working directory, creating parent directories. |
 | anything else | Error `-32601` *Method not found*, so a well-behaved agent can carry on. |
 
-Each request is handled on its own task, so a permission request waiting for you does not stop the client from reading other messages.
+Each request is handled on its own task, so a permission request waiting for you does not stop the client from reading other messages. Every request gets an answer: a refused path is `-32602`, a missing file `-32002`, and any other failure — a denied write, say — `-32603` with the reason, so an agent is never left waiting.
 
 ## Permission outcomes
 
@@ -82,9 +82,10 @@ An allow decision returns the chosen option. A denial returns the first reject-t
 
 1. the path is required;
 2. a relative path is combined with the session's working directory, and the result is normalised (`Path.GetFullPath`);
-3. anything that is not the working directory itself or below it is refused with JSON-RPC error `-32602` *Access outside the session working directory is not allowed*.
+3. anything that is not the working directory itself or below it is refused with JSON-RPC error `-32602` *Access outside the session working directory is not allowed*;
+4. the same check is repeated on the **real** location: the path and the working directory are resolved the way the operating system will open them, following every symbolic link — file or directory, relative or absolute, chained — so a link inside the directory that points outside it is refused too. A link cycle is refused as well.
 
-The comparison is ordinal (case-sensitive), so on case-insensitive file systems a differently-cased spelling of an allowed path is refused rather than allowed. The git endpoints use the same rule (`GitService.GuardPath`). The guard covers requests an agent sends *to the Bridge*; what an agent's own tools do inside its process is governed by the permission gateway — see the [security model](../security/index.md).
+The comparison is ordinal (case-sensitive), so on case-insensitive file systems a differently-cased spelling of an allowed path is refused rather than allowed. The git endpoints use the same rule (`GitService.GuardPath`); both share `PathGuard` in [`Security/PathGuard.cs`](https://github.com/konradcinkusz/agent-helm/blob/master/src/AgentHelm.Bridge/Security/PathGuard.cs). The guard covers requests an agent sends *to the Bridge*; what an agent's own tools do inside its process is governed by the permission gateway — see the [security model](../security/index.md).
 
 ## Errors and robustness
 
@@ -93,6 +94,7 @@ The comparison is ordinal (case-sensitive), so on case-insensitive file systems 
 | A line on stdout that is not JSON | ignored (logged at `Debug`) — some agents log to stdout |
 | A JSON-RPC error response | raised as `AcpException(code, message)`; during a prompt it becomes an *Agent error: …* transcript entry |
 | The agent exits | every outstanding request fails with *Agent connection closed.* |
+| A file request fails (missing file, denied write) | answered with a JSON-RPC error rather than left unanswered |
 | Unknown notification methods | ignored |
 | Unknown update kinds | forwarded, never fatal |
 

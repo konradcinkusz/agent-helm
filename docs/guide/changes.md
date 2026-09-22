@@ -49,7 +49,7 @@ Whether a file is tracked or untracked is worked out again by the Bridge at the 
 
 ## Guard rails
 
-- Every path is resolved against the session's working directory, and anything that points outside it (for example `../../etc/passwd`) is refused with *Path escapes the session working directory*.
+- Every path is resolved against the session's working directory, and anything that points outside it — `../../etc/passwd`, or a symbolic link whose target lies outside — is refused with *Path escapes the session working directory*.
 - Accept and reject are audited like permission decisions, so the transcript shows what was kept and what was undone.
 - The tab runs the ordinary `git` executable: repository hooks, `.gitignore` and your git configuration apply as usual.
 

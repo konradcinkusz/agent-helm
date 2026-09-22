@@ -41,6 +41,7 @@ src/
     Integrations/           ScopeClient — CopilotScope
     Persistence/            SessionRepository, PersistenceWriter — PostgreSQL snapshots
     Providers/              ProviderAccountService — agent CLI accounts, models, login
+    Security/               PathGuard — the working-directory rule, symbolic links included
     Sessions/               SessionManager, HelmSession, AcpAdapter, PermissionPolicy
     Workbench/              GitService, TerminalService
     Program.cs              endpoints, token middleware, DI
@@ -76,6 +77,7 @@ Some files carry more weight than their size suggests. A change to one of them i
 | `src/AgentHelm.Bridge/Sessions/PermissionPolicy.cs` | The no-auto-reject invariant and the policy taxonomy. |
 | `src/AgentHelm.Bridge/Agents/Acp/AcpClient.cs` | The working-directory path guard. |
 | `src/AgentHelm.Bridge/Workbench/GitService.cs` | The same guard for git, and server-side tracked/untracked decisions. |
+| `src/AgentHelm.Bridge/Security/PathGuard.cs` | The guard both of them share, including symbolic-link resolution. |
 
 ## Contributing a change
 

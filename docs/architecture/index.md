@@ -54,6 +54,7 @@ flowchart TB
 | `AcpClient`, `ProcessTransport` | `Agents/Acp/AcpClient.cs` | The ACP client and the child-process transport, including the working-directory path guard. See [Agent Client Protocol](acp.md). |
 | `CopilotSdkAdapter` | `Agents/CopilotSdk/CopilotSdkAdapter.cs` | Skeleton of a GitHub Copilot SDK adapter, compiled only with `COPILOT_SDK`. |
 | `PolicyEngine` | `Sessions/PermissionPolicy.cs` | Pure function deciding permission requests under `ask` / `auto_read` / `yolo`. See [Permissions & policies](../guide/permissions.md). |
+| `PathGuard` | `Security/PathGuard.cs` | The working-directory rule shared by the ACP file requests and the git endpoints — checked as written and after following symbolic links. |
 | `GitService` | `Workbench/GitService.cs` | Changes, diffs, accept and reject via the `git` CLI, with the same path guard. |
 | `TerminalManager` | `Workbench/TerminalService.cs` | One shell per session, PTY through `script(1)` where available. |
 | `ScopeClient` | `Integrations/ScopeClient.cs` | CopilotScope API client and time-window correlation. |

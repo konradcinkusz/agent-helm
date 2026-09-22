@@ -30,7 +30,7 @@ Details: [Permissions & policies](../guide/permissions.md).
 
 ### The working-directory path guard
 
-When an agent asks the Bridge to read or write a file (ACP `fs/read_text_file`, `fs/write_text_file`), the path is resolved against the session's working directory and refused if it falls outside. The Changes tab's git actions apply the same rule, and decide between *revert* and *delete* on the server, never from the request.
+When an agent asks the Bridge to read or write a file (ACP `fs/read_text_file`, `fs/write_text_file`), the path is resolved against the session's working directory and refused if it falls outside — checked both as written and after following symbolic links, so a link inside the directory cannot lead out of it. The Changes tab's git actions apply the same rule, and decide between *revert* and *delete* on the server, never from the request.
 
 ### Where the guard does not reach
 

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text;
+using AgentHelm.Bridge.Security;
 
 namespace AgentHelm.Bridge.Workbench;
 
@@ -169,14 +170,10 @@ public sealed class GitService(IGitRunner runner)
         return result.ExitCode == 0 && result.StdOut.StartsWith("??", StringComparison.Ordinal);
     }
 
-    /// <summary>Same invariant as the ACP fs guard: nothing outside the session cwd.</summary>
+    /// <summary>Same invariant as the ACP fs guard: nothing outside the session cwd, links included.</summary>
     internal static void GuardPath(string cwd, string relative)
     {
-        var root = System.IO.Path.GetFullPath(cwd);
-        var full = System.IO.Path.GetFullPath(System.IO.Path.Combine(root, relative));
-        var rootWithSep = root.EndsWith(System.IO.Path.DirectorySeparatorChar)
-            ? root : root + System.IO.Path.DirectorySeparatorChar;
-        if (!full.StartsWith(rootWithSep, StringComparison.Ordinal))
+        if (PathGuard.Resolve(cwd, relative, allowRoot: false) is null)
             throw new ArgumentException($"Path escapes the session working directory: {relative}");
     }
 }

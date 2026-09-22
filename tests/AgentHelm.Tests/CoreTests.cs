@@ -1085,3 +1085,152 @@ public class ProcessTransportTests
         Assert.Equal("7b 22 6a", firstBytes?.Trim());   // `{"j`, not EF BB BF
     }
 }
+
+/// <summary>
+/// The working-directory guard against paths that only leave the directory
+/// once the operating system follows a symbolic link, plus the rule that every
+/// file request an agent makes gets an answer.
+/// </summary>
+public class WorkingDirectoryGuardTests
+{
+    private static (string Cwd, string Outside) Dirs() =>
+        (Directory.CreateTempSubdirectory("helm-cwd-").FullName,
+         Directory.CreateTempSubdirectory("helm-outside-").FullName);
+
+    private static async Task<JsonNode> FsRequestAsync(string cwd, string method, JsonObject params_)
+    {
+        var transport = new FakeTransport();
+        using var client = new AcpClient(transport, cwd, NullLogger.Instance);
+        client.Start();
+        params_["sessionId"] = "s-1";
+        transport.AgentSays(new JsonObject
+        {
+            ["jsonrpc"] = "2.0", ["id"] = 77, ["method"] = method, ["params"] = params_
+        });
+        for (var i = 0; i < 100; i++)
+        {
+            if (transport.Sent.FirstOrDefault(n => n["id"]?.GetValue<long>() == 77) is { } response)
+                return response;
+            await Task.Delay(20);
+        }
+        throw new TimeoutException("The client never answered the request.");
+    }
+
+    private static Task<JsonNode> ReadAsync(string cwd, string path) =>
+        FsRequestAsync(cwd, "fs/read_text_file", new JsonObject { ["path"] = path });
+
+    private static void AssertRefused(JsonNode response)
+    {
+        Assert.Null(response["result"]);
+        Assert.Equal(-32602, response["error"]?["code"]?.GetValue<int>());
+    }
+
+    [Fact]
+    public async Task ReadThroughALinkToAFileOutsideIsRefused()
+    {
+        if (OperatingSystem.IsWindows()) return;   // creating links needs privileges there
+        var (cwd, outside) = Dirs();
+        File.WriteAllText(Path.Combine(outside, "secret.txt"), "top secret");
+        File.CreateSymbolicLink(Path.Combine(cwd, "leak.txt"), Path.Combine(outside, "secret.txt"));
+
+        AssertRefused(await ReadAsync(cwd, "leak.txt"));
+    }
+
+    [Fact]
+    public async Task ReadThroughALinkedDirectoryOutsideIsRefused()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        var (cwd, outside) = Dirs();
+        File.WriteAllText(Path.Combine(outside, "secret.txt"), "top secret");
+        Directory.CreateSymbolicLink(Path.Combine(cwd, "docs"), outside);
+
+        AssertRefused(await ReadAsync(cwd, "docs/secret.txt"));
+    }
+
+    [Fact]
+    public async Task ReadThroughARelativeLinkOutsideIsRefused()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        var (cwd, outside) = Dirs();
+        File.WriteAllText(Path.Combine(outside, "secret.txt"), "top secret");
+        File.CreateSymbolicLink(Path.Combine(cwd, "up.txt"),
+            Path.Combine("..", Path.GetFileName(outside), "secret.txt"));
+
+        AssertRefused(await ReadAsync(cwd, "up.txt"));
+    }
+
+    [Fact]
+    public async Task WriteThroughADanglingLinkOutsideIsRefusedAndCreatesNothing()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        var (cwd, outside) = Dirs();
+        var target = Path.Combine(outside, "created.txt");
+        File.CreateSymbolicLink(Path.Combine(cwd, "new.txt"), target);
+
+        AssertRefused(await FsRequestAsync(cwd, "fs/write_text_file",
+            new JsonObject { ["path"] = "new.txt", ["content"] = "planted" }));
+        Assert.False(File.Exists(target));
+    }
+
+    [Fact]
+    public async Task LinkCyclesAreRefused()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        var (cwd, _) = Dirs();
+        File.CreateSymbolicLink(Path.Combine(cwd, "a"), Path.Combine(cwd, "b"));
+        File.CreateSymbolicLink(Path.Combine(cwd, "b"), Path.Combine(cwd, "a"));
+
+        AssertRefused(await ReadAsync(cwd, "a"));
+    }
+
+    [Fact]
+    public async Task LinksThatStayInsideAreFollowed()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        var (cwd, _) = Dirs();
+        File.WriteAllText(Path.Combine(cwd, "real.txt"), "inside");
+        File.CreateSymbolicLink(Path.Combine(cwd, "alias.txt"), "real.txt");
+
+        var response = await ReadAsync(cwd, "alias.txt");
+        Assert.Equal("inside", response["result"]?["content"]?.GetValue<string>());
+    }
+
+    [Fact]
+    public async Task AWorkingDirectoryReachedThroughALinkStillWorks()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        var (real, outside) = Dirs();
+        File.WriteAllText(Path.Combine(real, "file.txt"), "hello");
+        var viaLink = Path.Combine(outside, "repo-link");
+        Directory.CreateSymbolicLink(viaLink, real);
+
+        var response = await ReadAsync(viaLink, "file.txt");
+        Assert.Equal("hello", response["result"]?["content"]?.GetValue<string>());
+    }
+
+    [Fact]
+    public async Task ReadingAMissingFileIsAnsweredWithAnError()
+    {
+        var (cwd, _) = Dirs();
+
+        var response = await ReadAsync(cwd, "missing.txt");
+
+        Assert.Null(response["result"]);
+        Assert.NotNull(response["error"]?["message"]);
+    }
+
+    [Fact]
+    public void GitGuardRefusesLinksLeavingTheWorkingDirectory()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        var (cwd, outside) = Dirs();
+        File.WriteAllText(Path.Combine(outside, "secret.txt"), "top secret");
+        File.WriteAllText(Path.Combine(cwd, "real.txt"), "inside");
+        File.CreateSymbolicLink(Path.Combine(cwd, "leak.txt"), Path.Combine(outside, "secret.txt"));
+        File.CreateSymbolicLink(Path.Combine(cwd, "alias.txt"), "real.txt");
+
+        Assert.Contains("escapes",
+            Record.Exception(() => GitService.GuardPath(cwd, "leak.txt"))!.Message);
+        GitService.GuardPath(cwd, "alias.txt");   // a link that stays inside is fine
+    }
+}
