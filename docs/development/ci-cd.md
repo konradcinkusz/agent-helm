@@ -13,7 +13,7 @@ All automation is GitHub Actions in [`.github/workflows`](https://github.com/kon
 | **ci** | `ci.yml` | every pull request; pushes to `master` | Builds the whole solution in Release — the AppHost included, which doubles as the regression check for the Aspire SDK setup — and runs the tests. A second job, `release-layout`, builds the release zip's layout and smoke-tests it with its own launcher: the Bridge must have its agents, the UI its assets, and the echo agent must finish a turn. |
 | **GitHub Pages** | `pages.yml` | pull requests and pushes to `master` that touch `docs/**`, `mkdocs.yml` or the workflow; manual | Builds this wiki with `mkdocs build --strict`; on `master` it deploys the site to GitHub Pages. |
 | **release** | `release.yml` | tags `v*` | Builds and tests, builds the release layout with `scripts/build-release-layout.sh` (Bridge, Web and echo agent published, the echo agent's path rewritten for the layout, the launchers added), zips it, and creates a GitHub Release with generated notes. |
-| **build containers** | `build-containers.yml` | tags `v*`; manual | Builds and pushes `ghcr.io/<owner>/agenthelm-bridge` and `…/agenthelm-web`, tagged with the version, `major.minor` and `latest`. |
+| **build containers** | `build-containers.yml` | tags `v*`; pull requests that touch the Dockerfiles, `.dockerignore`, `nuget.config` or the workflow; manual | Builds and pushes `ghcr.io/<owner>/agenthelm-bridge` and `…/agenthelm-web`, tagged with the version, `major.minor` and `latest`. On a pull request it builds both images without pushing, starts the Bridge image with an API token and waits for it to report healthy. |
 
 Workflow files are a [protected path](index.md#protected-paths): a change to them is not merged past a red run.
 
