@@ -36,12 +36,6 @@ Defects confirmed in the current code or in the latest release, with workarounds
 
 This skips the OpenTelemetry variables the launchers export; set them yourself if you use [CopilotScope](../guide/copilotscope.md).
 
-### Minor
-
-- After you pick **YOLO** and then **Cancel** the confirmation, the policy drop-down keeps showing *YOLO*. The policy has not changed — the session card in the rail shows the real one (`ask`).
-- The hint under the terminal always says *shell pipe (no PTY)*, also when the terminal runs in PTY mode — see [Terminal](../guide/terminal.md#pty-mode-and-pipe-mode).
-- A prompt whose attachments exceed the Bridge's 8,000,000-character cap is refused (HTTP 413) without a message in the UI — see [Attachments](../guide/sessions.md#attachments).
-
 ## Installation and startup
 
 ### "Aspire Workload has been deprecated"

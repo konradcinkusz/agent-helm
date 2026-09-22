@@ -121,8 +121,23 @@ public sealed class BridgeClient
         return (null, string.IsNullOrWhiteSpace(body) ? response.StatusCode.ToString() : body);
     }
 
-    public Task PromptAsync(string id, string text, List<AttachmentDto>? attachments = null, CancellationToken ct = default) =>
-        _http.PostAsJsonAsync($"/api/sessions/{id}/prompt", new { text, attachments }, Json, ct);
+    /// <summary>Sends a prompt. Null when the Bridge accepted it, otherwise why it did not.</summary>
+    public async Task<string?> PromptAsync(string id, string text, List<AttachmentDto>? attachments = null, CancellationToken ct = default)
+    {
+        try
+        {
+            using var response = await _http.PostAsJsonAsync($"/api/sessions/{id}/prompt", new { text, attachments }, Json, ct);
+            if (response.IsSuccessStatusCode) return null;
+            if (response.StatusCode == System.Net.HttpStatusCode.RequestEntityTooLarge)
+                return "The attachments are too large for one prompt. Remove some and send again.";
+            var body = await response.Content.ReadAsStringAsync(ct);
+            return string.IsNullOrWhiteSpace(body) ? $"The Bridge refused the prompt ({(int)response.StatusCode})." : body;
+        }
+        catch (HttpRequestException ex)
+        {
+            return $"Could not reach the Bridge: {ex.Message}";
+        }
+    }
 
     // ------------------------------------------------------------- M2: git
     public async Task<GitChangesDto> GetGitChangesAsync(string id, CancellationToken ct = default)
