@@ -1,0 +1,162 @@
+# Documentation wiki for AgentHelm, published to GitHub Pages by
+# .github/workflows/pages.yml. Pages live in docs/ as Markdown; the toolchain
+# is pinned in docs/requirements.txt. Preview locally with `mkdocs serve`
+# (see docs/development/documentation.md).
+site_name: AgentHelm
+site_description: >-
+  Documentation for AgentHelm, a web cockpit for AI coding agents: drive GitHub
+  Copilot CLI, Claude Code, Gemini CLI and any Agent Client Protocol agent with
+  explicit tool permissions and an audit trail.
+site_url: https://konradcinkusz.github.io/agent-helm/
+repo_url: https://github.com/konradcinkusz/agent-helm
+repo_name: konradcinkusz/agent-helm
+edit_uri: edit/master/docs/
+copyright: AgentHelm is released under the MIT License.
+
+# Working notes that live next to the wiki but are not part of it.
+exclude_docs: |
+  requirements.txt
+  ANALYSIS.md
+  ANNOUNCE-POST.md
+  RELEASE-CHECKLIST.md
+
+theme:
+  name: material
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  font: false
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  features:
+    - content.action.edit
+    - content.action.view
+    - content.code.copy
+    - content.tooltips
+    - navigation.footer
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.path
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+
+plugins:
+  - search
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - github-callouts
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+extra_css:
+  - assets/extra.css
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/konradcinkusz/agent-helm
+      name: AgentHelm on GitHub
+
+# `mkdocs build --strict` turns every warning into a failure, so a broken
+# link, a missing anchor or a page left out of the nav fails the build.
+validation:
+  nav:
+    omitted_files: warn
+    not_found: warn
+    absolute_links: warn
+  links:
+    not_found: warn
+    absolute_links: warn
+    unrecognized_links: warn
+    anchors: warn
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - getting-started/index.md
+      - Installation: getting-started/installation.md
+      - Your first session: getting-started/first-session.md
+      - Tutorial: getting-started/tutorial.md
+      - Connecting agents: getting-started/agents.md
+  - User guide:
+      - guide/index.md
+      - Sessions & chat: guide/sessions.md
+      - Permissions & policies: guide/permissions.md
+      - Reviewing changes: guide/changes.md
+      - Terminal: guide/terminal.md
+      - Agent handoff: guide/handoff.md
+      - History & resume: guide/history.md
+      - CopilotScope integration: guide/copilotscope.md
+      - Provider accounts: guide/providers.md
+  - Configuration:
+      - configuration/index.md
+      - Agent catalog: configuration/agent-catalog.md
+      - Deployment & topology: configuration/deployment.md
+  - Architecture:
+      - architecture/index.md
+      - Agent Client Protocol: architecture/acp.md
+      - Agent adapters: architecture/adapters.md
+      - Sessions & events: architecture/sessions.md
+      - Persistence: architecture/persistence.md
+      - Design decisions: architecture/decisions.md
+  - Reference:
+      - Bridge HTTP API: reference/http-api.md
+      - Events & transcript: reference/events.md
+      - Glossary: reference/glossary.md
+  - Security: security/index.md
+  - Development:
+      - development/index.md
+      - Testing: development/testing.md
+      - CI/CD & releases: development/ci-cd.md
+      - Editing the docs: development/documentation.md
+  - Project:
+      - Roadmap: project/roadmap.md
+      - Troubleshooting & FAQ: project/troubleshooting.md
+      - Background & vision: project/background.md

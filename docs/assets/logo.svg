@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="AgentHelm logo">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f1923"/>
+      <stop offset="100%" stop-color="#1a2d3f"/>
+    </linearGradient>
+    <linearGradient id="helm" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="50" fill="url(#bg)"/>
+
+  <!-- Outer ring -->
+  <circle cx="50" cy="50" r="34" fill="none" stroke="url(#helm)" stroke-width="5"/>
+
+  <!-- 8 spokes from hub edge (r=10) to ring inner edge (r=31.5) -->
+  <g stroke="#22d3ee" stroke-width="2.8" stroke-linecap="round" opacity="0.9">
+    <!-- 0° right -->
+    <line x1="60" y1="50" x2="81.5" y2="50"/>
+    <!-- 45° bottom-right -->
+    <line x1="57.1" y1="57.1" x2="72.3" y2="72.3"/>
+    <!-- 90° down -->
+    <line x1="50" y1="60" x2="50" y2="81.5"/>
+    <!-- 135° bottom-left -->
+    <line x1="42.9" y1="57.1" x2="27.7" y2="72.3"/>
+    <!-- 180° left -->
+    <line x1="40" y1="50" x2="18.5" y2="50"/>
+    <!-- 225° top-left -->
+    <line x1="42.9" y1="42.9" x2="27.7" y2="27.7"/>
+    <!-- 270° up -->
+    <line x1="50" y1="40" x2="50" y2="18.5"/>
+    <!-- 315° top-right -->
+    <line x1="57.1" y1="42.9" x2="72.3" y2="27.7"/>
+  </g>
+
+  <!-- Handle knobs at r=42 -->
+  <g fill="#22d3ee">
+    <circle cx="92" cy="50" r="3.5"/>
+    <circle cx="79.7" cy="79.7" r="3.5"/>
+    <circle cx="50" cy="92" r="3.5"/>
+    <circle cx="20.3" cy="79.7" r="3.5"/>
+    <circle cx="8" cy="50" r="3.5"/>
+    <circle cx="20.3" cy="20.3" r="3.5"/>
+    <circle cx="50" cy="8" r="3.5"/>
+    <circle cx="79.7" cy="20.3" r="3.5"/>
+  </g>
+
+  <!-- Center hub -->
+  <circle cx="50" cy="50" r="10" fill="#0d1a24" stroke="#22d3ee" stroke-width="2.5"/>
+
+  <!-- Center hexagon — represents the AI agent node -->
+  <polygon points="56,50 53,55.2 47,55.2 44,50 47,44.8 53,44.8" fill="#22d3ee"/>
+</svg>

@@ -1,33 +1,64 @@
 name: GitHub Pages
 
+# Builds the documentation wiki (MkDocs + Material, sources in docs/) and
+# deploys it to GitHub Pages. Pull requests that touch the docs run the build
+# only: `--strict` turns a broken link, a missing anchor or a page left out of
+# the nav into a failed check before merge rather than a broken site after it.
 on:
   push:
     branches: [master]
     paths:
       - 'docs/**'
+      - 'mkdocs.yml'
+      - '.github/workflows/pages.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
+# Deployments on master queue rather than cancel each other; a newer push to
+# the same pull request supersedes its older build.
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: pages-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/configure-pages@v6
-      - uses: actions/upload-pages-artifact@v5
+      - uses: actions/setup-python@v6
         with:
-          path: docs
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: docs/requirements.txt
+      - name: Install MkDocs
+        run: pip install -r docs/requirements.txt
+      - name: Build (strict)
+        run: mkdocs build --strict
+      - if: github.ref == 'refs/heads/master'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v6
       - id: deployment
         uses: actions/deploy-pages@v5

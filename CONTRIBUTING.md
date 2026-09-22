@@ -19,7 +19,7 @@ dotnet run --project src/AgentHelm.AppHost
 
 # Option B — without Docker
 dotnet run --project src/AgentHelm.Bridge   # http://127.0.0.1:5199
-dotnet run --project src/AgentHelm.Web      # http://127.0.0.1:5200
+dotnet run --project src/AgentHelm.Web      # https://localhost:53168 (launch profile)
 ```
 
 The built-in echo agent works without any external tools, so you can test the full permission/audit loop immediately.
@@ -52,7 +52,21 @@ tools/
 3. Make your changes. Keep commits focused; one logical change per commit is easier to review.
 4. Add or update tests for any new behaviour. The test suite is the specification.
 5. Run `dotnet test` — all tests must pass.
-6. Open a pull request against `master`. Describe *why* the change is needed, not just what it does.
+6. If the change affects behaviour, configuration, the API or the workflows, update the matching page of the documentation wiki in the same PR (see below).
+7. Open a pull request against `master`. Describe *why* the change is needed, not just what it does.
+
+## Documentation
+
+The [documentation wiki](https://konradcinkusz.github.io/agent-helm/) is built from `docs/` with MkDocs (Material theme) and deployed to GitHub Pages when a docs change reaches `master`. To preview it locally:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate            # Windows: .venv\Scripts\activate
+pip install -r docs/requirements.txt
+mkdocs serve                         # http://127.0.0.1:8000
+```
+
+Pull requests that touch `docs/` or `mkdocs.yml` run `mkdocs build --strict`, which fails on broken links, missing anchors and pages left out of the navigation. See [Editing the docs](https://konradcinkusz.github.io/agent-helm/development/documentation/) for the conventions.
 
 ## Code style
 
