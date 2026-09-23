@@ -57,16 +57,15 @@ tools/
 
 ## Documentation
 
-The [documentation wiki](https://konradcinkusz.github.io/agent-helm/) is built from `docs/` with MkDocs (Material theme) and deployed to GitHub Pages when a docs change reaches `master`. To preview it locally:
+The [documentation wiki](https://github.com/konradcinkusz/agent-helm/wiki) is generated from the `wiki/` folder: each page is a Markdown file there, and the `wiki` workflow publishes the folder to the repository's GitHub Wiki when a change reaches `master`. Edit the files in `wiki/`, not the wiki itself — the next publish overwrites edits made in the wiki's web editor.
+
+Before opening a pull request, run the check CI runs (it needs only Python 3):
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate            # Windows: .venv\Scripts\activate
-pip install -r docs/requirements.txt
-mkdocs serve                         # http://127.0.0.1:8000
+python3 scripts/wiki.py check
 ```
 
-Pull requests that touch `docs/` or `mkdocs.yml` run `mkdocs build --strict`, which fails on broken links, missing anchors and pages left out of the navigation. See [Editing the docs](https://konradcinkusz.github.io/agent-helm/development/documentation/) for the conventions.
+It fails on links to missing pages or headings, missing images, pages left out of `wiki/_Sidebar.md`, and Markdown that GitHub does not render. See [Editing the wiki](https://github.com/konradcinkusz/agent-helm/wiki/Editing-the-Wiki) for the conventions.
 
 ## Code style
 

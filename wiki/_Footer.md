@@ -1,0 +1,1 @@
+📝 These pages are generated from the [`wiki/` folder](https://github.com/konradcinkusz/agent-helm/tree/master/wiki) of the repository and published on every change to `master`, so edits made here are overwritten. To change a page, open a pull request — see [Editing the wiki](Editing-the-Wiki.md).

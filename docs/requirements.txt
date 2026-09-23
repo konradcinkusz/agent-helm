@@ -1,6 +1,0 @@
-# Toolchain for the documentation site (docs/ + mkdocs.yml → GitHub Pages).
-# Pinned so that a build that passes today still passes tomorrow; bump these
-# deliberately and check `mkdocs build --strict` before merging.
-mkdocs==1.6.1
-mkdocs-material==9.7.7
-markdown-callouts==0.4.0

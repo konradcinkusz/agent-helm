@@ -1,0 +1,71 @@
+# Checks the wiki/ folder and publishes it to the repository's GitHub Wiki
+# (https://github.com/<owner>/<repo>/wiki). wiki/ is the source of truth: a
+# publish replaces the wiki's pages, so edits made in the wiki's web editor are
+# overwritten. Pull requests only run the check.
+#
+# One-time setup before the first publish: enable Wikis (Settings → General →
+# Features) and create the first page in the Wiki tab. GitHub creates the
+# wiki's Git repository only then; until it exists the publish job fails.
+name: wiki
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'wiki/**'
+      - 'scripts/wiki.py'
+      - '.github/workflows/wiki.yml'
+  pull_request:
+    paths:
+      - 'wiki/**'
+      - 'scripts/wiki.py'
+      - '.github/workflows/wiki.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check links, headings, images and syntax
+        run: python3 scripts/wiki.py check
+
+  publish:
+    needs: check
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write # push to the wiki's Git repository
+    concurrency:
+      group: wiki-publish
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build the pages
+        run: python3 scripts/wiki.py build "$RUNNER_TEMP/pages" --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_SHA"
+      - name: Publish to the wiki
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          wiki="$RUNNER_TEMP/wiki"
+          if ! git clone --quiet --depth 1 "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git" "$wiki"; then
+            echo "::error::Could not clone the wiki's Git repository. If the wiki has not been set up yet, enable Wikis (Settings → General → Features), create the first page in the Wiki tab, then re-run this workflow."
+            exit 1
+          fi
+          # The wiki mirrors wiki/: replace every file, so removed pages go too.
+          git -C "$wiki" rm -q -r --ignore-unmatch -- .
+          cp "$RUNNER_TEMP/pages/"*.md "$wiki/"
+          git -C "$wiki" add -A
+          if git -C "$wiki" diff --cached --quiet; then
+            echo "The wiki is already up to date."
+            exit 0
+          fi
+          git -C "$wiki" -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+            commit --quiet -m "Publish the wiki from ${GITHUB_SHA::7}" -m "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          git -C "$wiki" push --quiet origin HEAD
+          echo "Published ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/wiki"
