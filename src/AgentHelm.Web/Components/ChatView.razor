@@ -1,16 +1,49 @@
-<div class="chat" id="chat-scroll">
-    @foreach (var entry in Entries)
+<div class="chat" id="chat-scroll" @ref="_scroll">
+    @foreach (var group in GroupRuns(Entries))
     {
-        <div class="msg @RoleClass(entry)">
-            <div class="msg-role">@entry.Role@(entry.Kind is "tool_call" ? " · tool" : "")</div>
-            <div class="msg-bubble">@entry.Text</div>
-        </div>
+        if (group[0].Kind == "tool_call")
+        {
+            <details class="tool-group">
+                <summary>@group.Count tool call@(group.Count == 1 ? "" : "s")</summary>
+                @foreach (var tool in group)
+                {
+                    <div class="tool-item">@tool.Text</div>
+                }
+            </details>
+        }
+        else
+        {
+            var entry = group[0];
+            <div class="msg @RoleClass(entry)">
+                @if (entry.Role == "assistant")
+                {
+                    <div class="msg-avatar" aria-hidden="true">◆</div>
+                }
+                <div class="msg-body">
+                    @if (entry.Role is not ("user" or "assistant"))
+                    {
+                        <div class="msg-role">@entry.Role</div>
+                    }
+                    @if (entry.Role == "assistant")
+                    {
+                        <div class="msg-bubble md">@((MarkupString)ChatMarkdown.Render(entry.Text))</div>
+                    }
+                    else
+                    {
+                        <div class="msg-bubble">@entry.Text</div>
+                    }
+                </div>
+            </div>
+        }
     }
     @if (Streaming.Length > 0)
     {
         <div class="msg assistant">
-            <div class="msg-role">assistant · streaming</div>
-            <div class="msg-bubble">@Streaming<span class="caret">▌</span></div>
+            <div class="msg-avatar" aria-hidden="true">◆</div>
+            <div class="msg-body">
+                <div class="msg-role">streaming</div>
+                <div class="msg-bubble">@Streaming<span class="caret">▌</span></div>
+            </div>
         </div>
     }
 </div>
