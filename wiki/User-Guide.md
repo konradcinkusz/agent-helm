@@ -1,10 +1,10 @@
-AgentHelm's UI has two pages: the **Dashboard**, where you work with sessions, and **Providers**, where you check the accounts of your agent CLIs. This page is a map of the Dashboard; the pages that follow cover each feature in depth.
+AgentHelm's UI has three pages: the **Dashboard**, where you work with sessions, **Search**, which finds sessions, and **Providers**, where you check the accounts of your agent CLIs. This page is a map of the Dashboard; the pages that follow cover each feature in depth.
 
 ![The AgentHelm dashboard with an open session](images/session-chat.png)
 
 ## Top bar
 
-The brand, links to **Dashboard** and **Providers**, and on the right the number of agents the Bridge has configured. If it keeps saying *connecting…*, the UI cannot reach the Bridge or the Bridge has no agents configured — see [Troubleshooting](Troubleshooting-and-FAQ.md#the-ui-says-connecting-and-lists-no-agents).
+The brand, links to **Dashboard**, **Search** and **Providers**, and on the right the number of agents the Bridge has configured. If it keeps saying *connecting…*, the UI cannot reach the Bridge or the Bridge has no agents configured — see [Troubleshooting](Troubleshooting-and-FAQ.md#the-ui-says-connecting-and-lists-no-agents).
 
 ## Session rail (left)
 
@@ -12,7 +12,12 @@ The brand, links to **Dashboard** and **Providers**, and on the right the number
 |---|---|
 | **Sessions / History** | The rail shows live sessions; **History** switches to archived sessions from PostgreSQL, **Live** switches back. See [History & resume](History-and-Resume.md). |
 | **＋ New** | Opens the **New session** dialog: agent, working directory, title, model. See [Sessions & chat](Sessions-and-Chat.md#starting-a-session). |
+| **My work** | Back to the Dashboard. |
+| **Search**, **Chats** | Shown for the coming features; disabled for now. |
 | Session cards | One per live session: title, then `agent · status · policy`, plus `⏳ permission` while a permission request is waiting for you. |
+| **Providers** (footer) | Opens the [Providers](Provider-Accounts.md) page. |
+| **Feedback** (footer) | Opens the project's GitHub issues in a new tab. |
+| **«** / **»** (top) | Collapse the rail to icons only, and expand it again. |
 
 The rail refreshes every few seconds; the open session itself updates live.
 
@@ -24,7 +29,6 @@ The rail refreshes every few seconds; the open session itself updates live.
 | Sub-line | Agent id, working directory, model (when known) and capability chips (`resume`, `images`, `files`). |
 | **Scope** | Quality scores from [CopilotScope](CopilotScope-Integration.md) for this session's time window. |
 | **Handoff** | Continue the conversation with another agent — see [Agent handoff](Agent-Handoff.md). |
-| Policy drop-down | **Ask every tool**, **Auto-allow reads** or **YOLO** — see [Permissions & policies](Permissions-and-Policies.md). |
 | Status badge | `idle` or `running` (a turn is in progress). |
 | **Stop** | Asks the agent to cancel the current turn (ACP `session/cancel`). |
 | **Delete** | Ends the session: stops the agent and the terminal and deletes the session's history record. |
@@ -52,6 +56,10 @@ Banners appear between the header and the tabs when something needs you:
 | <kbd>Ctrl</kbd>+<kbd>Enter</kbd> | Composer | Send the prompt |
 | <kbd>Enter</kbd> / <kbd>Esc</kbd> | Title editor | Save / cancel the new title |
 | <kbd>Enter</kbd> | Terminal input | Run the command |
+
+## Search page
+
+Type in the search box to filter live and archived sessions as you type. A session matches when its title or agent contains the text, or when any message in its transcript does; transcript matches show the surrounding text with the match highlighted. Select a result to open the session. Archived results need PostgreSQL, like [History](History-and-Resume.md).
 
 ## Providers page
 

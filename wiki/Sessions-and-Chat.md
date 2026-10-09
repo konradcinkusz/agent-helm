@@ -34,7 +34,7 @@ A form that stays on *Starting…* means the agent started but never answered th
 
 ## Chatting
 
-Type in the composer at the bottom and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> or **Send**. While the agent works:
+Type in the composer at the bottom and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> or **Send**. Under the prompt box, the **Mode** drop-down sets the session's permission policy (Interactive, Plan or Autopilot — see [Permissions & policies](Permissions-and-Policies.md)), and the model field shows the model the session runs with. While the agent works:
 
 - its reply streams into a bubble marked *assistant · streaming*;
 - tool calls appear as `tool` entries, and permission requests as banners ([Permissions & policies](Permissions-and-Policies.md));

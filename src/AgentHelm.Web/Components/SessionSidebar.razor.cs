@@ -15,6 +15,10 @@ public partial class SessionSidebar
     [Parameter] public EventCallback<string> OnSelectSession { get; set; }
     [Parameter] public EventCallback<ArchivedSessionDto> OnSelectArchived { get; set; }
 
+    private bool _collapsed;
+
+    private void ToggleCollapsed() => _collapsed = !_collapsed;
+
     private static string PolicyLabel(string policy) => policy switch
     {
         "auto_read" => "auto-read",
