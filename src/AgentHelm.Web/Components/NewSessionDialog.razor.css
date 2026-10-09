@@ -1,0 +1,50 @@
+.nsd-overlay {
+  position: fixed; inset: 0; z-index: 150;
+  background: rgba(0, 0, 0, .55); backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center;
+}
+.nsd {
+  background: var(--panel); border: 1px solid var(--copper); border-radius: 12px;
+  width: min(520px, 95vw); max-height: 85vh;
+  display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, .6);
+}
+.nsd-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; border-bottom: 1px solid var(--line);
+}
+.nsd-head .rail-label { flex: 1; }
+.nsd-body { display: flex; flex-direction: column; gap: 12px; padding: 16px; overflow-y: auto; }
+.nsd-field { display: flex; flex-direction: column; gap: 6px; }
+.nsd-label {
+  font-family: var(--mono); font-size: 11px; color: var(--dim);
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.nsd-hint { text-transform: none; letter-spacing: 0; }
+.nsd-body select, .nsd-body input {
+  background: var(--ink); color: var(--text); border: 1px solid var(--line);
+  border-radius: 6px; padding: 7px 9px; font-size: 12px;
+}
+.nsd-body select:focus, .nsd-body input:focus { outline: none; border-color: var(--copper); }
+.nsd-foot {
+  display: flex; justify-content: flex-end; gap: 10px; padding: 14px 16px;
+  border-top: 1px solid var(--line); background: var(--panel-2);
+}
+
+.cwd-row { display: flex; gap: 6px; }
+.cwd-input { flex: 1; background: var(--ink); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; font-size: 12px; min-width: 0; }
+.cwd-browse { padding: 7px 10px; font-size: 14px; flex-shrink: 0; }
+
+.preconfig-toggle { font-family: var(--mono); font-size: 11px; letter-spacing: 0.5px; align-self: flex-start; }
+.preconfig-toggle.active { border-color: var(--copper); color: var(--copper); }
+.preconfig-panel {
+  display: flex; flex-direction: column; gap: 6px;
+  background: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+}
+.preconfig-label { font-family: var(--mono); font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+.preconfig-hint { text-transform: none; letter-spacing: 0; color: color-mix(in srgb, var(--copper) 70%, var(--dim)); }
+.preconfig-panel input {
+  background: var(--panel-2); color: var(--text); border: 1px solid var(--line);
+  border-radius: 6px; padding: 7px 9px; font-size: 12px; font-family: var(--mono);
+}
+.preconfig-panel input:focus { outline: none; border-color: var(--copper); }

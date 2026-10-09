@@ -11,7 +11,7 @@ The brand, links to **Dashboard** and **Providers**, and on the right the number
 | Element | What it does |
 |---|---|
 | **Sessions / History** | The rail shows live sessions; **History** switches to archived sessions from PostgreSQL, **Live** switches back. See [History & resume](History-and-Resume.md). |
-| **＋ New** | Opens the new-session form: agent, working directory, title, model. See [Sessions & chat](Sessions-and-Chat.md#starting-a-session). |
+| **＋ New** | Opens the **New session** dialog: agent, working directory, title, model. See [Sessions & chat](Sessions-and-Chat.md#starting-a-session). |
 | Session cards | One per live session: title, then `agent · status · policy`, plus `⏳ permission` while a permission request is waiting for you. |
 
 The rail refreshes every few seconds; the open session itself updates live.
