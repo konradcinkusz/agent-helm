@@ -210,6 +210,8 @@ public sealed class HelmSession : IDisposable
     public required IAgentAdapter Adapter { get; init; }
     public string? Model { get; init; }
     public string Title { get; set; } = "New session";
+    /// <summary>Quick chat: no repository, runs in a scratch directory on the Bridge.</summary>
+    public bool IsChat { get; init; }
     public string Policy { get; private set; } = PermissionPolicies.Ask;
     public string Status { get; private set; } = "idle";   // idle | running | error
     public DateTimeOffset CreatedAt { get; } = DateTimeOffset.UtcNow;
@@ -409,10 +411,13 @@ public sealed class SessionManager(AgentCatalog catalog, ILoggerFactory loggerFa
 
     public async Task<HelmSession> CreateAsync(
         string agentId, string cwd, string? title, CancellationToken ct,
-        string? policy = null, string? resumeNativeSessionId = null, string? model = null)
+        string? policy = null, string? resumeNativeSessionId = null, string? model = null, bool isChat = false)
     {
         var spec = catalog.Find(agentId)
             ?? throw new ArgumentException($"Unknown agent '{agentId}'. Configure it under AgentHelm:Agents.");
+        var id = Guid.NewGuid().ToString("N")[..12];
+        if (isChat && string.IsNullOrWhiteSpace(cwd))
+            cwd = CreateChatDirectory(id);
         if (!Directory.Exists(cwd))
             throw new ArgumentException(
                 $"Working directory does not exist: {cwd}. " +
@@ -423,12 +428,15 @@ public sealed class SessionManager(AgentCatalog catalog, ILoggerFactory loggerFa
         IAgentAdapter adapter = BuildAdapter(spec, cwd, logger, resumeNativeSessionId, model);
         var session = new HelmSession
         {
-            Id = Guid.NewGuid().ToString("N")[..12],
+            Id = id,
             AgentId = agentId,
             Cwd = cwd,
             Adapter = adapter,
             Model = model,
-            Title = string.IsNullOrWhiteSpace(title) ? $"{spec.Name} · {Path.GetFileName(cwd)}" : title
+            IsChat = isChat,
+            Title = string.IsNullOrWhiteSpace(title)
+                ? isChat ? "New chat" : $"{spec.Name} · {Path.GetFileName(cwd)}"
+                : title
         };
         if (PermissionPolicies.IsValid(policy)) session.SetPolicy(policy!);
         session.WireAdapter();
@@ -436,6 +444,14 @@ public sealed class SessionManager(AgentCatalog catalog, ILoggerFactory loggerFa
 
         _sessions[session.Id] = session;
         return session;
+    }
+
+    /// <summary>Scratch working directory for a quick chat, created on the Bridge's machine.</summary>
+    public static string CreateChatDirectory(string sessionId)
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "AgentHelm", "chats", sessionId);
+        Directory.CreateDirectory(dir);
+        return dir;
     }
 
     /// <summary>

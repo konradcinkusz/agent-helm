@@ -945,6 +945,33 @@ public class ScopeIntegrationTests
     }
 }
 
+public class TerminalManagerTests
+{
+    [Fact]
+    public void TerminalsAreScopedToTheirSessionAndCloseIndependently()
+    {
+        using var manager = new TerminalManager();
+        var first = manager.Create("s1", Path.GetTempPath());
+        var second = manager.Create("s1", Path.GetTempPath());
+        var other = manager.Create("s2", Path.GetTempPath());
+
+        Assert.NotEqual(first.Id, second.Id);
+        Assert.Equal(new[] { first.Id, second.Id }, manager.List("s1").Select(t => t.Id));
+        Assert.Same(second, manager.Get("s1", second.Id));
+        Assert.Null(manager.Get("s2", first.Id));
+
+        Assert.True(manager.Close("s1", first.Id));
+        Assert.False(manager.Close("s1", first.Id));
+        Assert.Null(manager.Get("s1", first.Id));
+        Assert.Equal(new[] { second.Id }, manager.List("s1").Select(t => t.Id));
+        Assert.Same(other, manager.Get("s2", other.Id));
+
+        manager.Remove("s1");
+        Assert.Empty(manager.List("s1"));
+        Assert.Same(other, manager.Get("s2", other.Id));
+    }
+}
+
 public class PtyTerminalTests
 {
     [Fact]

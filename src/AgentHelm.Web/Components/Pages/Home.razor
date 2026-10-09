@@ -18,6 +18,7 @@
         <SessionSidebar Sessions="@_sessions" History="@_history"
                         ShowHistory="@_showHistory" SelectedId="@_selectedId" ArchivedId="@_archived?.Id"
                         OnToggleHistory="@ToggleHistoryAsync" OnToggleNewSession="@ToggleNewSession"
+                        CreatingChat="@_creatingChat" ChatError="@_chatError" OnNewChat="@CreateChatAsync"
                         OnSelectSession="@SelectSessionAsync" OnSelectArchived="@SelectArchived" />
     </Sidebar>
 
@@ -54,7 +55,7 @@
                            OnStartEditTitle="@StartEditTitle" OnTitleKey="@OnTitleKeyAsync"
                            OnToggleScope="@ToggleScopeAsync" OnToggleHandoff="@ToggleHandoff"
                            OnStop="@CancelTurnAsync"
-                           OnDelete="@DeleteSessionAsync" />
+                           OnDelete="@DeleteSessionAsync" ActiveTab="@_activeTab" OnSwitchTab="@SwitchTabAsync" />
 
             @if (_yoloConfirmPending)
             {
@@ -112,12 +113,6 @@
                 </div>
             }
 
-            <div class="tabs">
-                <button class="tab @(_activeTab == "chat" ? "active" : "")" @onclick='() => SwitchTabAsync("chat")'>Chat</button>
-                <button class="tab @(_activeTab == "changes" ? "active" : "")" @onclick='() => SwitchTabAsync("changes")'>Changes</button>
-                <button class="tab @(_activeTab == "terminal" ? "active" : "")" @onclick='() => SwitchTabAsync("terminal")'>Terminal</button>
-            </div>
-
             @if (_activeTab == "chat")
             {
                 <ChatView Entries="@_transcript" Streaming="@_streaming" />
@@ -138,8 +133,10 @@
             }
             else
             {
-                <TerminalPanel @bind-TermInput="_termInput" IsPty="@_termIsPty"
-                               OnKeyDown="@OnTerminalKeyAsync" OnInsertOutput="@InsertOutputIntoPromptAsync" />
+                <TerminalPanel Terminals="@_terminals" ActiveTerminalId="@_activeTermId" @bind-TermInput="_termInput"
+                               IsPty="@(ActiveTerminal?.Pty ?? false)"
+                               OnKeyDown="@OnTerminalKeyAsync" OnInsertOutput="@InsertOutputIntoPromptAsync"
+                               OnSelect="@SelectTerminal" OnClose="@CloseTerminalAsync" OnNew="@NewTerminalAsync" />
             }
         }
     </Main>

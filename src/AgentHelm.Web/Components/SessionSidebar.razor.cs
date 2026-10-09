@@ -12,6 +12,9 @@ public partial class SessionSidebar
     [Parameter] public string? ArchivedId { get; set; }
     [Parameter] public EventCallback OnToggleHistory { get; set; }
     [Parameter] public EventCallback OnToggleNewSession { get; set; }
+    [Parameter] public bool CreatingChat { get; set; }
+    [Parameter] public string? ChatError { get; set; }
+    [Parameter] public EventCallback OnNewChat { get; set; }
     [Parameter] public EventCallback<string> OnSelectSession { get; set; }
     [Parameter] public EventCallback<ArchivedSessionDto> OnSelectArchived { get; set; }
 
@@ -24,8 +27,12 @@ public partial class SessionSidebar
         if (!_collapsedRepos.Add(repo)) _collapsedRepos.Remove(repo);
     }
 
+    private IEnumerable<SessionSummaryDto> ProjectSessions => Sessions.Where(s => !s.IsChat);
+
+    private IEnumerable<SessionSummaryDto> ChatSessions => Sessions.Where(s => s.IsChat);
+
     private List<(string Repo, List<SessionSummaryDto> Sessions)> GroupByRepo() =>
-        Sessions.GroupBy(s => RepoName(s.Cwd))
+        ProjectSessions.GroupBy(s => RepoName(s.Cwd))
                 .Select(g => (Repo: g.Key, Sessions: g.ToList()))
                 .ToList();
 
