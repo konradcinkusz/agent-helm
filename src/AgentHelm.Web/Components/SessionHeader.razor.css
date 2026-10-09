@@ -36,9 +36,6 @@
 }
 .menu-item:hover { background: var(--panel); color: var(--copper); }
 .menu-item.danger:hover { color: var(--err); }
-.menu-field { cursor: default; }
-.menu-field:hover { background: none; color: var(--text); }
-.menu-field .policy-select { font-size: 11px; }
 
 .title-input {
   background: var(--ink); color: var(--text); border: 1px solid var(--copper);

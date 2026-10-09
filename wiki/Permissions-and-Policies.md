@@ -12,13 +12,13 @@ When you click an allow option, AgentHelm passes that exact option back to the a
 
 ## Policies
 
-Each session has one policy, shown as the mode chip in the session header (*Interactive* for `ask`, *Plan* for `auto_read`, *Autopilot* for `yolo`) and changed from the **⋯** menu of the header. New sessions start with `ask`; a session created by [handoff](Agent-Handoff.md) inherits the policy of the session it came from.
+Each session has one policy, chosen with the **Mode** drop-down under the composer. New sessions start with `ask`; a session created by [handoff](Agent-Handoff.md) inherits the policy of the session it came from.
 
-| Policy | Drop-down label | Automatically allowed | Asks you |
+| Policy | Mode label | Automatically allowed | Asks you |
 |---|---|---|---|
-| `ask` | Ask every tool | nothing | every request |
-| `auto_read` | Auto-allow reads | tool kinds `read`, `search`, `think` | everything else, including `fetch` |
-| `yolo` | YOLO | everything | nothing |
+| `ask` | Interactive | nothing | every request |
+| `auto_read` | Plan | tool kinds `read`, `search`, `think` | everything else, including `fetch` |
+| `yolo` | Autopilot | everything | nothing |
 
 Changing the policy takes effect for the next request and is itself recorded in the transcript: *Permission policy changed to 'auto_read'*.
 

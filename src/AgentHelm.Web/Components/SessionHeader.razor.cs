@@ -11,26 +11,18 @@ public partial class SessionHeader
     [Parameter] public bool EditingTitle { get; set; }
     [Parameter] public string TitleDraft { get; set; } = "";
     [Parameter] public EventCallback<string> TitleDraftChanged { get; set; }
-    [Parameter] public int PolicySelectVersion { get; set; }
     [Parameter] public string ActiveTab { get; set; } = "chat";
     [Parameter] public EventCallback<string> OnSwitchTab { get; set; }
     [Parameter] public EventCallback OnStartEditTitle { get; set; }
     [Parameter] public EventCallback<KeyboardEventArgs> OnTitleKey { get; set; }
     [Parameter] public EventCallback OnToggleScope { get; set; }
     [Parameter] public EventCallback OnToggleHandoff { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> OnPolicyChanged { get; set; }
     [Parameter] public EventCallback OnStop { get; set; }
     [Parameter] public EventCallback OnDelete { get; set; }
 
     private bool _menuOpen;
 
     private Task TitleInputAsync(ChangeEventArgs e) => TitleDraftChanged.InvokeAsync(e.Value?.ToString() ?? "");
-
-    private Task OnPolicyPick(ChangeEventArgs e)
-    {
-        _menuOpen = false;
-        return OnPolicyChanged.InvokeAsync(e);
-    }
 
     private async Task RunAsync(EventCallback callback)
     {
