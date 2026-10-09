@@ -1,0 +1,45 @@
+<div class="changes-panel">
+    <div class="rail-head">
+        <span class="rail-label">Working tree vs HEAD</span>
+        <button class="btn" @onclick="() => OnRefresh.InvokeAsync()">Refresh</button>
+    </div>
+    @if (!IsRepo)
+    {
+        <div class="empty">This working directory is not a git repository.</div>
+    }
+    else if (Changes.Count == 0)
+    {
+        <div class="empty">Working tree clean — nothing to review.</div>
+    }
+    @foreach (var change in Changes)
+    {
+        <div class="change-row @(change.Path == Diff?.Path ? "selected" : "")">
+            <span class="change-path">@change.Path</span>
+            <span class="change-status @change.Status">@change.Status</span>
+            <button class="btn" @onclick="() => OnView.InvokeAsync(change.Path)">View</button>
+            <button class="btn primary" @onclick="() => OnAccept.InvokeAsync(change.Path)">Accept</button>
+            @if (RejectConfirmPath == change.Path)
+            {
+                <button class="btn danger" @onclick="() => OnRejectConfirm.InvokeAsync(change.Path)">Confirm revert</button>
+                <button class="btn" @onclick="() => OnRejectCancel.InvokeAsync()">✕</button>
+            }
+            else
+            {
+                <button class="btn danger" @onclick="() => OnRejectRequest.InvokeAsync(change.Path)">Reject</button>
+            }
+        </div>
+    }
+    @if (Diff is not null)
+    {
+        <div class="rail-head">
+            <span class="rail-label">@Diff.Path</span>
+            <span class="diff-stats"><span class="plus">+@Diff.Additions</span> / <span class="minus">−@Diff.Deletions</span></span>
+        </div>
+        <div class="diff-view">
+            @foreach (var line in DiffLines)
+            {
+                <div class="diff-line @DiffLineClass(line)">@line</div>
+            }
+        </div>
+    }
+</div>

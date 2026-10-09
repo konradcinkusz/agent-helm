@@ -1,0 +1,40 @@
+.rail {
+  width: 280px; min-width: 280px; border-right: 1px solid var(--line);
+  background: var(--panel); overflow-y: auto; padding: 12px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.rail-actions { display: flex; gap: 6px; }
+
+.session-card {
+  display: flex; flex-direction: column; gap: 2px; text-align: left;
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px;
+  padding: 10px 12px; cursor: pointer; color: var(--text);
+}
+.session-card:hover { border-color: var(--copper); }
+.session-card.active { border-color: var(--copper); background: var(--ink); }
+.session-title { font-weight: 600; font-size: 13px; }
+.session-meta { font-family: var(--mono); font-size: 10px; color: var(--dim); }
+
+.new-session { display: flex; flex-direction: column; gap: 6px; padding: 8px 0; }
+.new-session select, .new-session input {
+  background: var(--ink); color: var(--text); border: 1px solid var(--line);
+  border-radius: 6px; padding: 7px 9px; font-size: 12px;
+}
+
+.cwd-row { display: flex; gap: 6px; }
+.cwd-input { flex: 1; background: var(--ink); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; font-size: 12px; min-width: 0; }
+.cwd-browse { padding: 7px 10px; font-size: 14px; flex-shrink: 0; }
+
+.preconfig-toggle { font-family: var(--mono); font-size: 11px; letter-spacing: 0.5px; }
+.preconfig-toggle.active { border-color: var(--copper); color: var(--copper); }
+.preconfig-panel {
+  display: flex; flex-direction: column; gap: 6px;
+  background: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+}
+.preconfig-label { font-family: var(--mono); font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+.preconfig-hint { text-transform: none; letter-spacing: 0; color: color-mix(in srgb, var(--copper) 70%, var(--dim)); }
+.preconfig-panel input {
+  background: var(--panel-2); color: var(--text); border: 1px solid var(--line);
+  border-radius: 6px; padding: 7px 9px; font-size: 12px; font-family: var(--mono);
+}
+.preconfig-panel input:focus { outline: none; border-color: var(--copper); }

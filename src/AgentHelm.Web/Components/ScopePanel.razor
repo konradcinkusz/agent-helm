@@ -1,0 +1,32 @@
+<div class="scope-panel">
+    @if (Scope is null)
+    {
+        <div class="term-note">Loading Scope data…</div>
+    }
+    else if (!Scope.Available)
+    {
+        <div class="term-note">CopilotScope is not reachable (AgentHelm:Scope:BaseUrl). Run Scope and point the agent's OTel export at it to see quality here.</div>
+    }
+    else if (Scope.Matches.Count == 0)
+    {
+        <div class="term-note">No Scope sessions overlap this session's activity window yet.</div>
+    }
+    else
+    {
+        @foreach (var match in Scope.Matches)
+        {
+            <div class="scope-row">
+                <span class="scope-score">@(match.Score is { } sc ? sc.ToString("0") : "—")</span>
+                <span class="scope-grade">@(match.Grade ?? "")</span>
+                <div class="scope-row-detail">
+                    @if (match.Model is not null)
+                    {
+                        <span class="scope-model">@match.Model</span>
+                    }
+                    <span class="scope-meta">@(match.Title ?? match.Id)@(match.Confidence is { } cf ? $" · conf {cf:P0}" : "")</span>
+                </div>
+            </div>
+        }
+        <div class="term-note">time-based best-effort match — exact correlation needs telemetry tagging (Beyond-M3)</div>
+    }
+</div>

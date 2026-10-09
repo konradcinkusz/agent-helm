@@ -1,0 +1,14 @@
+.chat { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.msg { display: flex; flex-direction: column; max-width: 78%; }
+.msg-role { font-family: var(--mono); font-size: 10px; color: var(--dim); margin: 0 6px 2px; text-transform: uppercase; letter-spacing: 1px; }
+.msg-bubble {
+  font-size: 13px; line-height: 1.5; padding: 9px 13px; border-radius: 10px;
+  white-space: pre-wrap; word-break: break-word; background: var(--panel-2);
+  border: 1px solid var(--line);
+}
+.msg.user { align-self: flex-end; align-items: flex-end; }
+.msg.user .msg-bubble { border-color: color-mix(in srgb, var(--copper) 55%, transparent); border-bottom-right-radius: 3px; }
+.msg.assistant { align-self: flex-start; }
+.msg.assistant .msg-bubble { border-color: color-mix(in srgb, var(--ok) 40%, transparent); border-bottom-left-radius: 3px; }
+.msg.tool, .msg.system { align-self: center; max-width: 92%; }
+.msg.tool .msg-bubble, .msg.system .msg-bubble { font-family: var(--mono); font-size: 11px; color: var(--dim); border-style: dashed; }

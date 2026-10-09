@@ -1,0 +1,20 @@
+.status { font-family: var(--mono); font-size: 11px; padding: 3px 8px; border-radius: 10px; border: 1px solid var(--line); }
+.status.running { color: var(--copper); border-color: var(--copper); }
+.status.idle { color: var(--ok); }
+.status.error { color: var(--err); border-color: var(--err); }
+
+.cap-chip {
+  display: inline-block; margin-left: 6px; padding: 1px 8px;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--ok); border: 1px solid color-mix(in srgb, var(--ok) 50%, transparent); border-radius: 8px;
+}
+
+.title-edit {
+  background: none; border: none; color: var(--dim); cursor: pointer;
+  font-size: 12px; padding: 0 4px; vertical-align: middle;
+}
+.title-edit:hover { color: var(--copper); }
+.title-input {
+  background: var(--ink); color: var(--text); border: 1px solid var(--copper);
+  border-radius: 6px; padding: 4px 8px; font-size: 14px; font-weight: 600; min-width: 260px;
+}

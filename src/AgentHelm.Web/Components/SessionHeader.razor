@@ -1,0 +1,37 @@
+<div class="session-head">
+    <div>
+        @if (EditingTitle)
+        {
+            <input class="title-input" value="@TitleDraft" @oninput="TitleInputAsync"
+                   @onkeydown="e => OnTitleKey.InvokeAsync(e)" />
+        }
+        else
+        {
+            <div class="session-head-title">@Session.Title
+                <button class="title-edit" title="Rename session" @onclick="() => OnStartEditTitle.InvokeAsync()">✎</button>
+            </div>
+        }
+        <div class="session-head-sub">
+            @Session.AgentId · @Session.Cwd@ModelSuffix()
+            @if (Session.Caps is { } caps)
+            {
+                @if (caps.LoadSession) { <span class="cap-chip">resume</span> }
+                @if (caps.Image) { <span class="cap-chip">images</span> }
+                @if (caps.EmbeddedContext) { <span class="cap-chip">files</span> }
+            }
+        </div>
+    </div>
+    <div class="session-head-actions">
+        <button class="btn" @onclick="() => OnToggleScope.InvokeAsync()" title="Quality scores from CopilotScope (time-based match)">Scope</button>
+        <button class="btn" @onclick="() => OnToggleHandoff.InvokeAsync()" title="Continue this conversation with a different agent">Handoff</button>
+        <select class="policy-select" @key="PolicySelectVersion" value="@Session.Policy" @onchange="e => OnPolicyChanged.InvokeAsync(e)"
+                title="Permission policy — every auto-decision is still audited in the transcript">
+            <option value="ask">Ask every tool</option>
+            <option value="auto_read">Auto-allow reads</option>
+            <option value="yolo">YOLO</option>
+        </select>
+        <span class="status @Session.Status">@Session.Status</span>
+        <button class="btn" @onclick="() => OnStop.InvokeAsync()" disabled="@(Session.Status != "running")">Stop</button>
+        <button class="btn danger" @onclick="() => OnDelete.InvokeAsync()">Delete</button>
+    </div>
+</div>
