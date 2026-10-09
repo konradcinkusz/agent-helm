@@ -29,7 +29,6 @@ The rail refreshes every few seconds; the open session itself updates live.
 | Sub-line | Agent id, working directory, model (when known) and capability chips (`resume`, `images`, `files`). |
 | **Scope** | Quality scores from [CopilotScope](CopilotScope-Integration.md) for this session's time window. |
 | **Handoff** | Continue the conversation with another agent — see [Agent handoff](Agent-Handoff.md). |
-| Policy drop-down | **Ask every tool**, **Auto-allow reads** or **YOLO** — see [Permissions & policies](Permissions-and-Policies.md). |
 | Status badge | `idle` or `running` (a turn is in progress). |
 | **Stop** | Asks the agent to cancel the current turn (ACP `session/cancel`). |
 | **Delete** | Ends the session: stops the agent and the terminal and deletes the session's history record. |
