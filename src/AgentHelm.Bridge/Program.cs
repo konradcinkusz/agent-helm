@@ -64,7 +64,8 @@ api.MapPost("/sessions", async (CreateSessionRequest req, CancellationToken ct) 
 {
     try
     {
-        var session = await sessions.CreateAsync(req.AgentId, req.Cwd, req.Title, ct, req.Policy, model: req.Model);
+        var session = await sessions.CreateAsync(req.AgentId, req.Cwd ?? "", req.Title, ct, req.Policy,
+            model: req.Model, isChat: req.IsChat);
         logger.LogInformation("Session {Id} started: agent={Agent} cwd={Cwd}", session.Id, req.AgentId, req.Cwd);
         return Results.Ok(SessionSummary(session));
     }
@@ -80,7 +81,7 @@ api.MapGet("/sessions/{id}", (string id) =>
     sessions.Get(id) is { } s
         ? Results.Ok(new
         {
-            s.Id, s.AgentId, s.Cwd, s.Title, s.Status, s.Policy, s.Model, s.CreatedAt, s.LastActivity,
+            s.Id, s.AgentId, s.Cwd, s.Title, s.Status, s.Policy, s.Model, s.IsChat, s.CreatedAt, s.LastActivity,
             Caps = s.Adapter.Capabilities,
             Pending = s.Pending,
             Transcript = s.TranscriptSnapshot()
@@ -153,7 +154,7 @@ api.MapPost("/history/{id}/resume", async (string id, ResumeRequest req, Cancell
     {
         var session = await sessions.CreateAsync(
             archived.AgentId, archived.Cwd, req.Title ?? $"{archived.Title} (resumed)",
-            ct, resumeNativeSessionId: archived.NativeSessionId);
+            ct, resumeNativeSessionId: archived.NativeSessionId, isChat: archived.IsChat);
         return Results.Ok(SessionSummary(session));
     }
     catch (Exception ex)
@@ -444,7 +445,7 @@ logger.LogInformation("""
 
 app.Run();
 
-record CreateSessionRequest(string AgentId, string Cwd, string? Title, string? Policy, string? Model);
+record CreateSessionRequest(string AgentId, string? Cwd, string? Title, string? Policy, string? Model, bool IsChat = false);
 record PolicyRequest(string Policy);
 record TitleRequest(string Title);
 record ResumeRequest(string? Title);
@@ -459,7 +460,7 @@ partial class Program
 {
     private static object SessionSummary(HelmSession s) => new
     {
-        s.Id, s.AgentId, s.Cwd, s.Title, s.Status, s.Policy, s.CreatedAt, s.LastActivity,
+        s.Id, s.AgentId, s.Cwd, s.Title, s.Status, s.Policy, s.IsChat, s.CreatedAt, s.LastActivity,
         HasPendingPermission = s.Pending is not null
     };
 }

@@ -71,3 +71,4 @@
 .status-dot.status-error { background: var(--err); }
 .status-dot.status-idle { background: var(--ok); }
 .permission-badge { font-size: 11px; flex-shrink: 0; }
+.chats-head { margin-top: 12px; }
