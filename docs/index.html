@@ -542,7 +542,7 @@ footer{
     <div style="margin-top:28px">
       <div class="qs-tabs">
         <button class="qs-tab active" onclick="switchTab(this,'aspire')">Aspire (recommended)</button>
-        <button class="qs-tab" onclick="switchTab(this,'zip')">Release zip</button>
+        <button class="qs-tab" onclick="switchTab(this,'zip')">Single file</button>
         <button class="qs-tab" onclick="switchTab(this,'docker')">Docker</button>
       </div>
 
@@ -555,18 +555,17 @@ footer{
       </div>
 
       <div id="tab-zip" class="qs-panel">
-        <div class="code-block"><span class="c"># Download the latest release zip from GitHub Releases</span>
-<span class="c"># Unpack it, then:</span>
+        <div class="code-block"><span class="c"># Download the file for your system from GitHub Releases</span>
 
 <span class="c"># macOS / Linux</span>
-<span class="cmd">./run.sh</span>
+<span class="cmd">chmod +x</span> ./agenthelm-&lt;tag&gt;-linux-x64
+<span class="cmd">./agenthelm-&lt;tag&gt;-linux-x64</span>
 
 <span class="c"># Windows</span>
-<span class="cmd">.\run.ps1</span>
+<span class="cmd">.\agenthelm-&lt;tag&gt;-win-x64.exe</span>
 
-<span class="c"># Bridge → http://127.0.0.1:5199</span>
-<span class="c"># Web UI → http://127.0.0.1:5200</span></div>
-        <p class="qs-note">Requires only the <strong>.NET 8 ASP.NET Core runtime</strong> (not the full SDK). No Docker needed — runs without Postgres in memory-only mode.</p>
+<span class="c"># UI and API → http://127.0.0.1:5199</span></div>
+        <p class="qs-note">One self-contained file: nothing else to install, no .NET, no Docker. Runs without Postgres in memory-only mode. First-run steps for macOS and Windows are in the <a href="https://github.com/konradcinkusz/agent-helm/wiki/Installation#first-run">installation guide</a>.</p>
       </div>
 
       <div id="tab-docker" class="qs-panel">
@@ -576,7 +575,7 @@ footer{
 
 <span class="c"># UI  → http://localhost:5300</span>
 <span class="c"># API → http://localhost:5299</span></div>
-        <p class="qs-note"><strong>Note:</strong> ACP agents (Copilot CLI, Claude Code, Gemini) cannot run inside containers — they need your local environment and auth. The built-in <strong>echo agent</strong> works out of the box. For real agents use the Aspire or zip option above.</p>
+        <p class="qs-note"><strong>Note:</strong> ACP agents (Copilot CLI, Claude Code, Gemini) cannot run inside containers — they need your local environment and auth. The built-in <strong>echo agent</strong> works out of the box. For real agents use the Aspire or single-file option above.</p>
       </div>
     </div>
 

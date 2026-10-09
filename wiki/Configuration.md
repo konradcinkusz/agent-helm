@@ -41,21 +41,24 @@ Source: [`src/AgentHelm.Web/appsettings.json`](https://github.com/konradcinkusz/
 |---|---|---|
 | `Bridge:BaseUrl` | empty → `http://127.0.0.1:5199` | Where the Web server finds the Bridge. Under Aspire, service discovery (`services:bridge:http:0`) takes precedence. |
 | `Bridge:ApiToken` | empty | Sent as `x-helm-token` on every Bridge request. Must match `AgentHelm:ApiToken`. |
-| `ASPNETCORE_URLS` | per launch profile | Where the UI listens (`https://localhost:53168;http://localhost:53171` with `dotnet run`, `http://127.0.0.1:5200` from the release launchers, `http://0.0.0.0:8080` in the container image). |
+| `ASPNETCORE_URLS` | per launch profile | Where the UI listens when it runs as its own process (`https://localhost:53168;http://localhost:53171` with `dotnet run`, `http://0.0.0.0:8080` in the container image). The single file has one address instead: see [Single file](#single-file). |
 
 The Web UI is a Blazor Server application: the **Web server** calls the Bridge, the browser never does. `Bridge:BaseUrl` must therefore be reachable from wherever the Web server runs.
 
-## Release launchers
+## Single file
 
-`run.sh` and `run.ps1` in the release zip read:
+The [single-file build](Installation.md#single-file) is one process, so it has one address and one set of settings. It reads the same keys as the table above, from the same sources, with these defaults and notes:
 
-| Variable | Default | Description |
+| Setting | Default | Description |
 |---|---|---|
-| `AGENTHELM_WEB_URLS` | `http://127.0.0.1:5200` | Passed to the Web UI as `ASPNETCORE_URLS`. |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4318` | OpenTelemetry endpoint exported to agents. |
-| `OTEL_EXPORTER_OTLP_HEADERS` | `x-api-key=dev-secret-123` | OpenTelemetry headers exported to agents. |
+| `AgentHelm__Urls` or `--urls <url>` | `http://127.0.0.1:5199` | The address for both the UI and the API. The UI's own Bridge connection is set to this address automatically. |
+| `AgentHelm__ApiToken` | empty (off) | Also gives the UI the token, so you set it once. |
+| `ConnectionStrings__helmdb` | none | PostgreSQL for history, as above. |
+| `--no-browser` | off | Do not open a browser on start. |
 
-They also export `COPILOT_OTEL_ENABLED=true`, `COPILOT_OTEL_EXPORTER_TYPE=otlp-http`, the `OTEL_EXPORTER_OTLP_*_PROTOCOL` variables (`http/protobuf`) and `OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT=true` — see [CopilotScope integration](CopilotScope-Integration.md).
+The file's built-in catalog is the Bridge's `appsettings.json` compiled in, so the Copilot entry's OpenTelemetry variables (see [CopilotScope integration](CopilotScope-Integration.md)) are fixed in the file. To change them or the catalog, run from source and edit `src/AgentHelm.Bridge/appsettings.json`.
+
+The single file's echo agent entry is rewritten at start-up to run the same executable with the `echo-agent` sub-command, so it needs no path setting.
 
 ## Containers
 
@@ -84,8 +87,7 @@ One setting can be changed without a restart: the CopilotScope URL, through the 
 
 | Port | What | When |
 |---|---|---|
-| 5199 | Bridge API | every local option (fixed under Aspire) |
-| 5200 | Web UI | release launchers |
+| 5199 | Bridge API (and, in the single file, the Web UI) | every local option (fixed under Aspire) |
 | 53168 / 53171 | Web UI (HTTPS / HTTP) | `dotnet run` launch profile |
 | 5299 → 5199 | Bridge API, host → container | Docker Compose |
 | 5300 → 8080 | Web UI, host → container | Docker Compose |

@@ -20,7 +20,7 @@ The Bridge starts every agent with the environment variables from its [catalog e
 | `OTEL_EXPORTER_OTLP_HEADERS` | `x-api-key=dev-secret-123` |
 | `OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT` | `true` |
 
-The release-zip launchers export the same set for every process they start; override `OTEL_EXPORTER_OTLP_ENDPOINT` and `OTEL_EXPORTER_OTLP_HEADERS` in your shell to change them.
+The built-in Copilot catalog entry sets this set. The single file has no launcher script; to change the endpoint or headers, run from source and edit the Copilot entry in `src/AgentHelm.Bridge/appsettings.json`. A shell variable does not override the entry, because the entry's own environment is applied to the agent process.
 
 > **Warning:** `OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT=true` puts **prompt and response content** into the telemetry. That is what lets CopilotScope judge a session, and it is harmless while the endpoint is a collector on your own machine. If you point the endpoint anywhere else, your conversations — and any code in them — go there too. Remove the variable if that is not what you want.
 

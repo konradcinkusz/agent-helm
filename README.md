@@ -36,59 +36,76 @@ scores inline**. See the [roadmap](#roadmap) for what remains beyond.
 
 ## Quick start
 
-Prerequisites: .NET 8 SDK **8.0.303 or newer** (Aspire ships as a NuGet
-MSBuild SDK — no `aspire` workload; if you installed it in the past you can
-`dotnet workload uninstall aspire`). Docker only if you want persistent
-history (Postgres); everything else runs without it.
+### Install — one file, nothing else to install (recommended)
 
-### Option 0 — containers, no clone (GHCR)
-
-Each GitHub release publishes two images to GHCR (see `.github/workflows/build-containers.yml`).
-Users don't need the repository at all:
-
-```bash
-# Linux / macOS / Git Bash:
-curl -O https://raw.githubusercontent.com/konradcinkusz/agenthelm/master/docker-compose.ghcr.yml
-# Windows PowerShell:
-curl.exe -O https://raw.githubusercontent.com/konradcinkusz/agenthelm/master/docker-compose.ghcr.yml
-
-docker compose -f docker-compose.ghcr.yml up
-```
-
-UI at **http://localhost:5300** · Bridge API at **http://localhost:5299**.
-
-One-time setup after the first workflow run: GHCR packages start private —
-switch each package to **public** (GitHub → Packages → package → Settings)
-so anonymous `docker pull` works.
-
-> **Constraint:** ACP agents (Copilot CLI, Claude Code, Gemini) run as local
-> subprocesses and cannot reach your host environment from inside a container.
-> The built-in **echo agent** is included in the Bridge image and works out of
-> the box. For real agents use Option A or B below.
-
-### Option 0b — release zip (no build)
-
-Download the latest zip from Releases, unpack, then `./run.sh` (or
-`.\run.ps1`). Bridge starts on `127.0.0.1:5199`, the UI on
-`127.0.0.1:5200`, and the built-in echo agent works out of the box. Requires
-only the .NET 8 ASP.NET Core *runtime*.
-
-### Option A — Aspire (recommended)
+Download the file for your system from the
+[latest release](https://github.com/konradcinkusz/agent-helm/releases/latest):
+`agenthelm-<tag>-linux-x64`, `agenthelm-<tag>-win-x64.exe`,
+`agenthelm-<tag>-osx-arm64` (Apple silicon) or `agenthelm-<tag>-osx-x64`
+(Intel Mac). The file is self-contained: it has the .NET runtime, the API, the
+web UI and the built-in echo agent inside. No SDK, no Docker, no second
+process.
 
 ```bash
-dotnet run --project src/AgentHelm.AppHost
+# macOS / Linux
+chmod +x ./agenthelm-v1.2.3-linux-x64
+./agenthelm-v1.2.3-linux-x64
 ```
 
-Starts Postgres (container, persistent volume), the Bridge (local process —
-this is deliberate, see [Why local](#why-the-bridge-runs-on-your-machine)),
-and the web UI. Open the URL Aspire prints for `web`.
-
-### Option B — no Docker, no Aspire
-
-```bash
-dotnet run --project src/AgentHelm.Bridge   # API on http://127.0.0.1:5199
-dotnet run --project src/AgentHelm.Web      # UI (memory-only history)
+```powershell
+# Windows (PowerShell)
+.\agenthelm-v1.2.3-win-x64.exe
 ```
+
+AgentHelm prints its address (`http://127.0.0.1:5199/` by default) and opens it
+in your browser; `--no-browser` turns that off. The UI and the API are on that
+one address.
+
+- **macOS:** if Gatekeeper refuses to open the file, run
+  `xattr -d com.apple.quarantine ./agenthelm-<tag>-osx-arm64` once.
+- **Windows:** if SmartScreen says "Windows protected your PC", choose
+  **More info → Run anyway**.
+- **Verify:** compare the file's SHA-256 with its line in the release's
+  `SHA256SUMS` (`sha256sum` / `shasum -a 256` / `Get-FileHash`).
+- **Port and token:** `--urls http://127.0.0.1:5300` or `AgentHelm__Urls=…`;
+  `AgentHelm__ApiToken=…` requires the `x-helm-token` header on API calls.
+  Settings come from optional environment variables and an `appsettings.json`
+  in the folder you start it from; sessions are kept in memory unless
+  `ConnectionStrings__helmdb` points at PostgreSQL.
+
+Install details, background running and autostart are in the
+[Installation page](wiki/Installation.md#single-file).
+
+### Other ways to run it
+
+- **Containers, no clone (GHCR).** `docker compose -f docker-compose.ghcr.yml up`
+  with the compose file from the repository. UI at **http://localhost:5300**,
+  Bridge API at **http://localhost:5299**. See
+  [Installation](wiki/Installation.md#containers-from-ghcr).
+
+  > **Constraint:** ACP agents (Copilot CLI, Claude Code, Gemini) run as local
+  > subprocesses and cannot reach your host environment from inside a container.
+  > The built-in **echo agent** works out of the box in the container; for real
+  > agents use the single file or build from source.
+
+- **Build from source.** Prerequisites: .NET 8 SDK **8.0.303 or newer** (Aspire
+  ships as a NuGet MSBuild SDK — no `aspire` workload; if you installed it in
+  the past you can `dotnet workload uninstall aspire`). Docker only if you want
+  persistent history (Postgres); everything else runs without it.
+
+  ```bash
+  # Option A — Aspire (starts Postgres, the Bridge and the web UI)
+  dotnet run --project src/AgentHelm.AppHost
+
+  # Option B — no Docker, no Aspire
+  dotnet run --project src/AgentHelm.Bridge   # API on http://127.0.0.1:5199
+  dotnet run --project src/AgentHelm.Web      # UI (memory-only history)
+  ```
+
+  Option A starts the Bridge as a local process on purpose (see
+  [Why local](#why-the-bridge-runs-on-your-machine)); open the URL Aspire prints
+  for `web`. To build the single file yourself, run
+  `scripts/build-single-file.sh <rid> <outdir>`.
 
 ### First session in 30 seconds — no agent required
 
@@ -111,7 +128,8 @@ the whole loop before installing anything:
 | Gemini CLI | `gemini` on PATH, authenticated | `gemini --acp` |
 
 Add or change agents in `src/AgentHelm.Bridge/appsettings.json` under
-`AgentHelm:Agents` — any ACP-speaking command works:
+`AgentHelm:Agents` — any ACP-speaking command works (the single file has that
+catalog built in, so changing it means running from source):
 
 ```json
 { "Id": "myagent", "Name": "My Agent", "Command": "my-agent", "Args": ["--acp"], "Type": "acp" }

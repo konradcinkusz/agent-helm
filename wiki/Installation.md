@@ -1,38 +1,134 @@
-AgentHelm is two .NET 8 processes — the **Bridge** (API, sessions, agents) and the **Web** UI — plus an optional PostgreSQL database for session history. Pick the option that matches what you want to do:
+AgentHelm is one program: the **Bridge** (API, sessions, agents) and the **Web UI** run in the same process on one address, `http://127.0.0.1:5199` by default. Persistent history (PostgreSQL) is optional. Pick the option that matches what you want to do:
 
 | Option | You need | Real agents | Persistent history | Best for |
 |---|---|:---:|:---:|---|
-| [Release zip](#release-zip) | .NET 8 ASP.NET Core runtime | ✓ | opt-in | Using AgentHelm |
+| [Single file](#single-file) | nothing (the .NET runtime is inside the file) | ✓ | opt-in | Using AgentHelm |
 | [From source with Aspire](#from-source-with-aspire) | .NET SDK 8.0.303+, Docker | ✓ | ✓ | Development, the full stack |
 | [From source with `dotnet run`](#from-source-with-dotnet-run) | .NET SDK 8 | ✓ | opt-in | Development without Docker |
 | [Containers from GHCR](#containers-from-ghcr) | Docker | echo only | ✓ | A quick look at the UI |
 | [Containers built from source](#containers-built-from-source) | Docker | echo only | ✓ | Testing the images |
 
-> **Important:** Real agents (Copilot CLI, Claude Code, Gemini CLI) run as **child processes of the Bridge**, with the Bridge's environment, credentials and file system. That is why every option that can drive real agents runs the Bridge directly on your machine, and why the container options only offer the built-in echo agent. [Deployment & topology](Deployment-and-Topology.md) explains the constraint in full.
+> **Important:** Real agents (Copilot CLI, Claude Code, Gemini CLI) run as **child processes of the Bridge**, with the Bridge's environment, credentials and file system. That is why every option that can drive real agents runs AgentHelm directly on your machine, and why the container options only offer the built-in echo agent. [Deployment & topology](Deployment-and-Topology.md) explains the constraint in full.
 
-## Release zip
+## Single file
 
-Each [GitHub release](https://github.com/konradcinkusz/agent-helm/releases) ships a portable, framework-dependent zip (`agenthelm-vX.Y.Z.zip`) that runs on any OS with the **.NET 8 ASP.NET Core runtime** — no SDK, no build, no Docker.
+Each [GitHub release](https://github.com/konradcinkusz/agent-helm/releases/latest) attaches one self-contained executable per platform. It bundles the .NET runtime, the Bridge, the Web UI and the built-in echo agent, so you need no SDK, no runtime, no build and no Docker.
 
-1. Download the latest `agenthelm-*.zip` from the [releases page](https://github.com/konradcinkusz/agent-helm/releases/latest) and unpack it.
-2. Start both processes with the launcher:
+1. Download the file for your system from the latest release. `<tag>` is the version, for example `v1.2.3`:
 
-    - macOS / Linux: `./run.sh`
-    - Windows (PowerShell): `.\run.ps1`
+    | Your system | File |
+    |---|---|
+    | Linux, x64 | `agenthelm-<tag>-linux-x64` |
+    | Windows, x64 | `agenthelm-<tag>-win-x64.exe` |
+    | macOS, Apple silicon (M1 and later) | `agenthelm-<tag>-osx-arm64` |
+    | macOS, Intel | `agenthelm-<tag>-osx-x64` |
 
-3. Open **<http://127.0.0.1:5200>**. The Bridge listens on `http://127.0.0.1:5199`.
+    Each release also has a `SHA256SUMS` file for [checking the download](#verify-the-download).
 
-The zip contains `bridge/`, `web/` and `echo-agent/` (the published applications), the two launchers, and `docker-compose.ghcr.yml`. The launchers start the Bridge in the background and the Web UI in the foreground; stopping the UI (<kbd>Ctrl</kbd>+<kbd>C</kbd>) stops the Bridge too.
+2. **macOS and Linux:** make the file executable, then run it:
 
-| Launcher variable | Default | Effect |
-|---|---|---|
-| `AGENTHELM_WEB_URLS` | `http://127.0.0.1:5200` | Where the Web UI listens. |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4318` | Where agents export OpenTelemetry (the [CopilotScope](CopilotScope-Integration.md) collector by default). |
-| `OTEL_EXPORTER_OTLP_HEADERS` | `x-api-key=dev-secret-123` | Headers sent with that telemetry. |
+    ```bash
+    chmod +x ./agenthelm-v1.2.3-linux-x64
+    ./agenthelm-v1.2.3-linux-x64
+    ```
 
-The launchers also set `COPILOT_OTEL_ENABLED=true` and the OTLP protocol variables, so every agent the Bridge starts inherits them. Without a database the zip runs **memory-only**: sessions work normally but are gone when the Bridge stops. To keep history, point the Bridge at a PostgreSQL database with `ConnectionStrings__helmdb` (see [configuration](Configuration.md#bridge-settings)).
+    **Windows:** double-click the `.exe`, or run `.\agenthelm-v1.2.3-win-x64.exe` in PowerShell.
 
-> **Warning:** **Releases v1.0.0 to v1.0.5:** their launchers start both applications from the zip's top-level folder, so the Bridge does not find its `appsettings.json` (the UI shows *connecting…* and no agents) and the UI does not find its styles. This is fixed for the next release; with one of these zips, start the two processes yourself — see [Troubleshooting → Known issues](Troubleshooting-and-FAQ.md#the-release-zip-starts-without-agents-and-without-styles).
+3. The console prints the address and opens your browser on it:
+
+    ```console
+    AgentHelm is running at http://127.0.0.1:5199/ (Ctrl+C to stop)
+    ```
+
+    If the browser does not open, open that address yourself. Stopping the program (<kbd>Ctrl</kbd>+<kbd>C</kbd>, or closing the console window) stops AgentHelm.
+
+The file has no companions: nothing has to sit next to it, and it runs from any folder. The built-in echo agent is the same file started with the sub-command `echo-agent`, so the [first session](Your-First-Session.md) works immediately.
+
+### First run
+
+- **macOS (Gatekeeper).** A file downloaded in a browser is quarantined, and macOS may refuse to open it ("cannot be opened because the developer cannot be verified"). Remove the quarantine flag once, then run it again:
+
+    ```bash
+    xattr -d com.apple.quarantine ./agenthelm-v1.2.3-osx-arm64
+    ```
+
+    Use the file name you downloaded. Alternatively, right-click the file in Finder and choose **Open**.
+
+- **Windows (SmartScreen).** "Windows protected your PC" appears for a file downloaded from the internet. Click **More info**, then **Run anyway**.
+
+- **Linux.** No extra step. If the file sits on a folder mounted `noexec` (some USB drives and `/tmp` setups), copy it to your home folder first.
+
+### Verify the download
+
+Each release has a `SHA256SUMS` file: one line per file, `<sha256>  <file name>`. Compare the checksum of the file you downloaded with its line:
+
+```bash
+# Linux
+sha256sum ./agenthelm-v1.2.3-linux-x64
+grep agenthelm-v1.2.3-linux-x64 SHA256SUMS
+
+# macOS
+shasum -a 256 ./agenthelm-v1.2.3-osx-arm64
+grep agenthelm-v1.2.3-osx-arm64 SHA256SUMS
+```
+
+```powershell
+# Windows (PowerShell)
+(Get-FileHash .\agenthelm-v1.2.3-win-x64.exe -Algorithm SHA256).Hash
+Select-String agenthelm-v1.2.3-win-x64.exe SHA256SUMS
+```
+
+The two hashes must be identical (PowerShell prints upper case; compare case-insensitively).
+
+### Settings and data
+
+- **No setup file is needed, and AgentHelm writes no configuration file of its own.** Settings come from, in increasing order of precedence: the defaults built into the file; an optional `appsettings.json` in the *content root*, which is the folder you start the program from; environment variables; and command-line arguments. The full list is in the [settings reference](Configuration.md).
+- **Sessions are kept in memory.** They are lost when AgentHelm stops, unless you give it a PostgreSQL database with `ConnectionStrings__helmdb` (see [History & resume](History-and-Resume.md)).
+- **Quick chats** use a scratch folder per session under your system's temporary folder, in `AgentHelm/chats/`.
+- **Agents** work in the folders you choose for their sessions. Their own logins (for example `~/.claude.json`) stay where the agent CLI keeps them; AgentHelm only reads them to show which account is signed in.
+
+### Port and token
+
+The default address is `http://127.0.0.1:5199`. The address and the API token are set with environment variables or arguments:
+
+```bash
+# Another port (the UI moves with it)
+AgentHelm__Urls=http://127.0.0.1:5300 ./agenthelm-v1.2.3-linux-x64
+./agenthelm-v1.2.3-linux-x64 --urls http://127.0.0.1:5300
+
+# A shared token: every API request must send it in the x-helm-token header
+AgentHelm__ApiToken="$(openssl rand -hex 24)" ./agenthelm-v1.2.3-linux-x64
+```
+
+```powershell
+# Windows (PowerShell)
+$env:AgentHelm__ApiToken = "replace-with-a-long-random-value"
+.\agenthelm-v1.2.3-win-x64.exe
+```
+
+The UI in the same process receives the token automatically; only direct API calls need the header (`curl -H "x-helm-token: $AgentHelm__ApiToken" http://127.0.0.1:5300/api/health`). Keep the address on loopback. Binding it to another interface (for example `0.0.0.0`) exposes a tool that runs agents on your machine; read [Security](Security.md#hardening-checklist) first.
+
+`--no-browser` stops the program from opening a browser on start.
+
+### Running in the background and at login
+
+AgentHelm has no service mode; it is an ordinary program. To keep it running:
+
+```bash
+# macOS / Linux: in the background, output to a log file
+nohup ./agenthelm-v1.2.3-linux-x64 --no-browser > agenthelm.log 2>&1 &
+```
+
+```powershell
+# Windows: in the background
+Start-Process -WindowStyle Hidden -FilePath .\agenthelm-v1.2.3-win-x64.exe -ArgumentList '--no-browser'
+```
+
+To start it at login, register the same command with the tool your system uses: a systemd user service (Linux), a launchd agent (macOS) or a Task Scheduler task that runs at logon (Windows). Add `--no-browser` so no browser opens at every login.
+
+### Supported platforms
+
+Release files exist for the four platforms in the table above. Other platforms (for example Linux arm64) can be built from source with [`scripts/build-single-file.sh`](Development.md#the-single-file-build).
 
 ## From source with Aspire
 

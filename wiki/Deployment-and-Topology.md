@@ -42,7 +42,7 @@ What can be elsewhere:
 
 | Setup | Bridge | Real agents | Notes |
 |---|---|:---:|---|
-| **All local** — release zip, `dotnet run`, Aspire | your machine | ✓ | Recommended. Everything on loopback. |
+| **All local** — single file, `dotnet run`, Aspire | your machine | ✓ | Recommended. Everything on loopback. |
 | **Containers** — Docker Compose | container | echo only | Good for trying the UI and the permission flow. Repositories must be mounted. |
 | **Remote Bridge** | another machine | on that machine | Not supported out of the box; see [Exposing the Bridge](#exposing-the-bridge). |
 
