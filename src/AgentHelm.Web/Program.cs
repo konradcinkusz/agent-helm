@@ -1,12 +1,8 @@
-using AgentHelm.Web.Components;
-using AgentHelm.Web.Services;
+using AgentHelm.Web;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddRazorComponents().AddInteractiveServerComponents();
-builder.Services.AddSingleton<BridgeClient>();
+builder.AddAgentHelmWeb();
 
 var app = builder.Build();
-app.UseStaticFiles();
-app.UseAntiforgery();
-app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+app.MapAgentHelmWeb();
 app.Run();

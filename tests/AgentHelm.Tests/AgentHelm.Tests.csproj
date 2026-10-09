@@ -15,5 +15,6 @@
     <!-- Built and copied next to the tests so EchoAgentEndToEndTests can run the
          real demo agent as a child process. -->
     <ProjectReference Include="..\..\tools\AgentHelm.EchoAgent\AgentHelm.EchoAgent.csproj" />
+    <ProjectReference Include="..\..\src\AgentHelm.App\AgentHelm.App.csproj" />
   </ItemGroup>
 </Project>

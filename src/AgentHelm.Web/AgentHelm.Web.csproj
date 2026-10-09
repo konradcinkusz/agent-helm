@@ -4,4 +4,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+  <!-- Inside the single-file build the App serves the UI itself; see AgentHelm.Bridge.csproj. -->
+  <ItemGroup Condition="'$(AgentHelmSingleFile)' == 'true'">
+    <Content Update="appsettings.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
 </Project>
