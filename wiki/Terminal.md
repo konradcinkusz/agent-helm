@@ -4,9 +4,9 @@ The **Terminal** tab is a shell next to the conversation, running in the session
 
 ## How it works
 
-- The shell starts the first time you open the tab, one per session, **in the working directory and as the user running the Bridge**.
+- The shell starts the first time you open the Terminal panel, one per session, **in the working directory and as the user running the Bridge**.
 - Type a command in the input box under the terminal and press <kbd>Enter</kbd>; the output streams into the terminal view (rendered by [xterm.js](https://xtermjs.org/), so colours and ANSI escape sequences display).
-- Switching tabs does not stop the shell. When you come back, the recent output is replayed (the Bridge keeps the last 64,000 characters).
+- Hiding the dock or switching to Changes does not stop the shell. When you come back, the recent output is replayed (the Bridge keeps the last 64,000 characters).
 - If the shell exits (you typed `exit`), a fresh one starts the next time you open the tab.
 - Deleting the session stops its shell.
 

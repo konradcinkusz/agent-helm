@@ -1,0 +1,32 @@
+<aside class="dock @(Open ? "open" : "closed")" @ref="_dockEl">
+    @if (Open)
+    {
+        <div class="dock-splitter" @ref="_splitterEl" title="Drag to resize"></div>
+        <div class="dock-head">
+            <div class="dock-tabs" role="tablist">
+                <button role="tab" class="dock-tab @(Tab == "changes" ? "active" : "")" aria-selected="@(Tab == "changes" ? "true" : "false")"
+                        @onclick='() => OnSelectTab.InvokeAsync("changes")'>Changes</button>
+                <button role="tab" class="dock-tab @(Tab == "terminal" ? "active" : "")" aria-selected="@(Tab == "terminal" ? "true" : "false")"
+                        @onclick='() => OnSelectTab.InvokeAsync("terminal")'>Terminal</button>
+            </div>
+            <button class="btn dock-close" title="Hide panel" aria-label="Hide panel" @onclick="() => OnToggle.InvokeAsync()">✕</button>
+        </div>
+        <div class="dock-body">
+            @if (Tab == "terminal")
+            {
+                @TerminalContent
+            }
+            else
+            {
+                @ChangesContent
+            }
+        </div>
+    }
+    else
+    {
+        <div class="dock-rail">
+            <button class="dock-rail-btn" title="Show changes" @onclick='() => OnSelectTab.InvokeAsync("changes")'>Changes</button>
+            <button class="dock-rail-btn" title="Show terminal" @onclick='() => OnSelectTab.InvokeAsync("terminal")'>Terminal</button>
+        </div>
+    }
+</aside>

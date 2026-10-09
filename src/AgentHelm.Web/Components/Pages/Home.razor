@@ -118,35 +118,32 @@
                 </div>
             }
 
-            <div class="tabs">
-                <button class="tab @(_activeTab == "chat" ? "active" : "")" @onclick='() => SwitchTabAsync("chat")'>Chat</button>
-                <button class="tab @(_activeTab == "changes" ? "active" : "")" @onclick='() => SwitchTabAsync("changes")'>Changes</button>
-                <button class="tab @(_activeTab == "terminal" ? "active" : "")" @onclick='() => SwitchTabAsync("terminal")'>Terminal</button>
-            </div>
-
-            @if (_activeTab == "chat")
-            {
-                <ChatView Entries="@_transcript" Streaming="@_streaming" />
-                <Composer @bind-Prompt="_prompt" Running="@(_detail.Status == "running")"
-                          Attachments="@_attachments" AttachError="@_attachError" SendError="@_sendError"
-                          AttachTitle="@AttachTitle()" OnFilesSelected="@OnFilesSelectedAsync"
-                          OnRemoveAttachment="@RemoveAttachment" OnSend="@SendPromptAsync" />
-            }
-            else if (_activeTab == "changes")
-            {
-                <ChangesPanel IsRepo="@_gitIsRepo" Changes="@_gitChanges" Diff="@_diff" DiffLines="@_diffLines"
-                              RejectConfirmPath="@_rejectConfirmPath"
-                              OnRefresh="@LoadChangesAsync" OnView="@LoadDiffAsync" OnAccept="@GitAcceptAsync"
-                              OnRejectRequest="@RequestReject" OnRejectCancel="@CancelReject"
-                              OnRejectConfirm="@GitRejectAsync" />
-            }
-            else
-            {
-                <TerminalPanel @bind-TermInput="_termInput" IsPty="@_termIsPty"
-                               OnKeyDown="@OnTerminalKeyAsync" OnInsertOutput="@InsertOutputIntoPromptAsync" />
-            }
+            <ChatView Entries="@_transcript" Streaming="@_streaming" />
+            <Composer @bind-Prompt="_prompt" Running="@(_detail.Status == "running")"
+                      Attachments="@_attachments" AttachError="@_attachError" SendError="@_sendError"
+                      AttachTitle="@AttachTitle()" OnFilesSelected="@OnFilesSelectedAsync"
+                      OnRemoveAttachment="@RemoveAttachment" OnSend="@SendPromptAsync" />
         }
     </Main>
+
+    <Dock>
+        @if (_detail is not null && _archived is null)
+        {
+            <Dock Open="@_dockOpen" Tab="@_activeTab" OnToggle="@ToggleDockAsync" OnSelectTab="@SelectDockTabAsync">
+                <ChangesContent>
+                    <ChangesPanel IsRepo="@_gitIsRepo" Changes="@_gitChanges" Diff="@_diff" DiffLines="@_diffLines"
+                                  RejectConfirmPath="@_rejectConfirmPath"
+                                  OnRefresh="@LoadChangesAsync" OnView="@LoadDiffAsync" OnAccept="@GitAcceptAsync"
+                                  OnRejectRequest="@RequestReject" OnRejectCancel="@CancelReject"
+                                  OnRejectConfirm="@GitRejectAsync" />
+                </ChangesContent>
+                <TerminalContent>
+                    <TerminalPanel @bind-TermInput="_termInput" IsPty="@_termIsPty"
+                                   OnKeyDown="@OnTerminalKeyAsync" OnInsertOutput="@InsertOutputIntoPromptAsync" />
+                </TerminalContent>
+            </Dock>
+        }
+    </Dock>
 </AppShell>
 
 @if (_browseOpen)

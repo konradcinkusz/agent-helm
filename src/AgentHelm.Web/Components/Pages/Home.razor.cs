@@ -50,8 +50,9 @@ public partial class Home : IDisposable
     // changed, and Blazor has no value change to render it back.
     private int _policySelectVersion;
 
-    // M2: tabs / attachments / git / terminal
-    private string _activeTab = "chat";
+    // M2: dock (changes / terminal) / attachments / git / terminal
+    private bool _dockOpen;
+    private string _activeTab = "changes";
     private readonly List<AttachmentDto> _attachments = [];
     private string? _attachError;
     private string? _sendError;
@@ -175,7 +176,6 @@ public partial class Home : IDisposable
         if (_yoloConfirmPending) _policySelectVersion++;
         _yoloConfirmPending = false;
         _sendError = null;
-        _activeTab = "chat";
         _attachments.Clear();
         _attachError = null;
         _diff = null;
@@ -198,6 +198,7 @@ public partial class Home : IDisposable
         _detail = await Bridge.GetSessionAsync(id, _pageCts.Token);
         _transcript = _detail?.Transcript ?? [];
         _pending = _detail?.Pending;
+        if (_dockOpen && _detail is not null) await ActivateTabAsync();
         await InvokeAsync(StateHasChanged);
 
         var token = _streamCts.Token;
@@ -316,19 +317,71 @@ public partial class Home : IDisposable
 
     // ------------------------------------------------------------------ tabs
 
-    private async Task SwitchTabAsync(string tab)
+    private async Task ToggleDockAsync()
+    {
+        _dockOpen = !_dockOpen;
+        if (_dockOpen) await ActivateTabAsync();
+        else StopTerminalStream();
+        await SaveDockAsync();
+    }
+
+    private async Task SelectDockTabAsync(string tab)
     {
         _activeTab = tab;
-        if (tab == "changes") await LoadChangesAsync();
-        if (tab == "terminal" && _detail is not null)
+        _dockOpen = true;
+        await ActivateTabAsync();
+        await SaveDockAsync();
+    }
+
+    private async Task ActivateTabAsync()
+    {
+        if (_activeTab == "changes")
+        {
+            StopTerminalStream();
+            await LoadChangesAsync();
+        }
+        else if (_detail is not null)
         {
             _termIsPty = await Bridge.StartTerminalAsync(_detail.Id, _pageCts.Token);
             _termNeedsInit = true;   // JS init must wait for the div to render
         }
     }
 
+    private void StopTerminalStream()
+    {
+        _termCts?.Cancel();
+        _termCts = null;
+    }
+
+    private async Task RestoreDockAsync()
+    {
+        try
+        {
+            var saved = await JS.InvokeAsync<DockState?>("helmDock.load");
+            if (saved is null) return;
+            _dockOpen = saved.Open;
+            if (saved.Tab is "changes" or "terminal") _activeTab = saved.Tab;
+        }
+        catch (JSException) { }
+    }
+
+    private async Task SaveDockAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("helmDock.save", new { open = _dockOpen, tab = _activeTab });
+        }
+        catch (JSException) { }
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+        {
+            await RestoreDockAsync();
+            StateHasChanged();
+            return;
+        }
         if (!_termNeedsInit || _detail is null) return;
         _termNeedsInit = false;
 
@@ -374,7 +427,6 @@ public partial class Home : IDisposable
         _prompt = string.IsNullOrWhiteSpace(_prompt)
             ? $"Terminal output:\n```\n{tail}\n```"
             : $"{_prompt}\n\nTerminal output:\n```\n{tail}\n```";
-        _activeTab = "chat";
     }
 
     // ------------------------------------------------------------------- git
@@ -675,6 +727,8 @@ public partial class Home : IDisposable
             _resuming = false;
         }
     }
+
+    public sealed record DockState(bool Open, string? Tab);
 
     public void Dispose()
     {

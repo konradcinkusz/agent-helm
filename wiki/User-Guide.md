@@ -37,9 +37,11 @@ Banners appear between the header and the tabs when something needs you:
 - **YOLO confirmation** — shown when you pick YOLO, before anything changes.
 - **Handoff** and **Scope** panels — opened from their header buttons.
 
-## Tabs
+## Chat and the dock
 
-| Tab | What it shows |
+The conversation and the composer are always in the main area. **Changes** and **Terminal** open in a dock on the right, side by side with the chat; drag its left edge to resize it, and use ✕ to hide it. AgentHelm remembers whether the dock was open and which panel it showed.
+
+| Panel | What it shows |
 |---|---|
 | **Chat** | The transcript and the composer. See [Sessions & chat](Sessions-and-Chat.md). |
 | **Changes** | Uncommitted git changes in the working directory, with diff, accept and reject. See [Reviewing changes](Reviewing-Changes.md). |
