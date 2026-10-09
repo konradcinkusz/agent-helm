@@ -1,10 +1,10 @@
-AgentHelm's UI has two pages: the **Dashboard**, where you work with sessions, and **Providers**, where you check the accounts of your agent CLIs. This page is a map of the Dashboard; the pages that follow cover each feature in depth.
+AgentHelm's UI has three pages: the **Dashboard**, where you work with sessions, **Search**, which finds sessions, and **Providers**, where you check the accounts of your agent CLIs. This page is a map of the Dashboard; the pages that follow cover each feature in depth.
 
 ![The AgentHelm dashboard with an open session](images/session-chat.png)
 
 ## Top bar
 
-The brand, links to **Dashboard** and **Providers**, and on the right the number of agents the Bridge has configured. If it keeps saying *connecting…*, the UI cannot reach the Bridge or the Bridge has no agents configured — see [Troubleshooting](Troubleshooting-and-FAQ.md#the-ui-says-connecting-and-lists-no-agents).
+The brand, links to **Dashboard**, **Search** and **Providers**, and on the right the number of agents the Bridge has configured. If it keeps saying *connecting…*, the UI cannot reach the Bridge or the Bridge has no agents configured — see [Troubleshooting](Troubleshooting-and-FAQ.md#the-ui-says-connecting-and-lists-no-agents).
 
 ## Session rail (left)
 
@@ -52,6 +52,10 @@ Banners appear between the header and the tabs when something needs you:
 | <kbd>Ctrl</kbd>+<kbd>Enter</kbd> | Composer | Send the prompt |
 | <kbd>Enter</kbd> / <kbd>Esc</kbd> | Title editor | Save / cancel the new title |
 | <kbd>Enter</kbd> | Terminal input | Run the command |
+
+## Search page
+
+Type in the search box to filter live and archived sessions as you type. A session matches when its title or agent contains the text, or when any message in its transcript does; transcript matches show the surrounding text with the match highlighted. Select a result to open the session. Archived results need PostgreSQL, like [History](History-and-Resume.md).
 
 ## Providers page
 
