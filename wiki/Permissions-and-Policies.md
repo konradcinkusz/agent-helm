@@ -2,7 +2,7 @@ Before an ACP agent runs a tool — edits a file, runs a command, fetches a URL 
 
 ## The permission banner
 
-A request that needs you appears as a banner above the tabs, naming the agent, the tool and its **kind**:
+A request that needs you appears as a banner above the chat, naming the agent, the tool and its **kind**:
 
 ![A permission banner for an edit tool](images/permission-banner.png)
 
@@ -12,7 +12,7 @@ When you click an allow option, AgentHelm passes that exact option back to the a
 
 ## Policies
 
-Each session has one policy, shown in the header drop-down. New sessions start with `ask`; a session created by [handoff](Agent-Handoff.md) inherits the policy of the session it came from.
+Each session has one policy, shown as the mode chip in the session header (*Interactive* for `ask`, *Plan* for `auto_read`, *Autopilot* for `yolo`) and changed from the **⋯** menu of the header. New sessions start with `ask`; a session created by [handoff](Agent-Handoff.md) inherits the policy of the session it came from.
 
 | Policy | Drop-down label | Automatically allowed | Asks you |
 |---|---|---|---|

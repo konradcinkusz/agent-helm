@@ -26,7 +26,7 @@ The release-zip launchers export the same set for every process they start; over
 
 ## 2. Scope scores inside AgentHelm
 
-Click **Scope** in the session header. The Bridge asks CopilotScope for its recent sessions (`GET <Scope URL>/api/sessions`) and shows those whose last activity falls within this session's lifetime — from when it started to its last activity, with two minutes of slack on each side — newest first, at most three. For each match you see the score, the grade, the model and the confidence.
+Open **⋯** in the session header and click **Scope**. The Bridge asks CopilotScope for its recent sessions (`GET <Scope URL>/api/sessions`) and shows those whose last activity falls within this session's lifetime — from when it started to its last activity, with two minutes of slack on each side — newest first, at most three. For each match you see the score, the grade, the model and the confidence.
 
 Once you have opened the panel, a session started without an explicit model shows the model of the newest matching Scope session in its header.
 

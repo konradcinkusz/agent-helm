@@ -3,17 +3,43 @@
 .status.idle { color: var(--ok); }
 .status.error { color: var(--err); border-color: var(--err); }
 
+.session-head-main { min-width: 0; }
+.session-head-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.session-head-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.session-head-actions { flex-shrink: 0; }
+
+.mode-chip {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 10px; color: var(--dim); border: 1px solid var(--line);
+}
+
 .cap-chip {
   display: inline-block; margin-left: 6px; padding: 1px 8px;
   font-family: var(--mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
   color: var(--ok); border: 1px solid color-mix(in srgb, var(--ok) 50%, transparent); border-radius: 8px;
 }
 
-.title-edit {
-  background: none; border: none; color: var(--dim); cursor: pointer;
-  font-size: 12px; padding: 0 4px; vertical-align: middle;
+.btn.toggle.on { border-color: var(--copper); color: var(--copper); }
+.btn.icon { padding: 7px 10px; font-weight: 600; }
+
+.head-menu { position: relative; }
+.head-menu-list {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 20;
+  display: flex; flex-direction: column; min-width: 220px; padding: 6px;
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
 }
-.title-edit:hover { color: var(--copper); }
+.menu-item {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  background: none; border: none; color: var(--text); font-size: 12px; text-align: left;
+  padding: 7px 10px; border-radius: 6px; cursor: pointer;
+}
+.menu-item:hover { background: var(--panel); color: var(--copper); }
+.menu-item.danger:hover { color: var(--err); }
+.menu-field { cursor: default; }
+.menu-field:hover { background: none; color: var(--text); }
+.menu-field .policy-select { font-size: 11px; }
+
 .title-input {
   background: var(--ink); color: var(--text); border: 1px solid var(--copper);
   border-radius: 6px; padding: 4px 8px; font-size: 14px; font-weight: 600; min-width: 260px;

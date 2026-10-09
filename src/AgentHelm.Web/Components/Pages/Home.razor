@@ -60,7 +60,7 @@
                            OnStartEditTitle="@StartEditTitle" OnTitleKey="@OnTitleKeyAsync"
                            OnToggleScope="@ToggleScopeAsync" OnToggleHandoff="@ToggleHandoff"
                            OnPolicyChanged="@OnPolicyChangeAsync" OnStop="@CancelTurnAsync"
-                           OnDelete="@DeleteSessionAsync" />
+                           OnDelete="@DeleteSessionAsync" ActiveTab="@_activeTab" OnSwitchTab="@SwitchTabAsync" />
 
             @if (_yoloConfirmPending)
             {
@@ -117,12 +117,6 @@
                     </div>
                 </div>
             }
-
-            <div class="tabs">
-                <button class="tab @(_activeTab == "chat" ? "active" : "")" @onclick='() => SwitchTabAsync("chat")'>Chat</button>
-                <button class="tab @(_activeTab == "changes" ? "active" : "")" @onclick='() => SwitchTabAsync("changes")'>Changes</button>
-                <button class="tab @(_activeTab == "terminal" ? "active" : "")" @onclick='() => SwitchTabAsync("terminal")'>Terminal</button>
-            </div>
 
             @if (_activeTab == "chat")
             {
