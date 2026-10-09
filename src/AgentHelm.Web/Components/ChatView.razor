@@ -1,0 +1,16 @@
+<div class="chat" id="chat-scroll">
+    @foreach (var entry in Entries)
+    {
+        <div class="msg @RoleClass(entry)">
+            <div class="msg-role">@entry.Role@(entry.Kind is "tool_call" ? " · tool" : "")</div>
+            <div class="msg-bubble">@entry.Text</div>
+        </div>
+    }
+    @if (Streaming.Length > 0)
+    {
+        <div class="msg assistant">
+            <div class="msg-role">assistant · streaming</div>
+            <div class="msg-bubble">@Streaming<span class="caret">▌</span></div>
+        </div>
+    }
+</div>

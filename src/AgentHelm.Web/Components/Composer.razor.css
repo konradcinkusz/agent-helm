@@ -1,0 +1,21 @@
+.composer { display: flex; gap: 10px; padding: 12px 18px; border-top: 1px solid var(--line); background: var(--panel); }
+.composer textarea {
+  flex: 1; min-height: 58px; resize: vertical;
+  background: var(--ink); color: var(--text); border: 1px solid var(--line);
+  border-radius: 8px; padding: 10px 12px; font-size: 13px; font-family: inherit;
+}
+.composer textarea:focus { outline: none; border-color: var(--copper); }
+
+.attach-row { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 18px 6px; }
+.attach-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px;
+  padding: 3px 10px; font-family: var(--mono); font-size: 11px;
+}
+.attach-chip button { background: none; border: none; color: var(--err); cursor: pointer; font-size: 12px; padding: 0; }
+.attach-label {
+  display: inline-flex; align-items: center; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 7px; padding: 7px 12px; font-size: 12px; color: var(--dim);
+}
+.attach-label:hover { border-color: var(--copper); color: var(--copper); }
+.attach-label ::deep input[type=file] { display: none; }

@@ -1,0 +1,30 @@
+@if (Attachments.Count > 0)
+{
+    <div class="attach-row">
+        @foreach (var attachment in Attachments)
+        {
+            <span class="attach-chip">@attachment.Name
+                <button @onclick="() => OnRemoveAttachment.InvokeAsync(attachment)">✕</button>
+            </span>
+        }
+    </div>
+}
+@if (AttachError is not null)
+{
+    <div class="error-note pad">@AttachError</div>
+}
+@if (SendError is not null)
+{
+    <div class="error-note pad">@SendError</div>
+}
+
+<div class="composer">
+    <label class="attach-label" title="@AttachTitle">
+        📎
+        <InputFile OnChange="@OnFilesSelected" multiple />
+    </label>
+    <textarea placeholder="Prompt the agent… (Ctrl+Enter to send)"
+              value="@Prompt" @oninput="PromptInputAsync"
+              @onkeydown="KeyDownAsync"></textarea>
+    <button class="btn primary" disabled="@(Running || string.IsNullOrWhiteSpace(Prompt))" @onclick="() => OnSend.InvokeAsync()">Send</button>
+</div>

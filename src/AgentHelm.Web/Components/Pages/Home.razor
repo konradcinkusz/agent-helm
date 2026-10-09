@@ -12,101 +12,22 @@
     <div class="conn">@(_agents.Count > 0 ? $"{_agents.Count} agent(s) configured" : "connecting…")</div>
 </header>
 
-<div class="layout">
-    <aside class="rail">
-        <div class="rail-head">
-            <span class="rail-label">@(_showHistory ? "History" : "Sessions")</span>
-            <div class="rail-actions">
-                <button class="btn" @onclick="ToggleHistoryAsync">@(_showHistory ? "Live" : "History")</button>
-                @if (!_showHistory)
-                {
-                    <button class="btn" @onclick="ToggleNewSession">＋ New</button>
-                }
-            </div>
-        </div>
+<AppShell>
+    <Sidebar>
+        <SessionSidebar Agents="@_agents" Sessions="@_sessions" History="@_history"
+                        ShowHistory="@_showHistory" ShowNewSession="@_showNewSession"
+                        SelectedId="@_selectedId" ArchivedId="@_archived?.Id"
+                        NewAgentId="@_newAgentId" OnNewAgentChanged="@OnNewAgentChangedAsync"
+                        NewAgentModels="@_newAgentModels" Creating="@_creating" CreateError="@_createError"
+                        @bind-NewCwd="_newCwd" @bind-NewTitle="_newTitle" @bind-NewModel="_newModel"
+                        ShowPreconfig="@_showPreconfig" @bind-PreconfigOtelUrl="_preconfigOtelUrl"
+                        OnToggleHistory="@ToggleHistoryAsync" OnToggleNewSession="@ToggleNewSession"
+                        OnBrowse="@OpenBrowseAsync" OnCreate="@CreateSessionAsync"
+                        OnTogglePreconfig="@TogglePreconfigAsync"
+                        OnSelectSession="@SelectSessionAsync" OnSelectArchived="@SelectArchived" />
+    </Sidebar>
 
-        @if (!_showHistory)
-        {
-            @if (_showNewSession)
-            {
-                <div class="new-session">
-                    <select value="@_newAgentId" @onchange="OnNewAgentChangedAsync">
-                        @foreach (var agent in _agents)
-                        {
-                            <option value="@agent.Id">@agent.Name</option>
-                        }
-                    </select>
-                    <div class="cwd-row">
-                        <input class="cwd-input" placeholder="Working directory (repo path)" @bind="_newCwd" />
-                        <button class="btn cwd-browse" title="Browse directories" @onclick="OpenBrowseAsync">📁</button>
-                    </div>
-                    <div class="term-note">Path on the Bridge server. Docker users: add <code>volumes:</code> to docker-compose (e.g. <code>- C:\Repos:/repos</code>) and enter the container path here.</div>
-                    <input placeholder="Title (optional)" @bind="_newTitle" />
-                    @if (_newAgentModels.Count > 0)
-                    {
-                        <select @bind="_newModel" title="Model for this session">
-                            @foreach (var m in _newAgentModels)
-                            {
-                                <option value="@m.Id">@m.Name@(m.IsDefault ? " (default)" : "")</option>
-                            }
-                        </select>
-                    }
-                    else
-                    {
-                        <input placeholder="Model (optional)" @bind="_newModel" />
-                    }
-                    <button class="btn preconfig-toggle @(_showPreconfig ? "active" : "")"
-                            @onclick="TogglePreconfigAsync">⚙ Pre-config</button>
-                    @if (_showPreconfig)
-                    {
-                        <div class="preconfig-panel">
-                            <label class="preconfig-label">OTel endpoint <span class="preconfig-hint">(GitHub Copilot / CopilotScope)</span></label>
-                            <input placeholder="http://localhost:4318" @bind="_preconfigOtelUrl" />
-                            <div class="term-note">Where the agent exports telemetry. Applied when starting the session.</div>
-                        </div>
-                    }
-                    <button class="btn primary" disabled="@(_creating || string.IsNullOrWhiteSpace(_newCwd))"
-                            @onclick="CreateSessionAsync">
-                        @(_creating ? "Starting…" : "Start session")
-                    </button>
-                    @if (_createError is not null)
-                    {
-                        <div class="error-note">@_createError</div>
-                    }
-                </div>
-            }
-
-            @foreach (var session in _sessions)
-            {
-                <button class="session-card @(session.Id == _selectedId ? "active" : "")"
-                        @onclick="() => SelectSessionAsync(session.Id)">
-                    <span class="session-title">@session.Title</span>
-                    <span class="session-meta">@session.AgentId · @session.Status · @PolicyLabel(session.Policy)@(session.HasPendingPermission ? " · ⏳ permission" : "")</span>
-                </button>
-            }
-            @if (_sessions.Count == 0 && !_showNewSession)
-            {
-                <div class="empty">No sessions yet.<br />Start one — the built-in <b>echo</b> agent works without any real agent installed.</div>
-            }
-        }
-        else
-        {
-            @foreach (var archived in _history)
-            {
-                <button class="session-card @(archived.Id == _archived?.Id ? "active" : "")"
-                        @onclick="() => SelectArchived(archived)">
-                    <span class="session-title">@archived.Title</span>
-                    <span class="session-meta">@archived.AgentId · @archived.LastActivity.LocalDateTime.ToString("MMM d, HH:mm")</span>
-                </button>
-            }
-            @if (_history.Count == 0)
-            {
-                <div class="empty">No archived sessions.<br />History requires Postgres (run via the AppHost).</div>
-            }
-        }
-    </aside>
-
-    <section class="main">
+    <Main>
         @if (_archived is not null)
         {
             <div class="session-head">
@@ -126,15 +47,7 @@
             {
                 <div class="error-note pad">@_resumeError</div>
             }
-            <div class="chat">
-                @foreach (var entry in _archived.Transcript)
-                {
-                    <div class="msg @RoleClass(entry)">
-                        <div class="msg-role">@entry.Role@(entry.Kind is "tool_call" ? " · tool" : "")</div>
-                        <div class="msg-bubble">@entry.Text</div>
-                    </div>
-                }
-            </div>
+            <ChatView Entries="@_archived.Transcript" />
         }
         else if (_detail is null)
         {
@@ -142,43 +55,12 @@
         }
         else
         {
-            <div class="session-head">
-                <div>
-                    @if (_editingTitle)
-                    {
-                        <input class="title-input" @bind="_titleDraft" @bind:event="oninput"
-                               @onkeydown="OnTitleKeyAsync" />
-                    }
-                    else
-                    {
-                        <div class="session-head-title">@_detail.Title
-                            <button class="title-edit" title="Rename session" @onclick="StartEditTitle">✎</button>
-                        </div>
-                    }
-                    <div class="session-head-sub">
-                        @_detail.AgentId · @_detail.Cwd@ModelSuffix()
-                        @if (_detail.Caps is { } caps)
-                        {
-                            @if (caps.LoadSession) { <span class="cap-chip">resume</span> }
-                            @if (caps.Image) { <span class="cap-chip">images</span> }
-                            @if (caps.EmbeddedContext) { <span class="cap-chip">files</span> }
-                        }
-                    </div>
-                </div>
-                <div class="session-head-actions">
-                    <button class="btn" @onclick="ToggleScopeAsync" title="Quality scores from CopilotScope (time-based match)">Scope</button>
-                    <button class="btn" @onclick="ToggleHandoff" title="Continue this conversation with a different agent">Handoff</button>
-                    <select class="policy-select" @key="_policySelectVersion" value="@_detail.Policy" @onchange="OnPolicyChangeAsync"
-                            title="Permission policy — every auto-decision is still audited in the transcript">
-                        <option value="ask">Ask every tool</option>
-                        <option value="auto_read">Auto-allow reads</option>
-                        <option value="yolo">YOLO</option>
-                    </select>
-                    <span class="status @_detail.Status">@_detail.Status</span>
-                    <button class="btn" @onclick="CancelTurnAsync" disabled="@(_detail.Status != "running")">Stop</button>
-                    <button class="btn danger" @onclick="DeleteSessionAsync">Delete</button>
-                </div>
-            </div>
+            <SessionHeader Session="@_detail" ScopeModel="@_scopeModel" EditingTitle="@_editingTitle"
+                           @bind-TitleDraft="_titleDraft" PolicySelectVersion="@_policySelectVersion"
+                           OnStartEditTitle="@StartEditTitle" OnTitleKey="@OnTitleKeyAsync"
+                           OnToggleScope="@ToggleScopeAsync" OnToggleHandoff="@ToggleHandoff"
+                           OnPolicyChanged="@OnPolicyChangeAsync" OnStop="@CancelTurnAsync"
+                           OnDelete="@DeleteSessionAsync" />
 
             @if (_yoloConfirmPending)
             {
@@ -214,38 +96,7 @@
 
             @if (_scopeOpen)
             {
-                <div class="scope-panel">
-                    @if (_scope is null)
-                    {
-                        <div class="term-note">Loading Scope data…</div>
-                    }
-                    else if (!_scope.Available)
-                    {
-                        <div class="term-note">CopilotScope is not reachable (AgentHelm:Scope:BaseUrl). Run Scope and point the agent's OTel export at it to see quality here.</div>
-                    }
-                    else if (_scope.Matches.Count == 0)
-                    {
-                        <div class="term-note">No Scope sessions overlap this session's activity window yet.</div>
-                    }
-                    else
-                    {
-                        @foreach (var match in _scope.Matches)
-                        {
-                            <div class="scope-row">
-                                <span class="scope-score">@(match.Score is { } sc ? sc.ToString("0") : "—")</span>
-                                <span class="scope-grade">@(match.Grade ?? "")</span>
-                                <div class="scope-row-detail">
-                                    @if (match.Model is not null)
-                                    {
-                                        <span class="scope-model">@match.Model</span>
-                                    }
-                                    <span class="scope-meta">@(match.Title ?? match.Id)@(match.Confidence is { } cf ? $" · conf {cf:P0}" : "")</span>
-                                </div>
-                            </div>
-                        }
-                        <div class="term-note">time-based best-effort match — exact correlation needs telemetry tagging (Beyond-M3)</div>
-                    }
-                </div>
+                <ScopePanel Scope="@_scope" />
             }
 
             @if (_pending is not null)
@@ -275,120 +126,28 @@
 
             @if (_activeTab == "chat")
             {
-                <div class="chat" id="chat-scroll">
-                    @foreach (var entry in _transcript)
-                    {
-                        <div class="msg @RoleClass(entry)">
-                            <div class="msg-role">@entry.Role@(entry.Kind is "tool_call" ? " · tool" : "")</div>
-                            <div class="msg-bubble">@entry.Text</div>
-                        </div>
-                    }
-                    @if (_streaming.Length > 0)
-                    {
-                        <div class="msg assistant">
-                            <div class="msg-role">assistant · streaming</div>
-                            <div class="msg-bubble">@_streaming<span class="caret">▌</span></div>
-                        </div>
-                    }
-                </div>
-
-                @if (_attachments.Count > 0)
-                {
-                    <div class="attach-row">
-                        @foreach (var attachment in _attachments)
-                        {
-                            <span class="attach-chip">@attachment.Name
-                                <button @onclick="() => RemoveAttachment(attachment)">✕</button>
-                            </span>
-                        }
-                    </div>
-                }
-                @if (_attachError is not null)
-                {
-                    <div class="error-note pad">@_attachError</div>
-                }
-                @if (_sendError is not null)
-                {
-                    <div class="error-note pad">@_sendError</div>
-                }
-
-                <div class="composer">
-                    <label class="attach-label" title="@AttachTitle()">
-                        📎
-                        <InputFile OnChange="OnFilesSelectedAsync" multiple />
-                    </label>
-                    <textarea placeholder="Prompt the agent… (Ctrl+Enter to send)"
-                              @bind="_prompt" @bind:event="oninput"
-                              @onkeydown="OnComposerKeyAsync"></textarea>
-                    <button class="btn primary" disabled="@(_detail.Status == "running" || string.IsNullOrWhiteSpace(_prompt))"
-                            @onclick="SendPromptAsync">Send</button>
-                </div>
+                <ChatView Entries="@_transcript" Streaming="@_streaming" />
+                <Composer @bind-Prompt="_prompt" Running="@(_detail.Status == "running")"
+                          Attachments="@_attachments" AttachError="@_attachError" SendError="@_sendError"
+                          AttachTitle="@AttachTitle()" OnFilesSelected="@OnFilesSelectedAsync"
+                          OnRemoveAttachment="@RemoveAttachment" OnSend="@SendPromptAsync" />
             }
             else if (_activeTab == "changes")
             {
-                <div class="changes-panel">
-                    <div class="rail-head">
-                        <span class="rail-label">Working tree vs HEAD</span>
-                        <button class="btn" @onclick="LoadChangesAsync">Refresh</button>
-                    </div>
-                    @if (!_gitIsRepo)
-                    {
-                        <div class="empty">This working directory is not a git repository.</div>
-                    }
-                    else if (_gitChanges.Count == 0)
-                    {
-                        <div class="empty">Working tree clean — nothing to review.</div>
-                    }
-                    @foreach (var change in _gitChanges)
-                    {
-                        <div class="change-row @(change.Path == _diff?.Path ? "selected" : "")">
-                            <span class="change-path">@change.Path</span>
-                            <span class="change-status @change.Status">@change.Status</span>
-                            <button class="btn" @onclick="() => LoadDiffAsync(change.Path)">View</button>
-                            <button class="btn primary" @onclick="() => GitAcceptAsync(change.Path)">Accept</button>
-                            @if (_rejectConfirmPath == change.Path)
-                            {
-                                <button class="btn danger" @onclick="() => GitRejectAsync(change.Path)">Confirm revert</button>
-                                <button class="btn" @onclick="() => _rejectConfirmPath = null">✕</button>
-                            }
-                            else
-                            {
-                                <button class="btn danger" @onclick="() => _rejectConfirmPath = change.Path">Reject</button>
-                            }
-                        </div>
-                    }
-                    @if (_diff is not null)
-                    {
-                        <div class="rail-head">
-                            <span class="rail-label">@_diff.Path</span>
-                            <span class="diff-stats"><span class="plus">+@_diff.Additions</span> / <span class="minus">−@_diff.Deletions</span></span>
-                        </div>
-                        <div class="diff-view">
-                            @foreach (var line in _diffLines)
-                            {
-                                <div class="diff-line @DiffLineClass(line)">@line</div>
-                            }
-                        </div>
-                    }
-                </div>
+                <ChangesPanel IsRepo="@_gitIsRepo" Changes="@_gitChanges" Diff="@_diff" DiffLines="@_diffLines"
+                              RejectConfirmPath="@_rejectConfirmPath"
+                              OnRefresh="@LoadChangesAsync" OnView="@LoadDiffAsync" OnAccept="@GitAcceptAsync"
+                              OnRejectRequest="@RequestReject" OnRejectCancel="@CancelReject"
+                              OnRejectConfirm="@GitRejectAsync" />
             }
             else
             {
-                <div class="terminal-panel">
-                    <div id="term-host" class="term-host"></div>
-                    <div class="term-input-row">
-                        <input placeholder="Command… (Enter to run)" @bind="_termInput" @bind:event="oninput"
-                               @onkeydown="OnTerminalKeyAsync" />
-                        <button class="btn" @onclick="InsertOutputIntoPromptAsync" title="Append recent terminal output to the chat composer">→ Prompt</button>
-                    </div>
-                    <div class="term-note">@(_termIsPty
-                        ? "PTY: prompts, colours and line editing work; input is sent a line at a time"
-                        : "shell pipe (no PTY): command output streams here; full-screen TUI apps won't render")</div>
-                </div>
+                <TerminalPanel @bind-TermInput="_termInput" IsPty="@_termIsPty"
+                               OnKeyDown="@OnTerminalKeyAsync" OnInsertOutput="@InsertOutputIntoPromptAsync" />
             }
         }
-    </section>
-</div>
+    </Main>
+</AppShell>
 
 @if (_browseOpen)
 {

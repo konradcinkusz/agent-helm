@@ -414,21 +414,9 @@ public partial class Home : IDisposable
         await LoadChangesAsync();
     }
 
-    private static string DiffLineClass(string line) => line switch
-    {
-        _ when line.StartsWith("+++") || line.StartsWith("---") => "meta",
-        _ when line.StartsWith("@@") => "hunk",
-        _ when line.StartsWith('+') => "add",
-        _ when line.StartsWith('-') => "del",
-        _ when line.StartsWith("diff ") || line.StartsWith("index ") => "meta",
-        _ => ""
-    };
+    private void RequestReject(string path) => _rejectConfirmPath = path;
 
-    private string ModelSuffix()
-    {
-        var m = _detail?.Model is { Length: > 0 } dm ? dm : _scopeModel;
-        return m is not null ? $" · {m}" : "";
-    }
+    private void CancelReject() => _rejectConfirmPath = null;
 
     private string AttachTitle() =>
         _detail?.Caps is { Image: false, EmbeddedContext: false }
@@ -581,11 +569,6 @@ public partial class Home : IDisposable
         }
     }
 
-    private async Task OnComposerKeyAsync(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter" && e.CtrlKey) await SendPromptAsync();
-    }
-
     private async Task ResolvePermissionAsync(PermissionOptionDto option)
     {
         if (_detail is null || _pending is null) return;
@@ -646,13 +629,6 @@ public partial class Home : IDisposable
         _policySelectVersion++;
     }
 
-    private static string PolicyLabel(string policy) => policy switch
-    {
-        "auto_read" => "auto-read",
-        "yolo" => "YOLO",
-        _ => "ask"
-    };
-
     // --------------------------------------------------------------- history
 
     private async Task ToggleHistoryAsync()
@@ -699,14 +675,6 @@ public partial class Home : IDisposable
             _resuming = false;
         }
     }
-
-    private static string RoleClass(ChatEntryDto entry) => entry.Role switch
-    {
-        "user" => "user",
-        "assistant" => "assistant",
-        "tool" => "tool",
-        _ => "system"
-    };
 
     public void Dispose()
     {

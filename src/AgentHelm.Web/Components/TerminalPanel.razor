@@ -1,0 +1,11 @@
+<div class="terminal-panel">
+    <div id="term-host" class="term-host"></div>
+    <div class="term-input-row">
+        <input placeholder="Command… (Enter to run)" value="@TermInput" @oninput="TermInputChangedAsync"
+               @onkeydown="e => OnKeyDown.InvokeAsync(e)" />
+        <button class="btn" @onclick="() => OnInsertOutput.InvokeAsync()" title="Append recent terminal output to the chat composer">→ Prompt</button>
+    </div>
+    <div class="term-note">@(IsPty
+        ? "PTY: prompts, colours and line editing work; input is sent a line at a time"
+        : "shell pipe (no PTY): command output streams here; full-screen TUI apps won't render")</div>
+</div>

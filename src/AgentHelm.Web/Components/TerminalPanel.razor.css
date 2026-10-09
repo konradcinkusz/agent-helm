@@ -1,0 +1,8 @@
+.terminal-panel { flex: 1; display: flex; flex-direction: column; padding: 14px 18px; gap: 10px; min-height: 0; }
+.term-host { flex: 1; background: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px; min-height: 0; overflow: hidden; }
+.term-input-row { display: flex; gap: 8px; }
+.term-input-row input {
+  flex: 1; background: var(--ink); color: var(--text); border: 1px solid var(--line);
+  border-radius: 7px; padding: 8px 12px; font-family: var(--mono); font-size: 13px;
+}
+.term-input-row input:focus { outline: none; border-color: var(--copper); }

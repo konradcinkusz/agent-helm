@@ -1,0 +1,92 @@
+<aside class="rail">
+    <div class="rail-head">
+        <span class="rail-label">@(ShowHistory ? "History" : "Sessions")</span>
+        <div class="rail-actions">
+            <button class="btn" @onclick="() => OnToggleHistory.InvokeAsync()">@(ShowHistory ? "Live" : "History")</button>
+            @if (!ShowHistory)
+            {
+                <button class="btn" @onclick="() => OnToggleNewSession.InvokeAsync()">＋ New</button>
+            }
+        </div>
+    </div>
+
+    @if (!ShowHistory)
+    {
+        @if (ShowNewSession)
+        {
+            <div class="new-session">
+                <select value="@NewAgentId" @onchange="NewAgentChangedAsync">
+                    @foreach (var agent in Agents)
+                    {
+                        <option value="@agent.Id">@agent.Name</option>
+                    }
+                </select>
+                <div class="cwd-row">
+                    <input class="cwd-input" placeholder="Working directory (repo path)" value="@NewCwd" @onchange="CwdChangedAsync" />
+                    <button class="btn cwd-browse" title="Browse directories" @onclick="() => OnBrowse.InvokeAsync()">📁</button>
+                </div>
+                <div class="term-note">Path on the Bridge server. Docker users: add <code>volumes:</code> to docker-compose (e.g. <code>- C:\Repos:/repos</code>) and enter the container path here.</div>
+                <input placeholder="Title (optional)" value="@NewTitle" @onchange="TitleChangedAsync" />
+                @if (NewAgentModels.Count > 0)
+                {
+                    <select value="@NewModel" @onchange="ModelChangedAsync" title="Model for this session">
+                        @foreach (var m in NewAgentModels)
+                        {
+                            <option value="@m.Id">@m.Name@(m.IsDefault ? " (default)" : "")</option>
+                        }
+                    </select>
+                }
+                else
+                {
+                    <input placeholder="Model (optional)" value="@NewModel" @onchange="ModelChangedAsync" />
+                }
+                <button class="btn preconfig-toggle @(ShowPreconfig ? "active" : "")"
+                        @onclick="() => OnTogglePreconfig.InvokeAsync()">⚙ Pre-config</button>
+                @if (ShowPreconfig)
+                {
+                    <div class="preconfig-panel">
+                        <label class="preconfig-label">OTel endpoint <span class="preconfig-hint">(GitHub Copilot / CopilotScope)</span></label>
+                        <input placeholder="http://localhost:4318" value="@PreconfigOtelUrl" @onchange="OtelUrlChangedAsync" />
+                        <div class="term-note">Where the agent exports telemetry. Applied when starting the session.</div>
+                    </div>
+                }
+                <button class="btn primary" disabled="@(Creating || string.IsNullOrWhiteSpace(NewCwd))"
+                        @onclick="() => OnCreate.InvokeAsync()">
+                    @(Creating ? "Starting…" : "Start session")
+                </button>
+                @if (CreateError is not null)
+                {
+                    <div class="error-note">@CreateError</div>
+                }
+            </div>
+        }
+
+        @foreach (var session in Sessions)
+        {
+            <button class="session-card @(session.Id == SelectedId ? "active" : "")"
+                    @onclick="() => OnSelectSession.InvokeAsync(session.Id)">
+                <span class="session-title">@session.Title</span>
+                <span class="session-meta">@session.AgentId · @session.Status · @PolicyLabel(session.Policy)@(session.HasPendingPermission ? " · ⏳ permission" : "")</span>
+            </button>
+        }
+        @if (Sessions.Count == 0 && !ShowNewSession)
+        {
+            <div class="empty">No sessions yet.<br />Start one — the built-in <b>echo</b> agent works without any real agent installed.</div>
+        }
+    }
+    else
+    {
+        @foreach (var archived in History)
+        {
+            <button class="session-card @(archived.Id == ArchivedId ? "active" : "")"
+                    @onclick="() => OnSelectArchived.InvokeAsync(archived)">
+                <span class="session-title">@archived.Title</span>
+                <span class="session-meta">@archived.AgentId · @archived.LastActivity.LocalDateTime.ToString("MMM d, HH:mm")</span>
+            </button>
+        }
+        @if (History.Count == 0)
+        {
+            <div class="empty">No archived sessions.<br />History requires Postgres (run via the AppHost).</div>
+        }
+    }
+</aside>
