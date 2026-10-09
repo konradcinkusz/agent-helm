@@ -1,4 +1,7 @@
-.composer { display: flex; gap: 10px; padding: 12px 18px; border-top: 1px solid var(--line); background: var(--panel); }
+.composer { display: flex; flex-direction: column; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--line); background: var(--panel); }
+.composer-row { display: flex; gap: 10px; }
+.composer-controls { display: flex; gap: 8px; }
+.composer-controls .policy-select:disabled { opacity: 0.7; cursor: default; }
 .composer textarea {
   flex: 1; min-height: 58px; resize: vertical;
   background: var(--ink); color: var(--text); border: 1px solid var(--line);

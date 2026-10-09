@@ -10,6 +10,7 @@
     <nav class="topbar-nav">
         <a href="/" class="nav-link">My work</a>
         <a href="/sessions" class="nav-link active">Sessions</a>
+        <a href="/search" class="nav-link">Search</a>
         <a href="/settings" class="nav-link">Providers</a>
     </nav>
     <div class="conn">@(_agents.Count > 0 ? $"{_agents.Count} agent(s) configured" : "connecting…")</div>
@@ -59,10 +60,10 @@
         else
         {
             <SessionHeader Session="@_detail" ScopeModel="@_scopeModel" EditingTitle="@_editingTitle"
-                           @bind-TitleDraft="_titleDraft" PolicySelectVersion="@_policySelectVersion"
+                           @bind-TitleDraft="_titleDraft"
                            OnStartEditTitle="@StartEditTitle" OnTitleKey="@OnTitleKeyAsync"
                            OnToggleScope="@ToggleScopeAsync" OnToggleHandoff="@ToggleHandoff"
-                           OnPolicyChanged="@OnPolicyChangeAsync" OnStop="@CancelTurnAsync"
+                           OnStop="@CancelTurnAsync"
                            OnDelete="@DeleteSessionAsync" />
 
             @if (_yoloConfirmPending)
@@ -133,7 +134,9 @@
                 <Composer @bind-Prompt="_prompt" Running="@(_detail.Status == "running")"
                           Attachments="@_attachments" AttachError="@_attachError" SendError="@_sendError"
                           AttachTitle="@AttachTitle()" OnFilesSelected="@OnFilesSelectedAsync"
-                          OnRemoveAttachment="@RemoveAttachment" OnSend="@SendPromptAsync" />
+                          OnRemoveAttachment="@RemoveAttachment" OnSend="@SendPromptAsync"
+                          Policy="@_detail.Policy" PolicySelectVersion="@_policySelectVersion"
+                          OnPolicyChanged="@OnPolicyChangeAsync" Model="@_detail.Model" />
             }
             else if (_activeTab == "changes")
             {

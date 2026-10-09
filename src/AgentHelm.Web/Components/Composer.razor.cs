@@ -17,6 +17,10 @@ public partial class Composer
     [Parameter] public string? AttachError { get; set; }
     [Parameter] public string? SendError { get; set; }
     [Parameter] public string AttachTitle { get; set; } = "";
+    [Parameter] public string Policy { get; set; } = "ask";
+    [Parameter] public int PolicySelectVersion { get; set; }
+    [Parameter] public EventCallback<ChangeEventArgs> OnPolicyChanged { get; set; }
+    [Parameter] public string? Model { get; set; }
 
     private Task PromptInputAsync(ChangeEventArgs e) => PromptChanged.InvokeAsync(e.Value?.ToString() ?? "");
 

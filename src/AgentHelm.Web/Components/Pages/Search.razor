@@ -1,0 +1,67 @@
+@page "/search"
+@inject BridgeClient Bridge
+
+<PageTitle>AgentHelm — Search</PageTitle>
+
+<header class="topbar">
+    <h1 class="brand"><a href="/" class="brand-link">Agent<span>Helm</span></a></h1>
+    <nav class="topbar-nav">
+        <a href="/" class="nav-link">My work</a>
+        <a href="/sessions" class="nav-link">Sessions</a>
+        <a href="/search" class="nav-link active">Search</a>
+        <a href="/settings" class="nav-link">Providers</a>
+    </nav>
+</header>
+
+<div class="search-page">
+    <div class="search-header">
+        <h2 class="search-title">Search sessions</h2>
+        <input class="search-input" type="search" data-testid="search-input" autocomplete="off"
+               placeholder="Title, agent or transcript text" @bind="_query" @bind:event="oninput" />
+    </div>
+
+    @if (_loading)
+    {
+        <div class="search-status">Loading sessions…</div>
+    }
+    else
+    {
+        <section class="search-section">
+            <div class="rail-label">Live (@LiveHits.Count)</div>
+            @foreach (var hit in LiveHits)
+            {
+                <a class="session-card search-hit" href="@HrefOf(hit.Item)" data-testid="search-result">
+                    <span class="session-title">@hit.Item.Title</span>
+                    <span class="session-meta">@hit.Item.AgentId · @hit.Item.Meta</span>
+                    @if (hit.Excerpt is { } excerpt)
+                    {
+                        <span class="search-excerpt">@excerpt.Before<mark>@excerpt.Hit</mark>@excerpt.After</span>
+                    }
+                </a>
+            }
+            @if (LiveHits.Count == 0)
+            {
+                <div class="search-status">@(string.IsNullOrWhiteSpace(_query) ? "No live sessions." : "No live sessions match.")</div>
+            }
+        </section>
+
+        <section class="search-section">
+            <div class="rail-label">Archived (@ArchivedHits.Count)</div>
+            @foreach (var hit in ArchivedHits)
+            {
+                <a class="session-card search-hit" href="@HrefOf(hit.Item)" data-testid="search-result">
+                    <span class="session-title">@hit.Item.Title</span>
+                    <span class="session-meta">@hit.Item.AgentId · @hit.Item.Meta</span>
+                    @if (hit.Excerpt is { } excerpt)
+                    {
+                        <span class="search-excerpt">@excerpt.Before<mark>@excerpt.Hit</mark>@excerpt.After</span>
+                    }
+                </a>
+            }
+            @if (ArchivedHits.Count == 0)
+            {
+                <div class="search-status">@(string.IsNullOrWhiteSpace(_query) ? "No archived sessions. History requires Postgres (run via the AppHost)." : "No archived sessions match.")</div>
+            }
+        </section>
+    }
+</div>
