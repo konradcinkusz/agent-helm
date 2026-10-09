@@ -15,16 +15,9 @@
 
 <AppShell>
     <Sidebar>
-        <SessionSidebar Agents="@_agents" Sessions="@_sessions" History="@_history"
-                        ShowHistory="@_showHistory" ShowNewSession="@_showNewSession"
-                        SelectedId="@_selectedId" ArchivedId="@_archived?.Id"
-                        NewAgentId="@_newAgentId" OnNewAgentChanged="@OnNewAgentChangedAsync"
-                        NewAgentModels="@_newAgentModels" Creating="@_creating" CreateError="@_createError"
-                        @bind-NewCwd="_newCwd" @bind-NewTitle="_newTitle" @bind-NewModel="_newModel"
-                        ShowPreconfig="@_showPreconfig" @bind-PreconfigOtelUrl="_preconfigOtelUrl"
+        <SessionSidebar Sessions="@_sessions" History="@_history"
+                        ShowHistory="@_showHistory" SelectedId="@_selectedId" ArchivedId="@_archived?.Id"
                         OnToggleHistory="@ToggleHistoryAsync" OnToggleNewSession="@ToggleNewSession"
-                        OnBrowse="@OpenBrowseAsync" OnCreate="@CreateSessionAsync"
-                        OnTogglePreconfig="@TogglePreconfigAsync"
                         CreatingChat="@_creatingChat" ChatError="@_chatError" OnNewChat="@CreateChatAsync"
                         OnSelectSession="@SelectSessionAsync" OnSelectArchived="@SelectArchived" />
     </Sidebar>
@@ -148,6 +141,16 @@
         }
     </Main>
 </AppShell>
+
+@if (_showNewSession)
+{
+    <NewSessionDialog Agents="@_agents" NewAgentId="@_newAgentId" OnNewAgentChanged="@OnNewAgentChangedAsync"
+                      NewAgentModels="@_newAgentModels" Creating="@_creating" CreateError="@_createError"
+                      @bind-NewCwd="_newCwd" @bind-NewTitle="_newTitle" @bind-NewModel="_newModel"
+                      ShowPreconfig="@_showPreconfig" @bind-PreconfigOtelUrl="_preconfigOtelUrl"
+                      OnClose="@ToggleNewSession" OnBrowse="@OpenBrowseAsync" OnCreate="@CreateSessionAsync"
+                      OnTogglePreconfig="@TogglePreconfigAsync" />
+}
 
 @if (_browseOpen)
 {

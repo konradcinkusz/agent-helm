@@ -11,7 +11,7 @@ The brand, links to **Dashboard**, **Search** and **Providers**, and on the righ
 | Element | What it does |
 |---|---|
 | **Sessions / History** | The rail shows live sessions; **History** switches to archived sessions from PostgreSQL, **Live** switches back. See [History & resume](History-and-Resume.md). |
-| **+** | Opens the new-session form: agent, working directory, title, model. See [Sessions & chat](Sessions-and-Chat.md#starting-a-session). |
+| **+** | Opens the **New session** dialog: agent, working directory, title, model. See [Sessions & chat](Sessions-and-Chat.md#starting-a-session). |
 | **My work** | Back to the Dashboard. |
 | **Search**, **Chats** | Shown for the coming features; disabled for now. |
 | Repository groups | Live sessions are grouped by repository (the last folder of their working directory). Click a group heading to collapse or expand it. |
