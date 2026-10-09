@@ -12,7 +12,12 @@ The brand, links to **Dashboard**, **Search** and **Providers**, and on the righ
 |---|---|
 | **Sessions / History** | The rail shows live sessions; **History** switches to archived sessions from PostgreSQL, **Live** switches back. See [History & resume](History-and-Resume.md). |
 | **＋ New** | Opens the new-session form: agent, working directory, title, model. See [Sessions & chat](Sessions-and-Chat.md#starting-a-session). |
+| **My work** | Back to the Dashboard. |
+| **Search**, **Chats** | Shown for the coming features; disabled for now. |
 | Session cards | One per live session: title, then `agent · status · policy`, plus `⏳ permission` while a permission request is waiting for you. |
+| **Providers** (footer) | Opens the [Providers](Provider-Accounts.md) page. |
+| **Feedback** (footer) | Opens the project's GitHub issues in a new tab. |
+| **«** / **»** (top) | Collapse the rail to icons only, and expand it again. |
 
 The rail refreshes every few seconds; the open session itself updates live.
 
