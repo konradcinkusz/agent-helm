@@ -13,3 +13,4 @@
 .shell-sidebar { grid-column: 1; display: flex; }
 .shell-main { grid-column: 2; display: flex; flex-direction: column; margin-left: var(--space-2); }
 .shell-dock { grid-column: 3; display: flex; margin-left: var(--space-2); }
+.shell-dock:empty { display: none; }

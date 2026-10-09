@@ -55,7 +55,9 @@
                            OnStartEditTitle="@StartEditTitle" OnTitleKey="@OnTitleKeyAsync"
                            OnToggleScope="@ToggleScopeAsync" OnToggleHandoff="@ToggleHandoff"
                            OnStop="@CancelTurnAsync"
-                           OnDelete="@DeleteSessionAsync" ActiveTab="@_activeTab" OnSwitchTab="@SwitchTabAsync" />
+                           OnDelete="@DeleteSessionAsync"
+                           DockOpen="@_dockOpen" DockTab="@_activeTab"
+                           OnToggleDock="@ToggleDockAsync" OnSelectDockTab="@SelectDockTabAsync" />
 
             @if (_yoloConfirmPending)
             {
@@ -113,33 +115,36 @@
                 </div>
             }
 
-            @if (_activeTab == "chat")
-            {
-                <ChatView Entries="@_transcript" Streaming="@_streaming" />
-                <Composer @bind-Prompt="_prompt" Running="@(_detail.Status == "running")"
-                          Attachments="@_attachments" AttachError="@_attachError" SendError="@_sendError"
-                          AttachTitle="@AttachTitle()" OnFilesSelected="@OnFilesSelectedAsync"
-                          OnRemoveAttachment="@RemoveAttachment" OnSend="@SendPromptAsync"
-                          Policy="@_detail.Policy" PolicySelectVersion="@_policySelectVersion"
-                          OnPolicyChanged="@OnPolicyChangeAsync" Model="@_detail.Model" />
-            }
-            else if (_activeTab == "changes")
-            {
-                <ChangesPanel IsRepo="@_gitIsRepo" Changes="@_gitChanges" Diff="@_diff" DiffLines="@_diffLines"
-                              RejectConfirmPath="@_rejectConfirmPath"
-                              OnRefresh="@LoadChangesAsync" OnView="@LoadDiffAsync" OnAccept="@GitAcceptAsync"
-                              OnRejectRequest="@RequestReject" OnRejectCancel="@CancelReject"
-                              OnRejectConfirm="@GitRejectAsync" OnAskAgent="@AskAgentAboutFileAsync" />
-            }
-            else
-            {
-                <TerminalPanel Terminals="@_terminals" ActiveTerminalId="@_activeTermId" @bind-TermInput="_termInput"
-                               IsPty="@(ActiveTerminal?.Pty ?? false)"
-                               OnKeyDown="@OnTerminalKeyAsync" OnInsertOutput="@InsertOutputIntoPromptAsync"
-                               OnSelect="@SelectTerminal" OnClose="@CloseTerminalAsync" OnNew="@NewTerminalAsync" />
-            }
+            <ChatView Entries="@_transcript" Streaming="@_streaming" />
+            <Composer @bind-Prompt="_prompt" Running="@(_detail.Status == "running")"
+                      Attachments="@_attachments" AttachError="@_attachError" SendError="@_sendError"
+                      AttachTitle="@AttachTitle()" OnFilesSelected="@OnFilesSelectedAsync"
+                      OnRemoveAttachment="@RemoveAttachment" OnSend="@SendPromptAsync"
+                      Policy="@_detail.Policy" PolicySelectVersion="@_policySelectVersion"
+                      OnPolicyChanged="@OnPolicyChangeAsync" Model="@_detail.Model" />
         }
     </Main>
+
+    <Dock>
+        @if (_detail is not null && _archived is null)
+        {
+            <Dock Open="@_dockOpen" Tab="@_activeTab" OnToggle="@ToggleDockAsync" OnSelectTab="@SelectDockTabAsync">
+                <ChangesContent>
+                    <ChangesPanel IsRepo="@_gitIsRepo" Changes="@_gitChanges" Diff="@_diff" DiffLines="@_diffLines"
+                                  RejectConfirmPath="@_rejectConfirmPath"
+                                  OnRefresh="@LoadChangesAsync" OnView="@LoadDiffAsync" OnAccept="@GitAcceptAsync"
+                                  OnRejectRequest="@RequestReject" OnRejectCancel="@CancelReject"
+                                  OnRejectConfirm="@GitRejectAsync" OnAskAgent="@AskAgentAboutFileAsync" />
+                </ChangesContent>
+                <TerminalContent>
+                    <TerminalPanel Terminals="@_terminals" ActiveTerminalId="@_activeTermId" @bind-TermInput="_termInput"
+                                   IsPty="@(ActiveTerminal?.Pty ?? false)"
+                                   OnKeyDown="@OnTerminalKeyAsync" OnInsertOutput="@InsertOutputIntoPromptAsync"
+                                   OnSelect="@SelectTerminal" OnClose="@CloseTerminalAsync" OnNew="@NewTerminalAsync" />
+                </TerminalContent>
+            </Dock>
+        }
+    </Dock>
 </AppShell>
 
 @if (_showNewSession)

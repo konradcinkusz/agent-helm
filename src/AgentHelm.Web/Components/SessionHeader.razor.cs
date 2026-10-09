@@ -11,8 +11,10 @@ public partial class SessionHeader
     [Parameter] public bool EditingTitle { get; set; }
     [Parameter] public string TitleDraft { get; set; } = "";
     [Parameter] public EventCallback<string> TitleDraftChanged { get; set; }
-    [Parameter] public string ActiveTab { get; set; } = "chat";
-    [Parameter] public EventCallback<string> OnSwitchTab { get; set; }
+    [Parameter] public bool DockOpen { get; set; }
+    [Parameter] public string DockTab { get; set; } = "changes";
+    [Parameter] public EventCallback OnToggleDock { get; set; }
+    [Parameter] public EventCallback<string> OnSelectDockTab { get; set; }
     [Parameter] public EventCallback OnStartEditTitle { get; set; }
     [Parameter] public EventCallback<KeyboardEventArgs> OnTitleKey { get; set; }
     [Parameter] public EventCallback OnToggleScope { get; set; }
@@ -29,6 +31,11 @@ public partial class SessionHeader
         _menuOpen = false;
         await callback.InvokeAsync();
     }
+
+    private bool DockShows(string tab) => DockOpen && DockTab == tab;
+
+    private Task DockClickAsync(string tab) =>
+        DockShows(tab) ? OnToggleDock.InvokeAsync() : OnSelectDockTab.InvokeAsync(tab);
 
     private string RepoName() =>
         Session.Cwd.TrimEnd('/', '\\').Split('/', '\\').LastOrDefault(s => s.Length > 0) ?? Session.Cwd;
