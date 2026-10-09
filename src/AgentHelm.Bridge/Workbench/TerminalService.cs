@@ -34,6 +34,8 @@ public sealed class TerminalSession : IDisposable
     /// </summary>
     public bool IsPty { get; }
 
+    public string Id { get; } = Guid.NewGuid().ToString("N");
+
     /// <summary>
     /// util-linux's script(1), or null. PTY mode passes util-linux options
     /// (-q -f -e -c); the `script` of macOS and BusyBox rejects them, and the
@@ -165,32 +167,71 @@ public sealed class TerminalSession : IDisposable
     }
 }
 
-/// <summary>One terminal per Helm session, created lazily, torn down with it.</summary>
+/// <summary>Any number of terminals per Helm session, in creation order; all are torn down with it.</summary>
 public sealed class TerminalManager : IDisposable
 {
-    private readonly ConcurrentDictionary<string, TerminalSession> _terminals = new();
+    private readonly object _lock = new();
+    private readonly Dictionary<string, List<TerminalSession>> _bySession = new();
 
-    public TerminalSession GetOrStart(string sessionId, string cwd)
+    public TerminalSession Create(string sessionId, string cwd)
     {
-        // A shell that exited (user typed `exit`) gets replaced transparently.
-        var terminal = _terminals.GetOrAdd(sessionId, _ => new TerminalSession(cwd));
-        if (!terminal.HasExited) return terminal;
-        terminal.Dispose();
-        var fresh = new TerminalSession(cwd);
-        _terminals[sessionId] = fresh;
-        return fresh;
+        var terminal = new TerminalSession(cwd);
+        lock (_lock)
+        {
+            if (!_bySession.TryGetValue(sessionId, out var terminals))
+            {
+                terminals = new List<TerminalSession>();
+                _bySession[sessionId] = terminals;
+            }
+            terminals.Add(terminal);
+        }
+        return terminal;
     }
 
-    public TerminalSession? Get(string sessionId) => _terminals.GetValueOrDefault(sessionId);
+    public TerminalSession? Get(string sessionId, string terminalId)
+    {
+        lock (_lock)
+            return _bySession.TryGetValue(sessionId, out var terminals)
+                ? terminals.Find(t => t.Id == terminalId)
+                : null;
+    }
+
+    public IReadOnlyList<TerminalSession> List(string sessionId)
+    {
+        lock (_lock)
+            return _bySession.TryGetValue(sessionId, out var terminals) ? terminals.ToList() : [];
+    }
+
+    public bool Close(string sessionId, string terminalId)
+    {
+        TerminalSession? terminal;
+        lock (_lock)
+        {
+            if (!_bySession.TryGetValue(sessionId, out var terminals)) return false;
+            terminal = terminals.Find(t => t.Id == terminalId);
+            if (terminal is null) return false;
+            terminals.Remove(terminal);
+            if (terminals.Count == 0) _bySession.Remove(sessionId);
+        }
+        terminal.Dispose();
+        return true;
+    }
 
     public void Remove(string sessionId)
     {
-        if (_terminals.TryRemove(sessionId, out var terminal)) terminal.Dispose();
+        lock (_lock)
+        {
+            if (!_bySession.Remove(sessionId, out var terminals)) return;
+            foreach (var terminal in terminals) terminal.Dispose();
+        }
     }
 
     public void Dispose()
     {
-        foreach (var (_, terminal) in _terminals) terminal.Dispose();
-        _terminals.Clear();
+        lock (_lock)
+        {
+            foreach (var terminal in _bySession.Values.SelectMany(t => t)) terminal.Dispose();
+            _bySession.Clear();
+        }
     }
 }

@@ -247,28 +247,36 @@ api.MapPost("/sessions/{id}/git/reject", async (string id, GitPathRequest req, C
 });
 
 // ----------------------------------------------------------- M2: terminal
-api.MapPost("/sessions/{id}/terminal/start", (string id) =>
+api.MapGet("/sessions/{id}/terminals", (string id) =>
+    sessions.Get(id) is null
+        ? Results.NotFound()
+        : Results.Ok(terminals.List(id).Select(t => new { id = t.Id, pty = t.IsPty, exited = t.HasExited })));
+
+api.MapPost("/sessions/{id}/terminals", (string id) =>
 {
     if (sessions.Get(id) is not { } session) return Results.NotFound();
-    var terminal = terminals.GetOrStart(id, session.Cwd);
-    return Results.Ok(new { pty = terminal.IsPty });
+    var terminal = terminals.Create(id, session.Cwd);
+    return Results.Ok(new { id = terminal.Id, pty = terminal.IsPty, exited = false });
 });
 
-api.MapPost("/sessions/{id}/terminal/input", async (string id, TerminalInputRequest req, CancellationToken ct) =>
+api.MapDelete("/sessions/{id}/terminals/{terminalId}", (string id, string terminalId) =>
+    terminals.Close(id, terminalId) ? Results.Ok() : Results.NotFound());
+
+api.MapPost("/sessions/{id}/terminals/{terminalId}/input", async (string id, string terminalId, TerminalInputRequest req, CancellationToken ct) =>
 {
-    if (terminals.Get(id) is not { } terminal) return Results.NotFound();
+    if (terminals.Get(id, terminalId) is not { } terminal) return Results.NotFound();
     await terminal.WriteInputAsync(req.Text, ct);
     return Results.Ok();
 });
 
-api.MapGet("/sessions/{id}/terminal/buffer", (string id) =>
-    terminals.Get(id) is { } terminal
+api.MapGet("/sessions/{id}/terminals/{terminalId}/buffer", (string id, string terminalId) =>
+    terminals.Get(id, terminalId) is { } terminal
         ? Results.Ok(new { text = terminal.BufferSnapshot() })
         : Results.NotFound());
 
-api.MapGet("/sessions/{id}/terminal/stream", async (string id, HttpContext ctx, CancellationToken ct) =>
+api.MapGet("/sessions/{id}/terminals/{terminalId}/stream", async (string id, string terminalId, HttpContext ctx, CancellationToken ct) =>
 {
-    if (terminals.Get(id) is not { } terminal) { ctx.Response.StatusCode = 404; return; }
+    if (terminals.Get(id, terminalId) is not { } terminal) { ctx.Response.StatusCode = 404; return; }
     ctx.Response.Headers.ContentType = "text/event-stream";
     ctx.Response.Headers.CacheControl = "no-cache";
     var reader = terminal.Subscribe(out var token);
