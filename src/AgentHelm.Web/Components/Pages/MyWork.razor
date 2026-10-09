@@ -1,0 +1,85 @@
+@page "/"
+@inject BridgeClient Bridge
+
+<PageTitle>AgentHelm — My work</PageTitle>
+
+<header class="topbar">
+    <h1 class="brand"><a href="/" class="brand-link">Agent<span>Helm</span></a></h1>
+    <nav class="topbar-nav">
+        <a href="/" class="nav-link active">My work</a>
+        <a href="/sessions" class="nav-link">Sessions</a>
+        <a href="/settings" class="nav-link">Providers</a>
+    </nav>
+</header>
+
+<div class="my-work">
+    <div class="my-work-head">
+        <h2 class="my-work-title">My work</h2>
+        <div class="view-toggle">
+            <button class="btn @(_tableView ? "" : "primary")" @onclick="() => _tableView = false">Cards</button>
+            <button class="btn @(_tableView ? "primary" : "")" @onclick="() => _tableView = true">Table</button>
+        </div>
+    </div>
+
+    <div class="tabs my-work-tabs">
+        @foreach (var section in Sections)
+        {
+            <button class="tab @(_section == section ? "active" : "")" @onclick="() => _section = section">
+                @SectionLabel(section) <span class="count">@CountIn(section)</span>
+            </button>
+        }
+    </div>
+
+    @if (_items.Count == 0)
+    {
+        <div class="empty big">No sessions yet.<br />Open <a href="/sessions">Sessions</a> to start one.</div>
+    }
+    else if (Visible.Count == 0)
+    {
+        <div class="empty big">Nothing in this section.</div>
+    }
+    else if (_tableView)
+    {
+        <div class="work-table-wrap">
+            <table class="work-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Agent</th>
+                        <th>Repo</th>
+                        <th>Status</th>
+                        <th>Last activity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Visible)
+                    {
+                        <tr class="work-row" @onclick="() => Open(item)">
+                            <td class="work-table-title">@item.Title</td>
+                            <td>@item.AgentId</td>
+                            <td title="@item.Cwd">@RepoName(item.Cwd)</td>
+                            <td><span class="pill @PillClass(item)">@StatusLabel(item)</span></td>
+                            <td>@Ago(item.LastActivity)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="work-grid">
+            @foreach (var item in Visible)
+            {
+                <button class="work-card" @onclick="() => Open(item)">
+                    <div class="work-card-top">
+                        <span class="pill @PillClass(item)">@StatusLabel(item)</span>
+                        <span class="work-card-ago">@Ago(item.LastActivity)</span>
+                    </div>
+                    <span class="work-card-title">@item.Title</span>
+                    <span class="work-card-meta">@item.AgentId · @RepoName(item.Cwd)</span>
+                </button>
+            }
+        </div>
+    }
+</div>

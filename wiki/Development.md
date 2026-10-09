@@ -40,7 +40,7 @@ src/
     Workbench/              GitService, TerminalService
     Program.cs              endpoints, token middleware, DI
   AgentHelm.Web/            Blazor Server UI
-    Components/Pages/       Home (dashboard), Settings (providers)
+    Components/Pages/       MyWork (start page), Home (sessions), Settings (providers)
     Services/BridgeClient.cs  the only way the UI talks to the Bridge
     wwwroot/                app.css, terminal.js (xterm.js host, folder picker)
 tests/AgentHelm.Tests/      xUnit tests (CoreTests.cs)

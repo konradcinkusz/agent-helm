@@ -1,0 +1,41 @@
+.my-work { padding: 16px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.my-work-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.my-work-title { margin: 0; font-size: 18px; font-weight: 600; }
+.view-toggle { display: flex; gap: 6px; }
+.my-work-tabs { padding: 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.count { font-family: var(--mono); font-size: 10px; color: var(--dim); margin-left: 4px; }
+
+.pill {
+  font-family: var(--mono); font-size: 11px; padding: 2px 8px; border-radius: 10px;
+  border: 1px solid var(--line); color: var(--dim); white-space: nowrap;
+}
+.pill.active { color: var(--copper); border-color: var(--copper); }
+.pill.needs { color: var(--err); border-color: var(--err); }
+.pill.done { color: var(--ok); }
+
+.work-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.work-card {
+  display: flex; flex-direction: column; gap: 6px; text-align: left;
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px;
+  padding: 12px 14px; cursor: pointer; color: var(--text); font: inherit; min-width: 0;
+}
+.work-card:hover { border-color: var(--copper); }
+.work-card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.work-card-ago { font-family: var(--mono); font-size: 10px; color: var(--dim); }
+.work-card-title {
+  font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.work-card-meta { font-family: var(--mono); font-size: 10px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.work-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+.work-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.work-table th {
+  text-align: left; font-family: var(--mono); font-size: 10px; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--dim); font-weight: normal;
+  padding: 8px 12px; border-bottom: 1px solid var(--line); background: var(--panel);
+}
+.work-table td { padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.work-table tr:last-child td { border-bottom: none; }
+.work-row { cursor: pointer; }
+.work-row:hover td { background: var(--panel-2); }
+.work-table-title { font-weight: 600; max-width: 320px; overflow: hidden; text-overflow: ellipsis; }

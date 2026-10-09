@@ -16,6 +16,8 @@ namespace AgentHelm.Web.Components.Pages;
 public partial class Home : IDisposable
 {
     [Inject] public IJSRuntime JS { get; set; } = default!;
+    [Parameter] public string? SessionId { get; set; }
+    [Parameter] public string? ArchivedId { get; set; }
 
     private List<AgentDto> _agents = [];
     private List<SessionSummaryDto> _sessions = [];
@@ -99,6 +101,21 @@ public partial class Home : IDisposable
         _sessions = await Bridge.GetSessionsAsync(_pageCts.Token);
         await LoadAgentModelsAsync(_newAgentId);
         _ = PollSessionListAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (SessionId is not null && SessionId != _selectedId)
+        {
+            await SelectSessionAsync(SessionId);
+        }
+        else if (ArchivedId is not null && ArchivedId != _archived?.Id)
+        {
+            _history = await Bridge.GetHistoryAsync(_pageCts.Token);
+            _showHistory = true;
+            if (_history.Find(a => a.Id == ArchivedId) is { } archived)
+                SelectArchived(archived);
+        }
     }
 
     private async Task OnNewAgentChangedAsync(ChangeEventArgs e)

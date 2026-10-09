@@ -1,10 +1,23 @@
-AgentHelm's UI has two pages: the **Dashboard**, where you work with sessions, and **Providers**, where you check the accounts of your agent CLIs. This page is a map of the Dashboard; the pages that follow cover each feature in depth.
+AgentHelm's UI has three pages: **My work**, the landing view that lists your sessions by what needs you; **Sessions**, where you work with a session; and **Providers**, where you check the accounts of your agent CLIs. This page is a map of the Sessions page; the pages that follow cover each feature in depth.
 
 ![The AgentHelm dashboard with an open session](images/session-chat.png)
 
 ## Top bar
 
-The brand, links to **Dashboard** and **Providers**, and on the right the number of agents the Bridge has configured. If it keeps saying *connecting…*, the UI cannot reach the Bridge or the Bridge has no agents configured — see [Troubleshooting](Troubleshooting-and-FAQ.md#the-ui-says-connecting-and-lists-no-agents).
+The brand, links to **My work**, **Sessions** and **Providers**, and on the right the number of agents the Bridge has configured. If it keeps saying *connecting…*, the UI cannot reach the Bridge or the Bridge has no agents configured — see [Troubleshooting](Troubleshooting-and-FAQ.md#the-ui-says-connecting-and-lists-no-agents).
+
+## My work
+
+The start page (`/`) lists live and archived sessions from one place. The filters are:
+
+| Filter | Shows |
+|---|---|
+| **All** | Every session. |
+| **Active** | Live sessions with a turn in progress (`running`). |
+| **Needs attention** | Live sessions waiting for a permission decision, or whose last turn errored. |
+| **Done** | Live sessions that are idle, plus archived sessions. |
+
+Each live session falls into exactly one of Active, Needs attention or Done. **Cards** and **Table** switch the layout. Clicking a session opens it on the **Sessions** page.
 
 ## Session rail (left)
 
