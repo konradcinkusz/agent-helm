@@ -1,10 +1,16 @@
 .changes-panel { flex: 1; overflow-y: auto; padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; }
+.change-card { display: flex; flex-direction: column; gap: 8px; }
 .change-row {
-  display: flex; align-items: center; gap: 10px;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
   background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px;
 }
-.change-row.selected { border-color: var(--copper); }
-.change-path { font-family: var(--mono); font-size: 12px; flex: 1; word-break: break-all; }
+.change-card.selected .change-row { border-color: var(--copper); }
+.change-toggle {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;
+  background: none; border: 0; padding: 0; color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.caret { font-family: var(--mono); font-size: 11px; color: var(--dim); }
+.change-path { font-family: var(--mono); font-size: 12px; word-break: break-all; }
 .change-status { font-family: var(--mono); font-size: 10px; padding: 2px 8px; border-radius: 9px; border: 1px solid var(--line); color: var(--dim); }
 .change-status.untracked { color: var(--ok); border-color: var(--ok); }
 .change-status.deleted { color: var(--err); border-color: var(--err); }
@@ -12,7 +18,9 @@
   background: var(--ink); border: 1px solid var(--line); border-radius: 8px;
   padding: 10px 0; font-family: var(--mono); font-size: 12px; overflow-x: auto;
 }
-.diff-line { padding: 0 14px; white-space: pre; line-height: 1.45; }
+.diff-line { display: flex; width: max-content; min-width: 100%; line-height: 1.45; }
+.diff-line .ln { flex: 0 0 4ch; padding: 0 8px 0 10px; text-align: right; color: var(--dim); opacity: 0.6; user-select: none; }
+.diff-line .code { padding-right: 14px; white-space: pre; }
 .diff-line.add { background: color-mix(in srgb, var(--ok) 10%, transparent); color: var(--ok); }
 .diff-line.del { background: color-mix(in srgb, var(--err) 10%, transparent); color: var(--err); }
 .diff-line.hunk { color: var(--copper); }

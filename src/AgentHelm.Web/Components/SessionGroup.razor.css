@@ -1,0 +1,13 @@
+.session-group { display: flex; flex-direction: column; gap: 6px; }
+
+.group-head {
+  display: flex; align-items: center; gap: 6px; text-align: left;
+  background: none; border: none; padding: 4px 2px; cursor: pointer;
+  color: var(--dim); font-family: var(--mono); font-size: 12px;
+}
+.group-head:hover { color: var(--text); }
+.group-chevron { width: 10px; flex-shrink: 0; }
+.group-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.group-count { font-size: 10px; flex-shrink: 0; }
+
+.group-body { display: flex; flex-direction: column; gap: 6px; }

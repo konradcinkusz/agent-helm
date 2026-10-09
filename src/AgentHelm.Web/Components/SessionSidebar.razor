@@ -23,7 +23,7 @@
             <button class="btn" @onclick="() => OnToggleHistory.InvokeAsync()">@(ShowHistory ? "Live" : "History")</button>
             @if (!ShowHistory)
             {
-                <button class="btn" @onclick="() => OnToggleNewSession.InvokeAsync()">＋ New</button>
+                <button class="btn new-btn" title="New session" aria-label="New session" @onclick="() => OnToggleNewSession.InvokeAsync()">+</button>
             }
         </div>
     </div>
@@ -79,13 +79,26 @@
             </div>
         }
 
-        @foreach (var session in Sessions)
+        @foreach (var group in GroupByRepo())
         {
-            <button class="session-card @(session.Id == SelectedId ? "active" : "")"
-                    @onclick="() => OnSelectSession.InvokeAsync(session.Id)">
-                <span class="session-title">@session.Title</span>
-                <span class="session-meta">@session.AgentId · @session.Status · @PolicyLabel(session.Policy)@(session.HasPendingPermission ? " · ⏳ permission" : "")</span>
-            </button>
+            <SessionGroup Name="@group.Repo" Count="@group.Sessions.Count" Expanded="@IsExpanded(group.Repo)"
+                          OnToggle="@(() => ToggleGroup(group.Repo))">
+                @foreach (var session in group.Sessions)
+                {
+                    <button class="session-card @(session.Id == SelectedId ? "active" : "")"
+                            @onclick="() => OnSelectSession.InvokeAsync(session.Id)">
+                        <span class="session-row">
+                            <span class="status-dot status-@session.Status" title="@session.Status"></span>
+                            <span class="session-title">@session.Title</span>
+                            @if (session.HasPendingPermission)
+                            {
+                                <span class="permission-badge" title="Waiting for your permission">⏳</span>
+                            }
+                        </span>
+                        <span class="session-meta">@session.AgentId · @PolicyLabel(session.Policy)</span>
+                    </button>
+                }
+            </SessionGroup>
         }
         @if (Sessions.Count == 0 && !ShowNewSession)
         {
