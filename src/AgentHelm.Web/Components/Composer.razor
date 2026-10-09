@@ -19,12 +19,25 @@
 }
 
 <div class="composer">
-    <label class="attach-label" title="@AttachTitle">
-        📎
-        <InputFile OnChange="@OnFilesSelected" multiple />
-    </label>
-    <textarea placeholder="Prompt the agent… (Ctrl+Enter to send)"
-              value="@Prompt" @oninput="PromptInputAsync"
-              @onkeydown="KeyDownAsync"></textarea>
-    <button class="btn primary" disabled="@(Running || string.IsNullOrWhiteSpace(Prompt))" @onclick="() => OnSend.InvokeAsync()">Send</button>
+    <div class="composer-row">
+        <label class="attach-label" title="@AttachTitle">
+            📎
+            <InputFile OnChange="@OnFilesSelected" multiple />
+        </label>
+        <textarea placeholder="Prompt the agent… (Ctrl+Enter to send)"
+                  value="@Prompt" @oninput="PromptInputAsync"
+                  @onkeydown="KeyDownAsync"></textarea>
+        <button class="btn primary" disabled="@(Running || string.IsNullOrWhiteSpace(Prompt))" @onclick="() => OnSend.InvokeAsync()">Send</button>
+    </div>
+    <div class="composer-controls">
+        <select class="policy-select" @key="PolicySelectVersion" value="@Policy" @onchange="e => OnPolicyChanged.InvokeAsync(e)"
+                title="Mode: Interactive asks for every tool, Plan auto-allows reads, Autopilot allows everything (audited)">
+            <option value="ask">Interactive</option>
+            <option value="auto_read">Plan</option>
+            <option value="yolo">Autopilot</option>
+        </select>
+        <select class="policy-select" disabled title="Model this session runs with">
+            <option>@(Model is { Length: > 0 } model ? model : "Default model")</option>
+        </select>
+    </div>
 </div>
