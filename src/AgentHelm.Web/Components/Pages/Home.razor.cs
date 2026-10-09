@@ -426,6 +426,12 @@ public partial class Home : IDisposable
         await Bridge.TerminalInputAsync(_detail.Id, command, _pageCts.Token);
     }
 
+    private Task AskAgentAboutFileAsync(string path)
+    {
+        _prompt = string.IsNullOrWhiteSpace(_prompt) ? $"{path} " : $"{_prompt.TrimEnd()} {path} ";
+        return Task.CompletedTask;
+    }
+
     private async Task InsertOutputIntoPromptAsync()
     {
         if (_detail is null) return;

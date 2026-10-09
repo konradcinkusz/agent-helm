@@ -138,7 +138,7 @@
                                   RejectConfirmPath="@_rejectConfirmPath"
                                   OnRefresh="@LoadChangesAsync" OnView="@LoadDiffAsync" OnAccept="@GitAcceptAsync"
                                   OnRejectRequest="@RequestReject" OnRejectCancel="@CancelReject"
-                                  OnRejectConfirm="@GitRejectAsync" />
+                                  OnRejectConfirm="@GitRejectAsync" OnAskAgent="@AskAgentAboutFileAsync" />
                 </ChangesContent>
                 <TerminalContent>
                     <TerminalPanel @bind-TermInput="_termInput" IsPty="@_termIsPty"

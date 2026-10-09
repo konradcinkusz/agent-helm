@@ -147,7 +147,7 @@ When an agent modifies files in the working directory, you can review the change
 1. Open a session whose working directory is a git repository.
 2. Ask the agent to make a change (for example `Create a file called hello.txt with the text "hello world"`).
 3. Open the **Changes** panel in the dock on the right of the chat (or click **Changes** in the dock's side rail if it is hidden).
-4. You will see the changed files with their status; **View** shows the diff against `HEAD` with `+` / `−` counts.
+4. You will see the changed files with their status; click a file to expand its diff against `HEAD`, with `+` / `−` counts.
 
 For each file you can:
 
