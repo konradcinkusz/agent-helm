@@ -61,7 +61,9 @@
                            OnStartEditTitle="@StartEditTitle" OnTitleKey="@OnTitleKeyAsync"
                            OnToggleScope="@ToggleScopeAsync" OnToggleHandoff="@ToggleHandoff"
                            OnStop="@CancelTurnAsync"
-                           OnDelete="@DeleteSessionAsync" />
+                           OnDelete="@DeleteSessionAsync"
+                           DockOpen="@_dockOpen" DockTab="@_activeTab"
+                           OnToggleDock="@ToggleDockAsync" OnSelectDockTab="@SelectDockTabAsync" />
 
             @if (_yoloConfirmPending)
             {

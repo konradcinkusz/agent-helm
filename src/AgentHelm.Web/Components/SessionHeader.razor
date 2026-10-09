@@ -1,5 +1,5 @@
 <div class="session-head">
-    <div>
+    <div class="session-head-main">
         @if (EditingTitle)
         {
             <input class="title-input" value="@TitleDraft" @oninput="TitleInputAsync"
@@ -7,12 +7,10 @@
         }
         else
         {
-            <div class="session-head-title">@Session.Title
-                <button class="title-edit" title="Rename session" @onclick="() => OnStartEditTitle.InvokeAsync()">✎</button>
-            </div>
+            <div class="session-head-title" title="@Session.Title">@Session.Title</div>
         }
         <div class="session-head-sub">
-            @Session.AgentId · @Session.Cwd@ModelSuffix()
+            <span>@RepoName()</span> · <span title="@Session.Cwd">@Session.Cwd</span>@ModelSuffix()
             @if (Session.Caps is { } caps)
             {
                 @if (caps.LoadSession) { <span class="cap-chip">resume</span> }
@@ -22,10 +20,27 @@
         </div>
     </div>
     <div class="session-head-actions">
-        <button class="btn" @onclick="() => OnToggleScope.InvokeAsync()" title="Quality scores from CopilotScope (time-based match)">Scope</button>
-        <button class="btn" @onclick="() => OnToggleHandoff.InvokeAsync()" title="Continue this conversation with a different agent">Handoff</button>
+        <span class="mode-chip" title="Permission mode — set under the composer">@ModeLabel()</span>
         <span class="status @Session.Status">@Session.Status</span>
+        <button class="btn toggle @(DockShows("changes") ? "on" : "")" aria-pressed="@(DockShows("changes") ? "true" : "false")"
+                @onclick='() => DockClickAsync("changes")'>Changes</button>
+        <button class="btn toggle @(DockShows("terminal") ? "on" : "")" aria-pressed="@(DockShows("terminal") ? "true" : "false")"
+                @onclick='() => DockClickAsync("terminal")'>Terminal</button>
         <button class="btn" @onclick="() => OnStop.InvokeAsync()" disabled="@(Session.Status != "running")">Stop</button>
-        <button class="btn danger" @onclick="() => OnDelete.InvokeAsync()">Delete</button>
+        <div class="head-menu">
+            <button class="btn icon" title="Session actions" aria-haspopup="menu" aria-expanded="@(_menuOpen ? "true" : "false")"
+                    @onclick="() => _menuOpen = !_menuOpen">⋯</button>
+            @if (_menuOpen)
+            {
+                <div class="head-menu-list" role="menu">
+                    <button class="menu-item" role="menuitem" @onclick="() => RunAsync(OnStartEditTitle)">Rename</button>
+                    <button class="menu-item" role="menuitem" title="Quality scores from CopilotScope (time-based match)"
+                            @onclick="() => RunAsync(OnToggleScope)">Scope</button>
+                    <button class="menu-item" role="menuitem" title="Continue this conversation with a different agent"
+                            @onclick="() => RunAsync(OnToggleHandoff)">Handoff</button>
+                    <button class="menu-item danger" role="menuitem" @onclick="() => RunAsync(OnDelete)">Delete</button>
+                </div>
+            }
+        </div>
     </div>
 </div>

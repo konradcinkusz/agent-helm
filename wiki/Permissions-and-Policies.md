@@ -2,7 +2,7 @@ Before an ACP agent runs a tool — edits a file, runs a command, fetches a URL 
 
 ## The permission banner
 
-A request that needs you appears as a banner above the tabs, naming the agent, the tool and its **kind**:
+A request that needs you appears as a banner above the chat, naming the agent, the tool and its **kind**:
 
 ![A permission banner for an edit tool](images/permission-banner.png)
 
