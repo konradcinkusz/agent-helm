@@ -17,6 +17,10 @@ public partial class Home : IDisposable
 {
     [Inject] public IJSRuntime JS { get; set; } = default!;
 
+    // Deep links from the Search page.
+    [Parameter, SupplyParameterFromQuery(Name = "session")] public string? QuerySessionId { get; set; }
+    [Parameter, SupplyParameterFromQuery(Name = "archived")] public string? QueryArchivedId { get; set; }
+
     private List<AgentDto> _agents = [];
     private List<SessionSummaryDto> _sessions = [];
     private SessionDetailDto? _detail;
@@ -100,6 +104,10 @@ public partial class Home : IDisposable
         _newAgentId = _agents.FirstOrDefault()?.Id ?? "";
         _sessions = await Bridge.GetSessionsAsync(_pageCts.Token);
         await LoadAgentModelsAsync(_newAgentId);
+        if (QuerySessionId is not null && _sessions.Any(s => s.Id == QuerySessionId))
+            await SelectSessionAsync(QuerySessionId);
+        else if (QueryArchivedId is not null)
+            await OpenArchivedAsync(QueryArchivedId);
         _ = PollSessionListAsync();
     }
 
@@ -668,6 +676,14 @@ public partial class Home : IDisposable
             _archived = null;
             _resumeError = null;
         }
+    }
+
+    private async Task OpenArchivedAsync(string id)
+    {
+        _history = await Bridge.GetHistoryAsync(_pageCts.Token);
+        _showHistory = true;
+        if (_history.FirstOrDefault(a => a.Id == id) is { } archived)
+            SelectArchived(archived);
     }
 
     private void SelectArchived(ArchivedSessionDto archived)

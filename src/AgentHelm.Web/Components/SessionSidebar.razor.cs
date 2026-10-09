@@ -41,6 +41,10 @@ public partial class SessionSidebar
 
     private IEnumerable<SessionSummaryDto> ChatSessions => Sessions.Where(s => s.IsChat);
 
+    private bool _collapsed;
+
+    private void ToggleCollapsed() => _collapsed = !_collapsed;
+
     private Task NewAgentChangedAsync(ChangeEventArgs e) => OnNewAgentChanged.InvokeAsync(e);
 
     private Task CwdChangedAsync(ChangeEventArgs e) => NewCwdChanged.InvokeAsync(e.Value?.ToString() ?? "");
