@@ -1,10 +1,23 @@
-AgentHelm's UI has three pages: the **Dashboard**, where you work with sessions, **Search**, which finds sessions, and **Providers**, where you check the accounts of your agent CLIs. This page is a map of the Dashboard; the pages that follow cover each feature in depth.
+AgentHelm's UI has four pages: **My work**, the landing view that lists your sessions by what needs you; **Sessions**, where you work with a session; **Search**, which finds sessions; and **Providers**, where you check the accounts of your agent CLIs. This page is a map of the Sessions page; the pages that follow cover each feature in depth.
 
 ![The AgentHelm dashboard with an open session](images/session-chat.png)
 
 ## Top bar
 
-The brand, links to **Dashboard**, **Search** and **Providers**, and on the right the number of agents the Bridge has configured. If it keeps saying *connecting…*, the UI cannot reach the Bridge or the Bridge has no agents configured — see [Troubleshooting](Troubleshooting-and-FAQ.md#the-ui-says-connecting-and-lists-no-agents).
+AgentHelm's UI has four pages: **My work**, the landing view that lists your sessions by what needs you; **Sessions**, where you work with a session; **Search**, which finds sessions; and **Providers**, where you check the accounts of your agent CLIs. This page is a map of the Sessions page; the pages that follow cover each feature in depth.
+
+## My work
+
+The start page (`/`) lists live and archived sessions from one place. The filters are:
+
+| Filter | Shows |
+|---|---|
+| **All** | Every session. |
+| **Active** | Live sessions with a turn in progress (`running`). |
+| **Needs attention** | Live sessions waiting for a permission decision, or whose last turn errored. |
+| **Done** | Live sessions that are idle, plus archived sessions. |
+
+Each live session falls into exactly one of Active, Needs attention or Done. **Cards** and **Table** switch the layout. Clicking a session opens it on the **Sessions** page.
 
 ## Session rail (left)
 
@@ -12,7 +25,7 @@ The brand, links to **Dashboard**, **Search** and **Providers**, and on the righ
 |---|---|
 | **Sessions / History** | The rail shows live sessions; **History** switches to archived sessions from PostgreSQL, **Live** switches back. See [History & resume](History-and-Resume.md). |
 | **+** | Opens the **New session** dialog: agent, working directory, title, model. See [Sessions & chat](Sessions-and-Chat.md#starting-a-session). |
-| **My work** | Back to the Dashboard. |
+| **My work** | Opens the start page listing all sessions by state. See [My work](#my-work). |
 | **Search** | Opens the [Search page](#search-page). |
 | **Chats** | Jumps to the Chats section of the rail. |
 | Repository groups | Live sessions are grouped by repository (the last folder of their working directory). Click a group heading to collapse or expand it. |

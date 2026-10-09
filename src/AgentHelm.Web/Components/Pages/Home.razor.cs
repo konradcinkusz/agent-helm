@@ -16,6 +16,8 @@ namespace AgentHelm.Web.Components.Pages;
 public partial class Home : IDisposable
 {
     [Inject] public IJSRuntime JS { get; set; } = default!;
+    [Parameter] public string? SessionId { get; set; }
+    [Parameter] public string? ArchivedId { get; set; }
 
     // Deep links from the Search page.
     [Parameter, SupplyParameterFromQuery(Name = "session")] public string? QuerySessionId { get; set; }
@@ -111,6 +113,18 @@ public partial class Home : IDisposable
         else if (QueryArchivedId is not null)
             await OpenArchivedAsync(QueryArchivedId);
         _ = PollSessionListAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (SessionId is not null && SessionId != _selectedId)
+        {
+            await SelectSessionAsync(SessionId);
+        }
+        else if (ArchivedId is not null && ArchivedId != _archived?.Id)
+        {
+            await OpenArchivedAsync(ArchivedId);
+        }
     }
 
     private async Task OnNewAgentChangedAsync(ChangeEventArgs e)

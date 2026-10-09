@@ -103,6 +103,6 @@ public partial class Search : IDisposable
 
     private static string HrefOf(SearchItem item) =>
         item.IsArchived
-            ? $"/?archived={Uri.EscapeDataString(item.Id)}"
-            : $"/?session={Uri.EscapeDataString(item.Id)}";
+            ? $"/sessions?archived={Uri.EscapeDataString(item.Id)}"
+            : $"/sessions?session={Uri.EscapeDataString(item.Id)}";
 }

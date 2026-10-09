@@ -1,4 +1,6 @@
-@page "/"
+@page "/sessions"
+@page "/sessions/{SessionId}"
+@page "/sessions/archived/{ArchivedId}"
 @inject BridgeClient Bridge
 
 <PageTitle>AgentHelm</PageTitle>
@@ -6,7 +8,8 @@
 <header class="topbar">
     <h1 class="brand">Agent<span>Helm</span></h1>
     <nav class="topbar-nav">
-        <a href="/" class="nav-link active">Dashboard</a>
+        <a href="/" class="nav-link">My work</a>
+        <a href="/sessions" class="nav-link active">Sessions</a>
         <a href="/search" class="nav-link">Search</a>
         <a href="/settings" class="nav-link">Providers</a>
     </nav>

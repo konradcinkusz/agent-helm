@@ -3,7 +3,7 @@ AgentHelm is a small .NET 8 solution. One process, the **Bridge**, does almost a
 ```mermaid
 flowchart TB
     subgraph Web["AgentHelm.Web — Blazor Server"]
-        UI["Pages: Home, Settings"] --> BC["BridgeClient"]
+        UI["Pages: MyWork, Home, Settings"] --> BC["BridgeClient"]
     end
     subgraph Bridge["AgentHelm.Bridge — ASP.NET Core minimal API"]
         API["/api endpoints<br/>token middleware"]
