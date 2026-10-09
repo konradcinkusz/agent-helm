@@ -56,6 +56,10 @@ Agent replies are rendered as Markdown (headings, lists, code blocks, links, bol
 
 The agent's "thinking" stream and tool-status updates are shown live but not recorded. The full list of entry kinds and audit texts is in [Events & transcript](Events-and-Transcript.md).
 
+## Quick chats
+
+**New chat** under *Chats* in the rail starts a quick chat with the agent and model selected in the new-session form. A quick chat needs no repository: the Bridge gives it a fresh scratch directory under its temporary folder (`AgentHelm/chats/<session id>`), and the title defaults to *New chat*. Quick chats are listed in their own *Chats* section rather than among the sessions, and they otherwise behave like any other session.
+
 ## Attachments
 
 Click the **📎** in the composer to attach files to the next prompt:

@@ -4,11 +4,12 @@ The **Terminal** tab is a shell next to the conversation, running in the session
 
 ## How it works
 
-- The shell starts the first time you open the tab, one per session, **in the working directory and as the user running the Bridge**.
-- Type a command in the input box under the terminal and press <kbd>Enter</kbd>; the output streams into the terminal view (rendered by [xterm.js](https://xtermjs.org/), so colours and ANSI escape sequences display).
-- Switching tabs does not stop the shell. When you come back, the recent output is replayed (the Bridge keeps the last 64,000 characters).
-- If the shell exits (you typed `exit`), a fresh one starts the next time you open the tab.
-- Deleting the session stops its shell.
+- The first shell starts when you open the tab. Each shell runs **in the working directory and as the user running the Bridge**.
+- A session can have several terminals. The tab strip above the output lists them as *Terminal 1*, *Terminal 2*, … ; **+** starts another shell and **×** closes one (closing it stops its shell).
+- Type a command in the input box under the terminal and press <kbd>Enter</kbd>, which runs it in the active terminal; the output streams into the terminal view (rendered by [xterm.js](https://xtermjs.org/), so colours and ANSI escape sequences display).
+- Only the active terminal streams into the view. Switching terminals or tabs does not stop any shell; when you come back, the recent output is replayed (the Bridge keeps the last 64,000 characters per terminal).
+- If a shell exits (you typed `exit`), its tab is marked *(exited)*. Close it, or start a new terminal with **+**.
+- Deleting the session stops all of its shells.
 
 ## PTY mode and pipe mode
 
@@ -27,7 +28,7 @@ Even in PTY mode, input is sent **a line at a time** from the input box. Full-sc
 
 ## Sending output to the agent
 
-**→ Prompt** takes the last 2,000 characters of terminal output and appends them to the chat composer as a fenced block under *Terminal output:*, then switches to the Chat tab. Add your question — *"Why does this test fail?"* — and send. Nothing is sent until you press **Send**.
+**→ Prompt** takes the last 2,000 characters of the active terminal's output and appends them to the chat composer as a fenced block under *Terminal output:*, then switches to the Chat tab. Add your question — *"Why does this test fail?"* — and send. Nothing is sent until you press **Send**.
 
 ## Security
 
