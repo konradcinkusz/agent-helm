@@ -12,10 +12,10 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
             <span class="rail-nav-label">Search</span>
         </button>
-        <button class="rail-nav-item" disabled title="Coming soon">
+        <a class="rail-nav-item" href="#chats" title="Chats">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
             <span class="rail-nav-label">Chats</span>
-        </button>
+        </a>
     </nav>
     <div class="rail-head">
         <span class="rail-label">@(ShowHistory ? "History" : "Sessions")</span>
@@ -23,7 +23,7 @@
             <button class="btn" @onclick="() => OnToggleHistory.InvokeAsync()">@(ShowHistory ? "Live" : "History")</button>
             @if (!ShowHistory)
             {
-                <button class="btn" @onclick="() => OnToggleNewSession.InvokeAsync()">＋ New</button>
+                <button class="btn new-btn" title="New session" aria-label="New session" @onclick="() => OnToggleNewSession.InvokeAsync()">+</button>
             }
         </div>
     </div>
@@ -79,29 +79,52 @@
             </div>
         }
 
-        @foreach (var session in ProjectSessions)
+        @foreach (var group in GroupByRepo())
         {
-            <button class="session-card @(session.Id == SelectedId ? "active" : "")"
-                    @onclick="() => OnSelectSession.InvokeAsync(session.Id)">
-                <span class="session-title">@session.Title</span>
-                <span class="session-meta">@session.AgentId · @session.Status · @PolicyLabel(session.Policy)@(session.HasPendingPermission ? " · ⏳ permission" : "")</span>
-            </button>
+            <SessionGroup Name="@group.Repo" Count="@group.Sessions.Count" Expanded="@IsExpanded(group.Repo)"
+                          OnToggle="@(() => ToggleGroup(group.Repo))">
+                @foreach (var session in group.Sessions)
+                {
+                    <button class="session-card @(session.Id == SelectedId ? "active" : "")"
+                            @onclick="() => OnSelectSession.InvokeAsync(session.Id)">
+                        <span class="session-row">
+                            <span class="status-dot status-@session.Status" title="@session.Status"></span>
+                            <span class="session-title">@session.Title</span>
+                            @if (session.HasPendingPermission)
+                            {
+                                <span class="permission-badge" title="Waiting for your permission">⏳</span>
+                            }
+                        </span>
+                        <span class="session-meta">@session.AgentId · @PolicyLabel(session.Policy)</span>
+                    </button>
+                }
+            </SessionGroup>
         }
         @if (!ProjectSessions.Any() && !ShowNewSession)
         {
             <div class="empty">No sessions yet.<br />Start one — the built-in <b>echo</b> agent works without any real agent installed.</div>
         }
 
-        <div class="rail-head chats-head">
+        <div id="chats" class="rail-head chats-head">
             <span class="rail-label">Chats</span>
-            <button class="btn" disabled="@CreatingChat" @onclick="() => OnNewChat.InvokeAsync()">@(CreatingChat ? "Starting…" : "＋ New chat")</button>
+            <div class="rail-actions">
+                <button class="btn new-btn" title="New chat" aria-label="New chat" disabled="@CreatingChat"
+                        @onclick="() => OnNewChat.InvokeAsync()">+</button>
+            </div>
         </div>
         @foreach (var chat in ChatSessions)
         {
             <button class="session-card @(chat.Id == SelectedId ? "active" : "")"
                     @onclick="() => OnSelectSession.InvokeAsync(chat.Id)">
-                <span class="session-title">@chat.Title</span>
-                <span class="session-meta">@chat.AgentId · @chat.Status · @PolicyLabel(chat.Policy)@(chat.HasPendingPermission ? " · ⏳ permission" : "")</span>
+                <span class="session-row">
+                    <span class="status-dot status-@chat.Status" title="@chat.Status"></span>
+                    <span class="session-title">@chat.Title</span>
+                    @if (chat.HasPendingPermission)
+                    {
+                        <span class="permission-badge" title="Waiting for your permission">⏳</span>
+                    }
+                </span>
+                <span class="session-meta">@chat.AgentId · @PolicyLabel(chat.Policy)</span>
             </button>
         }
         @if (!ChatSessions.Any())

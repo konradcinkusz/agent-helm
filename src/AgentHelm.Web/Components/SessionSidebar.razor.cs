@@ -37,9 +37,30 @@ public partial class SessionSidebar
     [Parameter] public EventCallback<string> OnSelectSession { get; set; }
     [Parameter] public EventCallback<ArchivedSessionDto> OnSelectArchived { get; set; }
 
+    private readonly HashSet<string> _collapsedRepos = new();
+
+    private bool IsExpanded(string repo) => !_collapsedRepos.Contains(repo);
+
+    private void ToggleGroup(string repo)
+    {
+        if (!_collapsedRepos.Add(repo)) _collapsedRepos.Remove(repo);
+    }
+
     private IEnumerable<SessionSummaryDto> ProjectSessions => Sessions.Where(s => !s.IsChat);
 
     private IEnumerable<SessionSummaryDto> ChatSessions => Sessions.Where(s => s.IsChat);
+
+    private List<(string Repo, List<SessionSummaryDto> Sessions)> GroupByRepo() =>
+        ProjectSessions.GroupBy(s => RepoName(s.Cwd))
+                .Select(g => (Repo: g.Key, Sessions: g.ToList()))
+                .ToList();
+
+    internal static string RepoName(string cwd)
+    {
+        var trimmed = cwd.TrimEnd('/', '\\');
+        var name = trimmed[(Math.Max(trimmed.LastIndexOf('/'), trimmed.LastIndexOf('\\')) + 1)..];
+        return name.Length > 0 ? name : "(no repo)";
+    }
 
     private bool _collapsed;
 
