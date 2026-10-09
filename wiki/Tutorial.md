@@ -146,7 +146,7 @@ When an agent modifies files in the working directory, you can review the change
 
 1. Open a session whose working directory is a git repository.
 2. Ask the agent to make a change (for example `Create a file called hello.txt with the text "hello world"`).
-3. Switch to the **Changes** tab.
+3. Open the **Changes** panel in the dock on the right of the chat (or click **Changes** in the dock's side rail if it is hidden).
 4. You will see the changed files with their status; click a file to expand its diff against `HEAD`, with `+` / `−` counts.
 
 For each file you can:
@@ -160,9 +160,9 @@ All paths are guarded: nothing outside the session's working directory can be ac
 
 ## 6. The integrated terminal (Terminal tab)
 
-The **Terminal** tab gives you a shell in the session's working directory, rendered with xterm.js.
+The **Terminal** panel gives you a shell in the session's working directory, rendered with xterm.js. It lives in the same dock as Changes, next to the chat.
 
-1. Switch to the **Terminal** tab.
+1. Open the **Terminal** panel in the dock.
 2. Type a command in the input box under the terminal (for example `ls -la` or `git log --oneline`) and press <kbd>Enter</kbd>.
 3. Click **→ Prompt** to append the most recent terminal output to the chat composer. This lets you hand a test failure, a build error or any command output to the agent without copy-pasting.
 

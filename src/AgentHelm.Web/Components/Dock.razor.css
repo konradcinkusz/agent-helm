@@ -1,0 +1,28 @@
+.dock {
+  position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0;
+  width: var(--dock-w, 440px); flex-shrink: 0;
+}
+.dock.closed { width: 40px; }
+.dock-splitter {
+  position: absolute; left: -4px; top: 0; bottom: 0; width: 8px; cursor: col-resize; z-index: 1;
+}
+.dock-splitter:hover { background: color-mix(in srgb, var(--copper) 35%, transparent); }
+.dock-head {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px 0 12px;
+  border-bottom: 1px solid var(--line);
+}
+.dock-tabs { display: flex; gap: 2px; flex: 1; }
+.dock-tab {
+  background: none; border: 1px solid transparent; border-bottom: none; color: var(--dim);
+  font: inherit; font-size: 12px; padding: 7px 12px; border-radius: 7px 7px 0 0; cursor: pointer;
+}
+.dock-tab:hover { color: var(--text); }
+.dock-tab.active { color: var(--copper); border-color: var(--line); background: var(--ink); }
+.dock-close { margin-bottom: 4px; }
+.dock-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.dock-rail { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 0; }
+.dock-rail-btn {
+  background: none; border: 1px solid var(--line); color: var(--dim); border-radius: 7px;
+  font: inherit; font-size: 11px; padding: 10px 4px; cursor: pointer; writing-mode: vertical-rl;
+}
+.dock-rail-btn:hover { color: var(--copper); border-color: var(--copper); }

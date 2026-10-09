@@ -1,13 +1,13 @@
-The **Terminal** tab is a shell next to the conversation, running in the session's working directory: build, run the tests, inspect git, and pass the output to the agent with one click.
+The **Terminal** panel is a shell next to the conversation, running in the session's working directory: build, run the tests, inspect git, and pass the output to the agent with one click.
 
-![The Terminal tab](images/terminal-tab.png)
+![The Terminal panel](images/terminal-tab.png)
 
 ## How it works
 
-- The first shell starts when you open the tab. Each shell runs **in the working directory and as the user running the Bridge**.
+- The first shell starts when you open the Terminal panel. Each shell runs **in the working directory and as the user running the Bridge**.
 - A session can have several terminals. The tab strip above the output lists them as *Terminal 1*, *Terminal 2*, … ; **+** starts another shell and **×** closes one (closing it stops its shell).
 - Type a command in the input box under the terminal and press <kbd>Enter</kbd>, which runs it in the active terminal; the output streams into the terminal view (rendered by [xterm.js](https://xtermjs.org/), so colours and ANSI escape sequences display).
-- Only the active terminal streams into the view. Switching terminals or tabs does not stop any shell; when you come back, the recent output is replayed (the Bridge keeps the last 64,000 characters per terminal).
+- Only the active terminal streams into the view. Hiding the dock or switching to Changes does not stop any shell; when you come back, the recent output is replayed (the Bridge keeps the last 64,000 characters per terminal).
 - If a shell exits (you typed `exit`), its tab is marked *(exited)*. Close it, or start a new terminal with **+**.
 - Deleting the session stops all of its shells.
 
