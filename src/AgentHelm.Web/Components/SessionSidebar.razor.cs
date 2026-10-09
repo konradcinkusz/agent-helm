@@ -34,6 +34,27 @@ public partial class SessionSidebar
     [Parameter] public EventCallback<string> OnSelectSession { get; set; }
     [Parameter] public EventCallback<ArchivedSessionDto> OnSelectArchived { get; set; }
 
+    private readonly HashSet<string> _collapsedRepos = new();
+
+    private bool IsExpanded(string repo) => !_collapsedRepos.Contains(repo);
+
+    private void ToggleGroup(string repo)
+    {
+        if (!_collapsedRepos.Add(repo)) _collapsedRepos.Remove(repo);
+    }
+
+    private List<(string Repo, List<SessionSummaryDto> Sessions)> GroupByRepo() =>
+        Sessions.GroupBy(s => RepoName(s.Cwd))
+                .Select(g => (Repo: g.Key, Sessions: g.ToList()))
+                .ToList();
+
+    internal static string RepoName(string cwd)
+    {
+        var trimmed = cwd.TrimEnd('/', '\\');
+        var name = trimmed[(trimmed.LastIndexAny(['/', '\\']) + 1)..];
+        return name.Length > 0 ? name : "(no repo)";
+    }
+
     private Task NewAgentChangedAsync(ChangeEventArgs e) => OnNewAgentChanged.InvokeAsync(e);
 
     private Task CwdChangedAsync(ChangeEventArgs e) => NewCwdChanged.InvokeAsync(e.Value?.ToString() ?? "");

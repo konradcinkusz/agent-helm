@@ -1,0 +1,11 @@
+<div class="session-group">
+    <button class="group-head" aria-expanded="@(Expanded ? "true" : "false")" @onclick="() => OnToggle.InvokeAsync()">
+        <span class="group-chevron">@(Expanded ? "▾" : "▸")</span>
+        <span class="group-name" title="@Name">@Name</span>
+        <span class="group-count">@Count</span>
+    </button>
+    @if (Expanded)
+    {
+        <div class="group-body">@ChildContent</div>
+    }
+</div>

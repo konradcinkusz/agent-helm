@@ -3,7 +3,7 @@ AgentHelm ships with a built-in **echo agent**: a tiny program that speaks the A
 ## 1. Start a session
 
 1. Open the UI (see [Installation](Installation.md) for the URL of your setup).
-2. Click **＋ New** in the left rail.
+2. Click **+** next to the *Sessions* heading in the left rail.
 3. Pick **Echo (built-in demo agent)**.
 4. Enter a **working directory** — any directory that exists *on the machine running the Bridge*. The 📁 button opens a directory browser.
 5. Optionally give the session a title, then click **Start session**.

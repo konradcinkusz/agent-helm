@@ -2,7 +2,7 @@ A **session** is one conversation with one agent in one working directory. Each 
 
 ## Starting a session
 
-Click **＋ New** in the rail and fill in the form:
+Click **+** next to the *Sessions* heading in the rail and fill in the form:
 
 <img src="images/new-session.png" alt="The new-session form" width="480">
 

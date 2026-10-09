@@ -38,3 +38,13 @@
   border-radius: 6px; padding: 7px 9px; font-size: 12px; font-family: var(--mono);
 }
 .preconfig-panel input:focus { outline: none; border-color: var(--copper); }
+
+.new-btn { font-size: 16px; line-height: 1; padding: 4px 10px; }
+
+.session-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.session-row .session-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--dim); }
+.status-dot.status-running { background: var(--copper); }
+.status-dot.status-error { background: var(--err); }
+.status-dot.status-idle { background: var(--ok); }
+.permission-badge { font-size: 11px; flex-shrink: 0; }
