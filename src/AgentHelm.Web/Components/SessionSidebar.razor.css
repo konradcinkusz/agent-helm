@@ -5,6 +5,29 @@
 }
 .rail-actions { display: flex; gap: 6px; }
 
+.rail-top { display: flex; justify-content: flex-end; }
+.rail-toggle { padding: 2px 8px; font-size: 14px; line-height: 1.2; }
+.rail-nav { display: flex; flex-direction: column; gap: 2px; }
+.rail-nav-item {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  background: none; border: 1px solid transparent; border-radius: 6px;
+  padding: 7px 9px; color: var(--text); font: inherit; font-size: 13px;
+  text-align: left; text-decoration: none; cursor: pointer;
+}
+.rail-nav-item:hover:not(:disabled) { background: var(--panel-2); border-color: var(--line); }
+.rail-nav-item:disabled { color: var(--dim); cursor: default; }
+.rail-nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+.rail-foot { margin-top: auto; display: flex; flex-direction: column; gap: 2px; padding-top: 8px; border-top: 1px solid var(--line); }
+
+.rail.collapsed { width: 56px; min-width: 56px; padding: 12px 8px; }
+.rail.collapsed .rail-top { justify-content: center; }
+.rail.collapsed .rail-nav-item { justify-content: center; padding: 8px 0; }
+.rail.collapsed .rail-nav-label,
+.rail.collapsed .rail-head,
+.rail.collapsed .new-session,
+.rail.collapsed .session-card,
+.rail.collapsed .empty { display: none; }
+
 .session-card {
   display: flex; flex-direction: column; gap: 2px; text-align: left;
   background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px;
@@ -38,3 +61,13 @@
   border-radius: 6px; padding: 7px 9px; font-size: 12px; font-family: var(--mono);
 }
 .preconfig-panel input:focus { outline: none; border-color: var(--copper); }
+
+.new-btn { font-size: 16px; line-height: 1; padding: 4px 10px; }
+
+.session-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.session-row .session-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--dim); }
+.status-dot.status-running { background: var(--copper); }
+.status-dot.status-error { background: var(--err); }
+.status-dot.status-idle { background: var(--ok); }
+.permission-badge { font-size: 11px; flex-shrink: 0; }

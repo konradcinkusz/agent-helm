@@ -11,12 +11,10 @@ public partial class SessionHeader
     [Parameter] public bool EditingTitle { get; set; }
     [Parameter] public string TitleDraft { get; set; } = "";
     [Parameter] public EventCallback<string> TitleDraftChanged { get; set; }
-    [Parameter] public int PolicySelectVersion { get; set; }
     [Parameter] public EventCallback OnStartEditTitle { get; set; }
     [Parameter] public EventCallback<KeyboardEventArgs> OnTitleKey { get; set; }
     [Parameter] public EventCallback OnToggleScope { get; set; }
     [Parameter] public EventCallback OnToggleHandoff { get; set; }
-    [Parameter] public EventCallback<ChangeEventArgs> OnPolicyChanged { get; set; }
     [Parameter] public EventCallback OnStop { get; set; }
     [Parameter] public EventCallback OnDelete { get; set; }
 

@@ -24,12 +24,6 @@
     <div class="session-head-actions">
         <button class="btn" @onclick="() => OnToggleScope.InvokeAsync()" title="Quality scores from CopilotScope (time-based match)">Scope</button>
         <button class="btn" @onclick="() => OnToggleHandoff.InvokeAsync()" title="Continue this conversation with a different agent">Handoff</button>
-        <select class="policy-select" @key="PolicySelectVersion" value="@Session.Policy" @onchange="e => OnPolicyChanged.InvokeAsync(e)"
-                title="Permission policy — every auto-decision is still audited in the transcript">
-            <option value="ask">Ask every tool</option>
-            <option value="auto_read">Auto-allow reads</option>
-            <option value="yolo">YOLO</option>
-        </select>
         <span class="status @Session.Status">@Session.Status</span>
         <button class="btn" @onclick="() => OnStop.InvokeAsync()" disabled="@(Session.Status != "running")">Stop</button>
         <button class="btn danger" @onclick="() => OnDelete.InvokeAsync()">Delete</button>
