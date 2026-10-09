@@ -44,15 +44,16 @@ internal static class SingleFileHost
         var address = OwnAddress(urls);
 
         // The UI talks to this same host, so its BridgeClient defaults to our own address and to
-        // the API token the Bridge checks. Both are defaults; an explicit Bridge:BaseUrl wins.
-        config.Sources.Insert(0, new MemoryConfigurationSource
-        {
-            InitialData = new Dictionary<string, string?>
-            {
-                ["Bridge:BaseUrl"] = address,
-                ["Bridge:ApiToken"] = config["AgentHelm:ApiToken"] ?? "",
-            }
-        });
+        // the API token the Bridge checks. Only empty values are filled in, and the source is added
+        // last so it can replace an empty Bridge:BaseUrl set by a Bridge appsettings.json file.
+        var bridgeDefaults = new Dictionary<string, string?>();
+        if (string.IsNullOrEmpty(config["Bridge:BaseUrl"]))
+            bridgeDefaults["Bridge:BaseUrl"] = address;
+        var apiToken = config["AgentHelm:ApiToken"];
+        if (string.IsNullOrEmpty(config["Bridge:ApiToken"]) && !string.IsNullOrEmpty(apiToken))
+            bridgeDefaults["Bridge:ApiToken"] = apiToken;
+        if (bridgeDefaults.Count > 0)
+            config.Sources.Add(new MemoryConfigurationSource { InitialData = bridgeDefaults });
         return address;
     }
 

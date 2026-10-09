@@ -21,6 +21,7 @@ trap 'rm -rf "$scratch"' EXIT
 # compressed bundle are set in src/AgentHelm.App/AgentHelm.App.csproj.
 dotnet publish src/AgentHelm.App -c Release -r "$rid" --self-contained \
   -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none \
+  -p:AgentHelmSingleFile=true \
   -o "$scratch/publish"
 
 [ -f "$scratch/publish/$exe" ] || { echo "publish did not produce $exe" >&2; exit 1; }

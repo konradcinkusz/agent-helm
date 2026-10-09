@@ -11,4 +11,9 @@
   <ItemGroup>
     <InternalsVisibleTo Include="AgentHelm.Tests" />
   </ItemGroup>
+  <!-- Inside the single-file build (AgentHelmSingleFile, set by scripts/build-single-file.sh) the
+       App embeds this file itself; publishing it too would clash with Web's appsettings.json. -->
+  <ItemGroup Condition="'$(AgentHelmSingleFile)' == 'true'">
+    <Content Update="appsettings.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
 </Project>
