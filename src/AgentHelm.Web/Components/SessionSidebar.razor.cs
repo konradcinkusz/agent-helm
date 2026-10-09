@@ -51,7 +51,7 @@ public partial class SessionSidebar
     internal static string RepoName(string cwd)
     {
         var trimmed = cwd.TrimEnd('/', '\\');
-        var name = trimmed[(trimmed.LastIndexAny(['/', '\\']) + 1)..];
+        var name = trimmed[(Math.Max(trimmed.LastIndexOf('/'), trimmed.LastIndexOf('\\')) + 1)..];
         return name.Length > 0 ? name : "(no repo)";
     }
 
