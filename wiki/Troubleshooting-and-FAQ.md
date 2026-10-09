@@ -1,34 +1,20 @@
 ## Known issues
 
-Defects confirmed in the current code or in the latest release, with workarounds where one exists. Each entry should be removed by the change that fixes it — or, for released artifacts, once a release with the fix is out.
+No defects are recorded against the current release. An entry is added when a confirmed defect has no fix yet, and removed by the change that fixes it.
 
-### The release zip starts without agents and without styles
+## Starting the single file
 
-**Affects:** the `run.sh` / `run.ps1` launchers in releases v1.0.0 to v1.0.5. The launchers on `master` are fixed, and CI now starts the release layout on every pull request; the next release ships the fix.
+### macOS or Windows refuses to open the file
 
-**Symptoms:** the UI is unstyled and says *connecting…*; the new-session form has no agents; the Bridge's startup banner shows an empty `Agents :` line and the Web UI logs *The WebRootPath was not found*.
+macOS Gatekeeper and Windows SmartScreen block files downloaded from the internet. Run `xattr -d com.apple.quarantine <file>` on macOS, or choose **More info → Run anyway** on Windows. The steps are in [Installation → First run](Installation.md#first-run).
 
-**Cause:** the launchers start `dotnet bridge/AgentHelm.Bridge.dll` and `dotnet web/AgentHelm.Web.dll` from the zip's top-level folder. ASP.NET Core uses the current directory as the content root, so the Bridge does not load `bridge/appsettings.json` (where the agent catalog lives) and the Web UI does not find `web/wwwroot`.
+### "Permission denied" on Linux or macOS
 
-**Workaround:** start each application from its own folder. In the unpacked zip:
+The file is not executable. Run `chmod +x <file>`. If it still will not start, check that it is not on a folder mounted `noexec`; copy it to your home folder.
 
-**macOS / Linux**
+### Check that the file is the one you downloaded
 
-```bash
-(cd bridge && dotnet AgentHelm.Bridge.dll) &
-(cd web && ASPNETCORE_URLS=http://127.0.0.1:5200 dotnet AgentHelm.Web.dll)
-```
-
-**Windows (PowerShell)**
-
-```powershell
-Start-Process dotnet -ArgumentList AgentHelm.Bridge.dll -WorkingDirectory bridge -NoNewWindow
-Set-Location web
-$env:ASPNETCORE_URLS = "http://127.0.0.1:5200"
-dotnet AgentHelm.Web.dll
-```
-
-This skips the OpenTelemetry variables the launchers export; set them yourself if you use [CopilotScope](CopilotScope-Integration.md).
+Compare its SHA-256 with the line in the release's `SHA256SUMS` ([Installation → Verify the download](Installation.md#verify-the-download)). A mismatch means a damaged or altered download; download it again.
 
 ## Installation and startup
 
@@ -53,7 +39,7 @@ The Web UI could not get the agent list from the Bridge. Check, in order:
 1. **Is the Bridge running?** `curl http://127.0.0.1:5199/api/health` should answer.
 2. **Can the Web server reach it?** `Bridge:BaseUrl` must point to the Bridge from where the Web server runs (default `http://127.0.0.1:5199`).
 3. **Do the tokens match?** With `AgentHelm:ApiToken` set on the Bridge, the Web UI needs the same value as `Bridge:ApiToken`; otherwise every call gets `401`.
-4. **Does the Bridge have agents?** Its startup banner lists them. An empty list means it did not load its `appsettings.json` — see the [release zip known issue](#the-release-zip-starts-without-agents-and-without-styles).
+4. **Does the Bridge have agents?** Its startup banner lists them. An empty list means the agent catalog did not load: from source, check `src/AgentHelm.Bridge/appsettings.json`; with the single file, download the release again.
 
 ### The Bridge answers 401
 
@@ -61,7 +47,7 @@ A token is configured (`AgentHelm:ApiToken`) and the request did not carry it. S
 
 ### "Address already in use"
 
-Another program uses port 5199 (Bridge) or 5200 (UI). Move the Bridge with `AgentHelm:Urls` *and* point the UI at it with `Bridge:BaseUrl`; move the UI with `AGENTHELM_WEB_URLS` (release zip) or `ASPNETCORE_URLS`. Under Aspire the Bridge's port 5199 is fixed in `AgentHelm.AppHost/Program.cs`.
+Another program uses port 5199. The single file has one address: start it with `--urls http://127.0.0.1:5300` or `AgentHelm__Urls=http://127.0.0.1:5300`. From source, move the Bridge with `AgentHelm:Urls` *and* point the UI at it with `Bridge:BaseUrl`, and move the UI with `ASPNETCORE_URLS`. Under Aspire the Bridge's port 5199 is fixed in `AgentHelm.AppHost/Program.cs`.
 
 ### History is empty
 
@@ -124,7 +110,7 @@ The login command waits for input or a browser on the Bridge's machine. Run the 
 
 ### Real agents are missing in Docker
 
-By design: agents need their binaries and your logins, which the container does not have. The container images demonstrate the UI with the echo agent; use the release zip or run from source for real agents.
+By design: agents need their binaries and your logins, which the container does not have. The container images demonstrate the UI with the echo agent; use the single file or run from source for real agents.
 
 ### `docker pull` is denied
 
@@ -135,6 +121,9 @@ Freshly published GHCR packages are private. The maintainer has to make `agenthe
 **Is AgentHelm a hosted service?**
 No. It runs on your machine; there is no AgentHelm server and no account.
 
+**Do I need .NET installed?**
+No for the [single file](Installation.md#single-file): it contains the runtime. You need the .NET 8 SDK only to build from source.
+
 **Does AgentHelm send my code anywhere?**
 AgentHelm itself only talks to the agents it starts, to PostgreSQL if configured, and to CopilotScope if it is running. The agents talk to their own model providers, exactly as they do in a terminal. With the preconfigured Copilot entry, telemetry *including prompt content* goes to the local CopilotScope endpoint — see [CopilotScope integration](CopilotScope-Integration.md).
 
@@ -142,7 +131,7 @@ AgentHelm itself only talks to the agents it starts, to PostgreSQL if configured
 Any agent that speaks ACP over stdio. GitHub Copilot CLI, Claude Code (through Zed's adapter) and Gemini CLI are preconfigured.
 
 **Which operating systems?**
-Windows, Linux and macOS — anywhere .NET 8 runs. The terminal has a real PTY on Linux and is a pipe on Windows and macOS.
+The single file is published for Linux x64, Windows x64 and macOS (Apple silicon and Intel). From source, anywhere .NET 8 runs: Windows, Linux and macOS. The terminal has a real PTY on Linux and is a pipe on Windows and macOS.
 
 **Can a team share one AgentHelm?**
 Not safely. AgentHelm is a single-user tool: it has no user accounts, only a shared token, and every agent runs as the user running the Bridge.

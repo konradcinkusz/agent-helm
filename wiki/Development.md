@@ -23,12 +23,24 @@ dotnet run --project src/AgentHelm.Web      # https://localhost:53168
 
 The built-in echo agent needs nothing else, so you can exercise sessions, streaming, permissions and resume immediately. [Installation](Installation.md) covers the options in detail.
 
+### The single-file build
+
+`src/AgentHelm.App` is the program that ships: the Bridge API, the Web UI and the echo agent in one process (`echo-agent` is its sub-command). To build the executable a release contains:
+
+```bash
+scripts/build-single-file.sh <rid> <outdir>   # rid: linux-x64, win-x64, osx-arm64, osx-x64, ...
+scripts/smoke-single-file.sh <outdir>         # starts the file from an empty folder and checks it
+```
+
+The script publishes self-contained with `PublishSingleFile`, without trimming (ASP.NET Core and Blazor need reflection), and copies only the executable (`agenthelm`, or `agenthelm.exe` for Windows) to `<outdir>`. The UI's static files and the Bridge's default `appsettings.json` are embedded in the assembly, so nothing else is needed next to the file. The smoke test is the same check CI runs on `linux-x64`.
+
 ## Repository layout
 
 ```text
 AgentHelm.sln
 src/
   AgentHelm.AppHost/        .NET Aspire orchestration (Postgres container, Bridge + Web as local processes)
+  AgentHelm.App/            the single-file program: Bridge + Web in one process, the echo-agent sub-command
   AgentHelm.Bridge/         the API: sessions, agents, permissions, git, terminal, persistence
     Agents/Acp/             AcpClient, ProcessTransport — the ACP client and path guard
     Agents/CopilotSdk/      CopilotSdkAdapter — gated skeleton (COPILOT_SDK)
@@ -47,7 +59,7 @@ src/
     wwwroot/                app.css, terminal.js (xterm.js host, folder picker)
 tests/AgentHelm.Tests/      xUnit tests (CoreTests.cs)
 tools/AgentHelm.EchoAgent/  the built-in demo ACP agent
-scripts/                    run.sh / run.ps1 — release launchers; build- and smoke-release-layout.sh;
+scripts/                    build-single-file.sh and smoke-single-file.sh — the release executable;
                             wiki.py — checks and builds this wiki
 wiki/                       this wiki, published to the GitHub Wiki
 docs/                       the GitHub Pages landing page and working notes

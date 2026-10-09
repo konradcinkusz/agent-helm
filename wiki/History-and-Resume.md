@@ -8,7 +8,7 @@ History needs a PostgreSQL connection string named `helmdb` (`ConnectionStrings:
 |---|---|
 | Aspire (`src/AgentHelm.AppHost`) | on — Aspire starts PostgreSQL and injects the connection string |
 | Docker Compose | on — the compose files include PostgreSQL |
-| Release zip, `dotnet run` | off unless you set `ConnectionStrings__helmdb` yourself |
+| Single file, `dotnet run` | off unless you set `ConnectionStrings__helmdb` yourself |
 
 Without it the Bridge runs **memory-only**: everything works, but sessions are lost when the Bridge stops, and the History view explains that history requires PostgreSQL. If the database is configured but unreachable at startup, the Bridge logs *Postgres unavailable — running memory-only* and carries on without history for that run.
 

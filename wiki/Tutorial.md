@@ -9,23 +9,24 @@ This tutorial walks you through AgentHelm from a fresh install to a real working
 
 ### Prerequisites
 
-- For the release zip: the .NET 8 ASP.NET Core runtime.
+- For the single file: nothing. It bundles the .NET runtime.
 - For running from source: the .NET SDK 8.0.303 or newer — check with `dotnet --version`.
 - Docker (optional) — only needed for persistent session history.
 
-### Quickest start: release zip
+### Quickest start: the single file
 
-Download the latest zip from [Releases](https://github.com/konradcinkusz/agent-helm/releases), unpack it, and run:
+Download the file for your system from the [latest release](https://github.com/konradcinkusz/agent-helm/releases/latest) (`agenthelm-<tag>-linux-x64`, `agenthelm-<tag>-win-x64.exe`, `agenthelm-<tag>-osx-arm64` or `agenthelm-<tag>-osx-x64`), then run it:
 
 ```bash
 # macOS / Linux
-./run.sh
+chmod +x ./agenthelm-v1.2.3-linux-x64
+./agenthelm-v1.2.3-linux-x64
 
-# Windows
-.\run.ps1
+# Windows (PowerShell)
+.\agenthelm-v1.2.3-win-x64.exe
 ```
 
-The Bridge starts on `http://127.0.0.1:5199` and the UI on `http://127.0.0.1:5200`. Open `http://127.0.0.1:5200` in your browser. (Using release v1.0.5 or older? Read the [known issue](Troubleshooting-and-FAQ.md#known-issues) about the launchers first.)
+AgentHelm prints `AgentHelm is running at http://127.0.0.1:5199/` and opens that address in your browser. The Bridge and the UI are the same process on that one address. On macOS or Windows, first-run prompts (Gatekeeper, SmartScreen) are explained in [Installation](Installation.md#first-run).
 
 ### From source (recommended for development)
 

@@ -23,7 +23,7 @@ The [glossary](Glossary.md) has the full list of terms.
 
 ## Next steps
 
-1. [Install AgentHelm](Installation.md) — release zip, from source with Aspire, or containers.
+1. [Install AgentHelm](Installation.md) — one downloadable file, from source with Aspire, or containers.
 2. [Run your first session](Your-First-Session.md) with the built-in echo agent — it takes about a minute and needs no real agent.
 3. Work through the [tutorial](Tutorial.md) for a guided tour of every feature.
 4. [Connect a real agent](Connecting-Agents.md).

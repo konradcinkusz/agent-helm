@@ -35,10 +35,10 @@ The built-in echo agent uses it in all three layouts:
 | Layout | Echo agent entry |
 |---|---|
 | From source | `"Command": "dotnet", "Args": ["run", "--project", "${AGENTHELM_DIR}../../../../../tools/AgentHelm.EchoAgent"]` |
-| Release zip | `"Command": "dotnet", "Args": ["${AGENTHELM_DIR}../echo-agent/AgentHelm.EchoAgent.dll"]` |
+| Single file | the file itself, rewritten at start-up: `"Command": "<path to agenthelm>", "Args": ["echo-agent"]` |
 | Container | `"Command": "dotnet", "Args": ["/app/echo-agent/AgentHelm.EchoAgent.dll"]` |
 
-The release and container variants are written by the build (`release.yml` and the `Dockerfile` rewrite the entry with `jq`).
+The single file rewrites its entry at start-up (`SingleFileHost` points it at the running executable), and the container variant is written by the `Dockerfile` with `jq`.
 
 ## `Type`: `acp` or `copilot-sdk`
 
