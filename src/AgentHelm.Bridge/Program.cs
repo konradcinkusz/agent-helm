@@ -64,7 +64,8 @@ api.MapPost("/sessions", async (CreateSessionRequest req, CancellationToken ct) 
 {
     try
     {
-        var session = await sessions.CreateAsync(req.AgentId, req.Cwd, req.Title, ct, req.Policy, model: req.Model);
+        var session = await sessions.CreateAsync(req.AgentId, req.Cwd ?? "", req.Title, ct, req.Policy,
+            model: req.Model, isChat: req.IsChat);
         logger.LogInformation("Session {Id} started: agent={Agent} cwd={Cwd}", session.Id, req.AgentId, req.Cwd);
         return Results.Ok(SessionSummary(session));
     }
@@ -80,7 +81,7 @@ api.MapGet("/sessions/{id}", (string id) =>
     sessions.Get(id) is { } s
         ? Results.Ok(new
         {
-            s.Id, s.AgentId, s.Cwd, s.Title, s.Status, s.Policy, s.Model, s.CreatedAt, s.LastActivity,
+            s.Id, s.AgentId, s.Cwd, s.Title, s.Status, s.Policy, s.Model, s.IsChat, s.CreatedAt, s.LastActivity,
             Caps = s.Adapter.Capabilities,
             Pending = s.Pending,
             Transcript = s.TranscriptSnapshot()
@@ -153,7 +154,7 @@ api.MapPost("/history/{id}/resume", async (string id, ResumeRequest req, Cancell
     {
         var session = await sessions.CreateAsync(
             archived.AgentId, archived.Cwd, req.Title ?? $"{archived.Title} (resumed)",
-            ct, resumeNativeSessionId: archived.NativeSessionId);
+            ct, resumeNativeSessionId: archived.NativeSessionId, isChat: archived.IsChat);
         return Results.Ok(SessionSummary(session));
     }
     catch (Exception ex)
@@ -247,28 +248,36 @@ api.MapPost("/sessions/{id}/git/reject", async (string id, GitPathRequest req, C
 });
 
 // ----------------------------------------------------------- M2: terminal
-api.MapPost("/sessions/{id}/terminal/start", (string id) =>
+api.MapGet("/sessions/{id}/terminals", (string id) =>
+    sessions.Get(id) is null
+        ? Results.NotFound()
+        : Results.Ok(terminals.List(id).Select(t => new { id = t.Id, pty = t.IsPty, exited = t.HasExited })));
+
+api.MapPost("/sessions/{id}/terminals", (string id) =>
 {
     if (sessions.Get(id) is not { } session) return Results.NotFound();
-    var terminal = terminals.GetOrStart(id, session.Cwd);
-    return Results.Ok(new { pty = terminal.IsPty });
+    var terminal = terminals.Create(id, session.Cwd);
+    return Results.Ok(new { id = terminal.Id, pty = terminal.IsPty, exited = false });
 });
 
-api.MapPost("/sessions/{id}/terminal/input", async (string id, TerminalInputRequest req, CancellationToken ct) =>
+api.MapDelete("/sessions/{id}/terminals/{terminalId}", (string id, string terminalId) =>
+    terminals.Close(id, terminalId) ? Results.Ok() : Results.NotFound());
+
+api.MapPost("/sessions/{id}/terminals/{terminalId}/input", async (string id, string terminalId, TerminalInputRequest req, CancellationToken ct) =>
 {
-    if (terminals.Get(id) is not { } terminal) return Results.NotFound();
+    if (terminals.Get(id, terminalId) is not { } terminal) return Results.NotFound();
     await terminal.WriteInputAsync(req.Text, ct);
     return Results.Ok();
 });
 
-api.MapGet("/sessions/{id}/terminal/buffer", (string id) =>
-    terminals.Get(id) is { } terminal
+api.MapGet("/sessions/{id}/terminals/{terminalId}/buffer", (string id, string terminalId) =>
+    terminals.Get(id, terminalId) is { } terminal
         ? Results.Ok(new { text = terminal.BufferSnapshot() })
         : Results.NotFound());
 
-api.MapGet("/sessions/{id}/terminal/stream", async (string id, HttpContext ctx, CancellationToken ct) =>
+api.MapGet("/sessions/{id}/terminals/{terminalId}/stream", async (string id, string terminalId, HttpContext ctx, CancellationToken ct) =>
 {
-    if (terminals.Get(id) is not { } terminal) { ctx.Response.StatusCode = 404; return; }
+    if (terminals.Get(id, terminalId) is not { } terminal) { ctx.Response.StatusCode = 404; return; }
     ctx.Response.Headers.ContentType = "text/event-stream";
     ctx.Response.Headers.CacheControl = "no-cache";
     var reader = terminal.Subscribe(out var token);
@@ -436,7 +445,7 @@ logger.LogInformation("""
 
 app.Run();
 
-record CreateSessionRequest(string AgentId, string Cwd, string? Title, string? Policy, string? Model);
+record CreateSessionRequest(string AgentId, string? Cwd, string? Title, string? Policy, string? Model, bool IsChat = false);
 record PolicyRequest(string Policy);
 record TitleRequest(string Title);
 record ResumeRequest(string? Title);
@@ -451,7 +460,7 @@ partial class Program
 {
     private static object SessionSummary(HelmSession s) => new
     {
-        s.Id, s.AgentId, s.Cwd, s.Title, s.Status, s.Policy, s.CreatedAt, s.LastActivity,
+        s.Id, s.AgentId, s.Cwd, s.Title, s.Status, s.Policy, s.IsChat, s.CreatedAt, s.LastActivity,
         HasPendingPermission = s.Pending is not null
     };
 }

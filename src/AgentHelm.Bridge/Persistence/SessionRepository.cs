@@ -17,6 +17,9 @@ public sealed record ArchivedSession(
 {
     /// <summary>Agent-side session id — enables resume (nullable: pre-M1 rows).</summary>
     public string? NativeSessionId { get; init; }
+
+    /// <summary>Quick chat flag; absent in older snapshots, which load as ordinary sessions.</summary>
+    public bool IsChat { get; init; }
 }
 
 public sealed class SessionRepository(string connectionString, ILogger<SessionRepository> logger)
@@ -43,7 +46,7 @@ public sealed class SessionRepository(string connectionString, ILogger<SessionRe
         var archived = new ArchivedSession(session.Id, session.AgentId, session.Cwd,
             session.Title, session.CreatedAt, session.LastActivity,
             session.TranscriptSnapshot().ToList())
-        { NativeSessionId = session.Adapter.NativeSessionId };
+        { NativeSessionId = session.Adapter.NativeSessionId, IsChat = session.IsChat };
 
         await using var conn = new NpgsqlConnection(connectionString);
         await conn.OpenAsync(ct);

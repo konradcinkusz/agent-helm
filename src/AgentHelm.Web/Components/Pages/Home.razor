@@ -28,6 +28,7 @@
                         OnToggleHistory="@ToggleHistoryAsync" OnToggleNewSession="@ToggleNewSession"
                         OnBrowse="@OpenBrowseAsync" OnCreate="@CreateSessionAsync"
                         OnTogglePreconfig="@TogglePreconfigAsync"
+                        CreatingChat="@_creatingChat" ChatError="@_chatError" OnNewChat="@CreateChatAsync"
                         OnSelectSession="@SelectSessionAsync" OnSelectArchived="@SelectArchived" />
     </Sidebar>
 
@@ -142,8 +143,10 @@
             }
             else
             {
-                <TerminalPanel @bind-TermInput="_termInput" IsPty="@_termIsPty"
-                               OnKeyDown="@OnTerminalKeyAsync" OnInsertOutput="@InsertOutputIntoPromptAsync" />
+                <TerminalPanel Terminals="@_terminals" ActiveTerminalId="@_activeTermId" @bind-TermInput="_termInput"
+                               IsPty="@(ActiveTerminal?.Pty ?? false)"
+                               OnKeyDown="@OnTerminalKeyAsync" OnInsertOutput="@InsertOutputIntoPromptAsync"
+                               OnSelect="@SelectTerminal" OnClose="@CloseTerminalAsync" OnNew="@NewTerminalAsync" />
             }
         }
     </Main>
