@@ -43,6 +43,8 @@ public sealed record ArchivedSessionDto(
 
 public sealed record SessionEventDto(string Kind, string Text, JsonElement? Data);
 
+public sealed record TerminalInfoDto(string Id, bool Pty, bool Exited);
+
 public sealed record DirListDto(string Path, string? Parent, string[] Dirs);
 
 public sealed record ProviderInfoDto(
@@ -159,18 +161,28 @@ public sealed class BridgeClient
         _http.PostAsJsonAsync($"/api/sessions/{id}/git/reject", new { path }, Json, ct);
 
     // -------------------------------------------------------- M2: terminal
-    public async Task<bool> StartTerminalAsync(string id, CancellationToken ct = default)
+    public async Task<List<TerminalInfoDto>> GetTerminalsAsync(string id, CancellationToken ct = default)
     {
         try
         {
-            var response = await _http.PostAsync($"/api/sessions/{id}/terminal/start", null, ct);
-            var result = await response.Content.ReadFromJsonAsync<TerminalStartDto>(Json, ct);
-            return result?.Pty ?? false;
+            return await _http.GetFromJsonAsync<List<TerminalInfoDto>>($"/api/sessions/{id}/terminals", Json, ct)
+                   ?? new List<TerminalInfoDto>();
         }
-        catch { return false; }
+        catch { return new List<TerminalInfoDto>(); }
     }
 
-    private sealed record TerminalStartDto(bool Pty);
+    public async Task<TerminalInfoDto?> CreateTerminalAsync(string id, CancellationToken ct = default)
+    {
+        try
+        {
+            var response = await _http.PostAsync($"/api/sessions/{id}/terminals", null, ct);
+            return await response.Content.ReadFromJsonAsync<TerminalInfoDto>(Json, ct);
+        }
+        catch { return null; }
+    }
+
+    public Task CloseTerminalAsync(string id, string terminalId, CancellationToken ct = default) =>
+        _http.DeleteAsync($"/api/sessions/{id}/terminals/{terminalId}", ct);
 
     public async Task<(HandoffResultDto? Result, string? Error)> HandoffAsync(
         string id, string agentId, string? title = null, CancellationToken ct = default)
@@ -188,14 +200,14 @@ public sealed class BridgeClient
         catch { return new(false, []); }
     }
 
-    public Task TerminalInputAsync(string id, string text, CancellationToken ct = default) =>
-        _http.PostAsJsonAsync($"/api/sessions/{id}/terminal/input", new { text }, Json, ct);
+    public Task TerminalInputAsync(string id, string terminalId, string text, CancellationToken ct = default) =>
+        _http.PostAsJsonAsync($"/api/sessions/{id}/terminals/{terminalId}/input", new { text }, Json, ct);
 
-    public async Task<string> GetTerminalBufferAsync(string id, CancellationToken ct = default)
+    public async Task<string> GetTerminalBufferAsync(string id, string terminalId, CancellationToken ct = default)
     {
         try
         {
-            var result = await _http.GetFromJsonAsync<TerminalBufferDto>($"/api/sessions/{id}/terminal/buffer", Json, ct);
+            var result = await _http.GetFromJsonAsync<TerminalBufferDto>($"/api/sessions/{id}/terminals/{terminalId}/buffer", Json, ct);
             return result?.Text ?? "";
         }
         catch { return ""; }
@@ -203,8 +215,8 @@ public sealed class BridgeClient
 
     private sealed record TerminalBufferDto(string Text);
 
-    public Task SubscribeTerminalAsync(string id, Func<SessionEventDto, Task> onEvent, CancellationToken ct) =>
-        ReadSseAsync($"/api/sessions/{id}/terminal/stream", onEvent, ct);
+    public Task SubscribeTerminalAsync(string id, string terminalId, Func<SessionEventDto, Task> onEvent, CancellationToken ct) =>
+        ReadSseAsync($"/api/sessions/{id}/terminals/{terminalId}/stream", onEvent, ct);
 
     public Task ResolvePermissionAsync(string id, string requestKey, bool allow, string? optionId, CancellationToken ct = default) =>
         _http.PostAsJsonAsync($"/api/sessions/{id}/permission", new { requestKey, allow, optionId }, Json, ct);

@@ -1,4 +1,17 @@
 <div class="terminal-panel">
+    <div class="term-tabs" role="tablist">
+        @for (var i = 0; i < Terminals.Count; i++)
+        {
+            var terminal = Terminals[i];
+            <div class="term-tab @(terminal.Id == ActiveTerminalId ? "active" : "")" data-testid="term-tab">
+                <button class="term-tab-label" role="tab" aria-selected="@(terminal.Id == ActiveTerminalId)"
+                        @onclick="() => OnSelect.InvokeAsync(terminal.Id)">Terminal @(i + 1)@(terminal.Exited ? " (exited)" : "")</button>
+                <button class="term-tab-close" title="Close terminal" aria-label="Close terminal"
+                        @onclick="() => OnClose.InvokeAsync(terminal.Id)">×</button>
+            </div>
+        }
+        <button class="term-tab-new" title="New terminal" aria-label="New terminal" @onclick="() => OnNew.InvokeAsync()">+</button>
+    </div>
     <div id="term-host" class="term-host"></div>
     <div class="term-input-row">
         <input placeholder="Command… (Enter to run)" value="@TermInput" @oninput="TermInputChangedAsync"

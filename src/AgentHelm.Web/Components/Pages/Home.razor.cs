@@ -65,8 +65,9 @@ public partial class Home : IDisposable
     private string[] _diffLines = [];
     private string? _rejectConfirmPath;
     private string _termInput = "";
+    private List<TerminalInfoDto> _terminals = [];
+    private string? _activeTermId;
     private bool _termNeedsInit;
-    private bool _termIsPty;
     private CancellationTokenSource? _termCts;
 
     // directory browser
@@ -191,6 +192,8 @@ public partial class Home : IDisposable
         _rejectConfirmPath = null;
         _termCts?.Cancel();
         _termCts = null;
+        _terminals = [];
+        _activeTermId = null;
         _handoffOpen = false;
         _handoffError = null;
         _scopeOpen = false;
@@ -328,34 +331,82 @@ public partial class Home : IDisposable
     {
         _activeTab = tab;
         if (tab == "changes") await LoadChangesAsync();
-        if (tab == "terminal" && _detail is not null)
+        if (tab == "terminal") await OpenTerminalTabAsync();
+    }
+
+    private TerminalInfoDto? ActiveTerminal => _terminals.FirstOrDefault(t => t.Id == _activeTermId);
+
+    private async Task OpenTerminalTabAsync()
+    {
+        if (_detail is null) return;
+        _terminals = await Bridge.GetTerminalsAsync(_detail.Id, _pageCts.Token);
+        if (_terminals.Count == 0 && await Bridge.CreateTerminalAsync(_detail.Id, _pageCts.Token) is { } first)
+            _terminals.Add(first);
+        if (_terminals.Count > 0)
+            ActivateTerminal(ActiveTerminal?.Id ?? _terminals[0].Id);
+    }
+
+    private void SelectTerminal(string terminalId)
+    {
+        if (terminalId != _activeTermId) ActivateTerminal(terminalId);
+    }
+
+    private async Task NewTerminalAsync()
+    {
+        if (_detail is null || await Bridge.CreateTerminalAsync(_detail.Id, _pageCts.Token) is not { } created) return;
+        _terminals.Add(created);
+        ActivateTerminal(created.Id);
+    }
+
+    private async Task CloseTerminalAsync(string terminalId)
+    {
+        if (_detail is null) return;
+        await Bridge.CloseTerminalAsync(_detail.Id, terminalId, _pageCts.Token);
+        var index = _terminals.FindIndex(t => t.Id == terminalId);
+        if (index >= 0) _terminals.RemoveAt(index);
+        if (_terminals.Count == 0 && await Bridge.CreateTerminalAsync(_detail.Id, _pageCts.Token) is { } fresh)
+            _terminals.Add(fresh);
+
+        if (terminalId != _activeTermId) return;
+        if (_terminals.Count == 0)
         {
-            _termIsPty = await Bridge.StartTerminalAsync(_detail.Id, _pageCts.Token);
-            _termNeedsInit = true;   // JS init must wait for the div to render
+            _activeTermId = null;
+            _termCts?.Cancel();
+            return;
         }
+        ActivateTerminal(_terminals[Math.Clamp(index, 0, _terminals.Count - 1)].Id);
+    }
+
+    private void ActivateTerminal(string terminalId)
+    {
+        _activeTermId = terminalId;
+        _termCts?.Cancel();
+        _termCts = null;
+        _termNeedsInit = true;   // JS init must wait for the div to render
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!_termNeedsInit || _detail is null) return;
+        if (!_termNeedsInit || _detail is null || ActiveTerminal is not { } terminal) return;
         _termNeedsInit = false;
 
-        await JS.InvokeVoidAsync("helmTerm.init", "term-host");
-        var backlog = await Bridge.GetTerminalBufferAsync(_detail.Id, _pageCts.Token);
-        if (backlog.Length > 0) await JS.InvokeVoidAsync("helmTerm.write", backlog);
+        var sessionId = _detail.Id;
+        var terminalId = terminal.Id;
+        await JS.InvokeVoidAsync("helmTerm.init", "term-host", terminalId);
+        var backlog = await Bridge.GetTerminalBufferAsync(sessionId, terminalId, _pageCts.Token);
+        if (backlog.Length > 0) await JS.InvokeVoidAsync("helmTerm.write", terminalId, backlog);
 
         _termCts?.Cancel();
         _termCts = CancellationTokenSource.CreateLinkedTokenSource(_pageCts.Token);
         var token = _termCts.Token;
-        var sessionId = _detail.Id;
         _ = Task.Run(async () =>
         {
             try
             {
-                await Bridge.SubscribeTerminalAsync(sessionId, async e =>
+                await Bridge.SubscribeTerminalAsync(sessionId, terminalId, async e =>
                 {
                     if (e.Kind == "out")
-                        await InvokeAsync(() => JS.InvokeVoidAsync("helmTerm.write", e.Text).AsTask());
+                        await InvokeAsync(() => JS.InvokeVoidAsync("helmTerm.write", terminalId, e.Text).AsTask());
                 }, token);
             }
             catch (OperationCanceledException) { }
@@ -365,12 +416,12 @@ public partial class Home : IDisposable
 
     private async Task OnTerminalKeyAsync(KeyboardEventArgs e)
     {
-        if (e.Key != "Enter" || _detail is null || string.IsNullOrWhiteSpace(_termInput)) return;
+        if (e.Key != "Enter" || _detail is null || ActiveTerminal is not { } terminal || string.IsNullOrWhiteSpace(_termInput)) return;
         var command = _termInput.Trim();
         _termInput = "";
         // A real PTY echoes input itself — local echo would double every line.
-        if (!_termIsPty) await JS.InvokeVoidAsync("helmTerm.echoInput", command);
-        await Bridge.TerminalInputAsync(_detail.Id, command, _pageCts.Token);
+        if (!terminal.Pty) await JS.InvokeVoidAsync("helmTerm.echoInput", terminal.Id, command);
+        await Bridge.TerminalInputAsync(_detail.Id, terminal.Id, command, _pageCts.Token);
     }
 
     private Task AskAgentAboutFileAsync(string path)
@@ -382,8 +433,8 @@ public partial class Home : IDisposable
 
     private async Task InsertOutputIntoPromptAsync()
     {
-        if (_detail is null) return;
-        var buffer = await Bridge.GetTerminalBufferAsync(_detail.Id, _pageCts.Token);
+        if (_detail is null || ActiveTerminal is not { } terminal) return;
+        var buffer = await Bridge.GetTerminalBufferAsync(_detail.Id, terminal.Id, _pageCts.Token);
         if (buffer.Length == 0) return;
         var tail = buffer.Length > 2000 ? buffer[^2000..] : buffer;
         _prompt = string.IsNullOrWhiteSpace(_prompt)

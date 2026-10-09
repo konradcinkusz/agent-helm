@@ -6,3 +6,14 @@
   border-radius: 7px; padding: 8px 12px; font-family: var(--mono); font-size: 13px;
 }
 .term-input-row input:focus { outline: none; border-color: var(--copper); }
+.term-tabs { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.term-tab { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 7px; }
+.term-tab.active { border-color: var(--copper); }
+.term-tab-label, .term-tab-close, .term-tab-new {
+  background: none; border: 0; color: var(--text); font: inherit; font-size: 12px; cursor: pointer;
+}
+.term-tab-label { padding: 4px 10px; }
+.term-tab.active .term-tab-label { color: var(--copper); }
+.term-tab-close { padding: 4px 8px 4px 0; opacity: .6; }
+.term-tab-close:hover { opacity: 1; }
+.term-tab-new { padding: 4px 10px; border: 1px dashed var(--line); border-radius: 7px; }
