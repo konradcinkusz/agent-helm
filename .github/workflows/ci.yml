@@ -36,3 +36,20 @@ jobs:
         run: bash scripts/build-release-layout.sh dist
       - name: Smoke-test the launcher
         run: bash scripts/smoke-release-layout.sh dist
+
+  # Builds the single-file executable with the script the release will use, then
+  # starts it from an empty folder: the UI and its static files must come from
+  # inside the file, the API must answer, the echo agent (the same file, run as a
+  # sub-command) must finish a turn, and the output folder must hold only the file.
+  single-file:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 8.0.x
+      - name: Build the single file
+        run: bash scripts/build-single-file.sh linux-x64 out
+      - name: Smoke-test the single file
+        run: bash scripts/smoke-single-file.sh out

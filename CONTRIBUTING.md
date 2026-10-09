@@ -37,6 +37,7 @@ The suite covers the ACP client, session layer, policy engine, git service, term
 ```
 src/
   AgentHelm.AppHost   .NET Aspire orchestrator
+  AgentHelm.App       One process: Bridge + Web on one URL, the single-file build
   AgentHelm.Bridge    ASP.NET Core API backend (sessions, ACP, permissions, git)
   AgentHelm.Web       Blazor Server frontend
 tests/
