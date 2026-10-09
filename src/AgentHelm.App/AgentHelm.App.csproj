@@ -30,9 +30,10 @@
        is a project reference. Embedded under the same wwwroot/ name as the other UI files. -->
   <!-- The bundle's exact folder inside obj is not fixed (it moved between SDK versions), so match
        the file name anywhere under the Web project. Its build output is the only match. -->
-  <!-- Before PrepareResources, so the item goes through the normal resource handling; added any
-       later (just before CoreCompile) it did not reach the assembly. -->
-  <Target Name="EmbedWebScopedCss" BeforeTargets="PrepareResources">
+  <!-- Resource lists are built early in the build, so the item must exist before BeforeBuild; the
+       Web project is built first (DependsOnTargets) so its bundle exists by then. Items added any
+       later (before CoreCompile or PrepareResources) did not reach the assembly. -->
+  <Target Name="EmbedWebScopedCss" BeforeTargets="BeforeBuild" DependsOnTargets="ResolveProjectReferences">
     <ItemGroup>
       <_WebScopedCss Include="..\AgentHelm.Web\obj\**\AgentHelm.Web.styles.css" />
       <EmbeddedResource Include="@(_WebScopedCss)" LogicalName="wwwroot/AgentHelm.Web.styles.css" />
