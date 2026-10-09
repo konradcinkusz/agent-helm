@@ -68,17 +68,17 @@ curl -s -X POST $B/sessions/da9ae20420d3/prompt -H 'content-type: application/js
 **Start a session** — `POST /sessions`:
 
 ```json
-{ "agentId": "echo", "cwd": "/home/dev/projects/acme-api", "title": null, "policy": "ask", "model": null }
+{ "agentId": "echo", "cwd": "/home/dev/projects/acme-api", "title": null, "policy": "ask", "model": null, "isChat": false }
 ```
 
-`agentId` and `cwd` are required; `title`, `policy` and `model` are optional. The response is a **session summary**:
+`agentId` and `cwd` are required, except for a quick chat: with `"isChat": true` and no `cwd`, the Bridge creates a scratch directory for the session. `title`, `policy`, `model` and `isChat` are optional. The response is a **session summary**:
 
 ```json
 {
   "id": "da9ae20420d3", "agentId": "echo", "cwd": "/home/dev/projects/acme-api",
   "title": "Echo (built-in demo agent) · acme-api", "status": "idle", "policy": "ask",
   "createdAt": "2026-09-22T19:13:39.1089865+00:00", "lastActivity": "2026-09-22T19:13:39.1089866+00:00",
-  "hasPendingPermission": false
+  "hasPendingPermission": false, "isChat": false
 }
 ```
 

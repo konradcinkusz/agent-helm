@@ -34,6 +34,8 @@ public partial class Home : IDisposable
     private List<ProviderModelDto> _newAgentModels = [];
     private bool _creating;
     private string? _createError;
+    private bool _creatingChat;
+    private string? _chatError;
     private string _prompt = "";
 
     // M1: history + resume
@@ -165,6 +167,29 @@ public partial class Home : IDisposable
         finally
         {
             _creating = false;
+        }
+    }
+
+    private async Task CreateChatAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_newAgentId)) return;
+        _creatingChat = true;
+        _chatError = null;
+        try
+        {
+            var (session, error) = await Bridge.CreateChatAsync(_newAgentId,
+                string.IsNullOrWhiteSpace(_newModel) ? null : _newModel.Trim(), _pageCts.Token);
+            if (session is null)
+            {
+                _chatError = error;
+                return;
+            }
+            _sessions = await Bridge.GetSessionsAsync(_pageCts.Token);
+            await SelectSessionAsync(session.Id);
+        }
+        finally
+        {
+            _creatingChat = false;
         }
     }
 

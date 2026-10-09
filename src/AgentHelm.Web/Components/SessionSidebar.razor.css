@@ -38,3 +38,4 @@
   border-radius: 6px; padding: 7px 9px; font-size: 12px; font-family: var(--mono);
 }
 .preconfig-panel input:focus { outline: none; border-color: var(--copper); }
+.chats-head { margin-top: 12px; }

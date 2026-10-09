@@ -61,7 +61,7 @@
             </div>
         }
 
-        @foreach (var session in Sessions)
+        @foreach (var session in ProjectSessions)
         {
             <button class="session-card @(session.Id == SelectedId ? "active" : "")"
                     @onclick="() => OnSelectSession.InvokeAsync(session.Id)">
@@ -69,9 +69,30 @@
                 <span class="session-meta">@session.AgentId · @session.Status · @PolicyLabel(session.Policy)@(session.HasPendingPermission ? " · ⏳ permission" : "")</span>
             </button>
         }
-        @if (Sessions.Count == 0 && !ShowNewSession)
+        @if (!ProjectSessions.Any() && !ShowNewSession)
         {
             <div class="empty">No sessions yet.<br />Start one — the built-in <b>echo</b> agent works without any real agent installed.</div>
+        }
+
+        <div class="rail-head chats-head">
+            <span class="rail-label">Chats</span>
+            <button class="btn" disabled="@CreatingChat" @onclick="() => OnNewChat.InvokeAsync()">@(CreatingChat ? "Starting…" : "＋ New chat")</button>
+        </div>
+        @foreach (var chat in ChatSessions)
+        {
+            <button class="session-card @(chat.Id == SelectedId ? "active" : "")"
+                    @onclick="() => OnSelectSession.InvokeAsync(chat.Id)">
+                <span class="session-title">@chat.Title</span>
+                <span class="session-meta">@chat.AgentId · @chat.Status · @PolicyLabel(chat.Policy)@(chat.HasPendingPermission ? " · ⏳ permission" : "")</span>
+            </button>
+        }
+        @if (!ChatSessions.Any())
+        {
+            <div class="empty">No chats yet. A quick chat needs no repository.</div>
+        }
+        @if (ChatError is not null)
+        {
+            <div class="error-note">@ChatError</div>
         }
     }
     else

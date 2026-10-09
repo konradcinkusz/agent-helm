@@ -31,8 +31,15 @@ public partial class SessionSidebar
     [Parameter] public EventCallback OnBrowse { get; set; }
     [Parameter] public EventCallback OnCreate { get; set; }
     [Parameter] public EventCallback OnTogglePreconfig { get; set; }
+    [Parameter] public bool CreatingChat { get; set; }
+    [Parameter] public string? ChatError { get; set; }
+    [Parameter] public EventCallback OnNewChat { get; set; }
     [Parameter] public EventCallback<string> OnSelectSession { get; set; }
     [Parameter] public EventCallback<ArchivedSessionDto> OnSelectArchived { get; set; }
+
+    private IEnumerable<SessionSummaryDto> ProjectSessions => Sessions.Where(s => !s.IsChat);
+
+    private IEnumerable<SessionSummaryDto> ChatSessions => Sessions.Where(s => s.IsChat);
 
     private Task NewAgentChangedAsync(ChangeEventArgs e) => OnNewAgentChanged.InvokeAsync(e);
 

@@ -7,7 +7,7 @@ public sealed record AgentDto(string Id, string Name);
 
 public sealed record SessionSummaryDto(
     string Id, string AgentId, string Cwd, string Title, string Status, string Policy,
-    DateTimeOffset CreatedAt, DateTimeOffset LastActivity, bool HasPendingPermission);
+    DateTimeOffset CreatedAt, DateTimeOffset LastActivity, bool HasPendingPermission, bool IsChat = false);
 
 public sealed record ChatEntryDto(DateTimeOffset Time, string Role, string Text, string Kind);
 
@@ -39,7 +39,7 @@ public sealed record GitFileDiffDto(string Path, string Status, string DiffText,
 public sealed record ArchivedSessionDto(
     string Id, string AgentId, string Cwd, string Title,
     DateTimeOffset CreatedAt, DateTimeOffset LastActivity,
-    List<ChatEntryDto> Transcript, string? NativeSessionId);
+    List<ChatEntryDto> Transcript, string? NativeSessionId, bool IsChat = false);
 
 public sealed record SessionEventDto(string Kind, string Text, JsonElement? Data);
 
@@ -93,6 +93,16 @@ public sealed class BridgeClient
         string agentId, string cwd, string? title, string? model = null, CancellationToken ct = default)
     {
         var response = await _http.PostAsJsonAsync("/api/sessions", new { agentId, cwd, title, model }, Json, ct);
+        if (response.IsSuccessStatusCode)
+            return (await response.Content.ReadFromJsonAsync<SessionSummaryDto>(Json, ct), null);
+        var body = await response.Content.ReadAsStringAsync(ct);
+        return (null, string.IsNullOrWhiteSpace(body) ? response.StatusCode.ToString() : body);
+    }
+
+    public async Task<(SessionSummaryDto? Session, string? Error)> CreateChatAsync(
+        string agentId, string? model, CancellationToken ct = default)
+    {
+        var response = await _http.PostAsJsonAsync("/api/sessions", new { agentId, model, isChat = true }, Json, ct);
         if (response.IsSuccessStatusCode)
             return (await response.Content.ReadFromJsonAsync<SessionSummaryDto>(Json, ct), null);
         var body = await response.Content.ReadAsStringAsync(ct);
