@@ -37,13 +37,18 @@ done
 health="$(curl -fsS "$base/api/health")" || fail "/api/health does not answer"
 echo "health: $health"
 
+echo "check: UI page at /"
 curl -fsS -o /dev/null "$base/" || fail "the UI does not serve /"
 for asset in app.css AgentHelm.Web.styles.css chat.js _framework/blazor.web.js; do
-  curl -fsS -o /dev/null "$base/$asset" || fail "the single file does not serve $asset"
+  echo "check: static file /$asset"
+  code="$(curl -s -o /dev/null -w '%{http_code}' "$base/$asset")"
+  [ "$code" = 200 ] || fail "the single file serves /$asset with HTTP $code, expected 200"
 done
 
+echo "check: agent catalog lists echo"
 agents="$(curl -fsS "$base/api/agents")"
 jq -e 'any(.[]; .id == "echo")' <<<"$agents" >/dev/null || fail "the agent catalog has no echo agent"
+echo "check: echo agent turn"
 
 session="$(curl -fsS -m 60 -X POST "$base/api/sessions" \
   -H 'content-type: application/json' \

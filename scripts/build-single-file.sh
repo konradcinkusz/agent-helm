@@ -24,6 +24,7 @@ dotnet publish src/AgentHelm.App -c Release -r "$rid" --self-contained \
   -p:AgentHelmSingleFile=true \
   -o "$scratch/publish"
 
+echo "scoped CSS bundle(s) in the Web project's obj: $(find src/AgentHelm.Web/obj -name AgentHelm.Web.styles.css 2>/dev/null | tr '\n' ' ')"
 [ -f "$scratch/publish/$exe" ] || { echo "publish did not produce $exe" >&2; exit 1; }
 mkdir -p "$outdir"
 cp "$scratch/publish/$exe" "$outdir/$exe"
