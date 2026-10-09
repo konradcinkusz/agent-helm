@@ -30,11 +30,14 @@
        is a project reference. Embedded under the same wwwroot/ name as the other UI files. -->
   <!-- The bundle's exact folder inside obj is not fixed (it moved between SDK versions), so match
        the file name anywhere under the Web project. Its build output is the only match. -->
-  <Target Name="EmbedWebScopedCss" BeforeTargets="CoreCompile">
+  <!-- Before PrepareResources, so the item goes through the normal resource handling; added any
+       later (just before CoreCompile) it did not reach the assembly. -->
+  <Target Name="EmbedWebScopedCss" BeforeTargets="PrepareResources">
     <ItemGroup>
-      <EmbeddedResource Include="..\AgentHelm.Web\obj\**\AgentHelm.Web.styles.css"
-                        LogicalName="wwwroot/AgentHelm.Web.styles.css" />
+      <_WebScopedCss Include="..\AgentHelm.Web\obj\**\AgentHelm.Web.styles.css" />
+      <EmbeddedResource Include="@(_WebScopedCss)" LogicalName="wwwroot/AgentHelm.Web.styles.css" />
     </ItemGroup>
+    <Message Importance="high" Text="Embedding scoped CSS bundle(s): @(_WebScopedCss)" />
   </Target>
   <ItemGroup>
     <InternalsVisibleTo Include="AgentHelm.Tests" />
