@@ -14,7 +14,7 @@ The brand, links to **Dashboard**, **Search** and **Providers**, and on the righ
 | **+** | Opens the new-session form: agent, working directory, title, model. See [Sessions & chat](Sessions-and-Chat.md#starting-a-session). |
 | **My work** | Back to the Dashboard. |
 | **Search** | Opens the [Search page](#search-page). |
-| **Chats** | Shown for a coming feature; disabled for now. |
+| **Chats** | Jumps to the Chats section of the rail. |
 | Repository groups | Live sessions are grouped by repository (the last folder of their working directory). Click a group heading to collapse or expand it. |
 | Session cards | One per live session: a status dot (copper = running, green = idle, red = error), the title, then `agent · policy`, plus a ⏳ while a permission request is waiting for you. |
 | **Providers** (footer) | Opens the [Providers](Provider-Accounts.md) page. |
