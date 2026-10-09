@@ -23,9 +23,9 @@
         <span class="mode-chip" title="Permission mode — every auto-decision is still audited in the transcript">@ModeLabel()</span>
         <span class="status @Session.Status">@Session.Status</span>
         <button class="btn toggle @(ActiveTab == "changes" ? "on" : "")" aria-pressed="@(ActiveTab == "changes" ? "true" : "false")"
-                @onclick="() => OnSwitchTab.InvokeAsync(ActiveTab == "changes" ? "chat" : "changes")">Changes</button>
+                @onclick='() => OnSwitchTab.InvokeAsync(ActiveTab == "changes" ? "chat" : "changes")'>Changes</button>
         <button class="btn toggle @(ActiveTab == "terminal" ? "on" : "")" aria-pressed="@(ActiveTab == "terminal" ? "true" : "false")"
-                @onclick="() => OnSwitchTab.InvokeAsync(ActiveTab == "terminal" ? "chat" : "terminal")">Terminal</button>
+                @onclick='() => OnSwitchTab.InvokeAsync(ActiveTab == "terminal" ? "chat" : "terminal")'>Terminal</button>
         <button class="btn" @onclick="() => OnStop.InvokeAsync()" disabled="@(Session.Status != "running")">Stop</button>
         <div class="head-menu">
             <button class="btn icon" title="Session actions" aria-haspopup="menu" aria-expanded="@(_menuOpen ? "true" : "false")"
