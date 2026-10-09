@@ -19,7 +19,7 @@ The Bridge saves a snapshot of the session — id, agent, working directory, tit
 - a turn ends (successfully or with an error),
 - you answer a permission request,
 - you rename the session or change its policy,
-- you accept or reject a change in the Changes tab,
+- you accept or reject a change in the Changes panel,
 - you hand the session off.
 
 A session you started but never used is not saved. The agent's live "thinking" stream, tool-status updates, the terminal and pending permission requests are not part of the snapshot. See [Persistence](Persistence.md) for the table layout.

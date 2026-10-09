@@ -13,7 +13,7 @@ Each entry is `{time, role, text, kind}` (PascalCase inside event streams and sn
 | `system` | `permission_result` | *Permission granted by user* / *Permission denied by user* | you answer, or the session is deleted while waiting |
 | `system` | `permission_auto` | *Permission auto-allowed by policy '`<policy>`': `<tool>` (`<kind>`)* | the policy answers |
 | `system` | `policy` | *Permission policy changed to '`<policy>`'* | the policy changes |
-| `system` | `git` | *Accepted (staged) changes: `<path>`* / *Rejected (reverted) changes: `<path>`* | you accept or reject in the Changes tab |
+| `system` | `git` | *Accepted (staged) changes: `<path>`* / *Rejected (reverted) changes: `<path>`* | you accept or reject in the Changes panel |
 | `system` | `handoff` | *Handoff to '`<agent>`' → session `<id>`* | you hand the session off (source session) |
 | `system` | `error` | *Agent error: `<message>`* | the prompt fails — the agent returned an error or exited |
 

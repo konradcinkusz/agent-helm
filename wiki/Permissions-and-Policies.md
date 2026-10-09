@@ -6,7 +6,7 @@ A request that needs you appears as a banner above the chat, naming the agent, t
 
 ![A permission banner for an edit tool](images/permission-banner.png)
 
-The buttons are exactly the options the agent offered, in the agent's words — typically *Allow*, *Allow always*, *Reject* and so on. Allow-type options are highlighted, reject-type options are red. While the banner is open, the agent's turn is paused and the session card in the rail shows `⏳ permission`.
+The buttons are exactly the options the agent offered, in the agent's words — typically *Allow*, *Allow always*, *Reject* and so on. Allow-type options are highlighted, reject-type options are red. While the banner is open, the agent's turn is paused and the session card in the rail shows a ⏳ badge.
 
 When you click an allow option, AgentHelm passes that exact option back to the agent. When you click a reject option, AgentHelm answers with the first reject-type option in the agent's list; an agent that offered none gets a *cancelled* outcome.
 
@@ -76,4 +76,4 @@ With PostgreSQL configured these entries are persisted with the rest of the tran
 
 ## What permissions do not cover
 
-The permission gateway decides whether an agent may run a tool. What the tool then does happens inside the agent's own process, as your user — a shell command the agent is allowed to run can reach anything you can. The Bridge's working-directory guard applies to the file operations an agent asks *the Bridge* to perform (ACP `fs/read_text_file` and `fs/write_text_file`) and to the git actions in the Changes tab. The [security model](Security.md) describes each boundary.
+The permission gateway decides whether an agent may run a tool. What the tool then does happens inside the agent's own process, as your user — a shell command the agent is allowed to run can reach anything you can. The Bridge's working-directory guard applies to the file operations an agent asks *the Bridge* to perform (ACP `fs/read_text_file` and `fs/write_text_file`) and to the git actions in the Changes panel. The [security model](Security.md) describes each boundary.

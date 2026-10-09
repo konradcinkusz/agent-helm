@@ -25,6 +25,9 @@ What an agent advertised in the ACP `initialize` handshake — `loadSession`, `i
 **CopilotScope**\
 AgentHelm's sibling project, a local collector that scores sessions from agent telemetry. See [CopilotScope integration](CopilotScope-Integration.md).
 
+**Dock**\
+The panel on the right of a session's page that holds the Changes and Terminal panels, beside the chat. See [The dock](User-Guide.md#dock-right).
+
 **Echo agent**\
 `AgentHelm.EchoAgent`, the built-in demo agent: echoes prompts, asks for a permission when a prompt contains "tool", supports resume.
 
@@ -47,7 +50,10 @@ How a session answers permission requests: `ask`, `auto_read` or `yolo`. Policie
 An agent's question, before running a tool, whether it may — with the tool's title, its kind and the answer options.
 
 **PTY**\
-Pseudo-terminal. The Terminal tab runs its shell in a PTY on Linux through `script(1)`, otherwise through a plain pipe.
+Pseudo-terminal. The Terminal panel runs its shell in a PTY on Linux through `script(1)`, otherwise through a plain pipe.
+
+**Quick chat**\
+A session started with **New chat** under *Chats*: it needs no repository, and the Bridge gives it a scratch directory. See [Quick chats](Sessions-and-Chat.md#quick-chats).
 
 **Session**\
 One conversation with one agent in one working directory, with its own agent process, transcript, policy and terminal.

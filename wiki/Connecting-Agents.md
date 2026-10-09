@@ -9,7 +9,7 @@ Four entries are preconfigured:
 | Claude Code | `claude` | `npx @zed-industries/claude-code-acp` | Node.js; Claude Code authentication |
 | Gemini CLI | `gemini` | `gemini --acp` | `gemini` on the `PATH`, authenticated |
 
-An agent whose command is not installed still appears in the **＋ New** drop-down; starting a session with it fails with *Could not start agent '…'* and the reason.
+An agent whose command is not installed still appears in the agent list of the New session dialog; starting a session with it fails with *Could not start agent '…'* and the reason.
 
 > **Important:** Agents run **as the user running the Bridge**, with the Bridge's environment variables and `PATH`, and in the session's working directory. Install and authenticate each CLI for that user, on that machine. If the Bridge runs in a container, only the echo agent is available — see [Deployment & topology](Deployment-and-Topology.md).
 

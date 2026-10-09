@@ -28,7 +28,7 @@ Even in PTY mode, input is sent **a line at a time** from the input box. Full-sc
 
 ## Sending output to the agent
 
-**→ Prompt** takes the last 2,000 characters of the active terminal's output and appends them to the chat composer as a fenced block under *Terminal output:*, then switches to the Chat tab. Add your question — *"Why does this test fail?"* — and send. Nothing is sent until you press **Send**.
+**→ Prompt** takes the last 2,000 characters of the active terminal's output and appends them to the chat composer as a fenced block under *Terminal output:*. The chat stays in view. Add your question — *"Why does this test fail?"* — and send. Nothing is sent until you press **Send**.
 
 ## Security
 

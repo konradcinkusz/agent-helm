@@ -40,6 +40,8 @@ src/
     Workbench/              GitService, TerminalService
     Program.cs              endpoints, token middleware, DI
   AgentHelm.Web/            Blazor Server UI
+    Components/             AppShell (rail | main | dock), SessionSidebar, SessionHeader, ChatView,
+                            Composer, Dock, ChangesPanel, TerminalPanel, NewSessionDialog, ScopePanel
     Components/Pages/       MyWork (start page), Home (sessions), Search, Settings (providers)
     Services/BridgeClient.cs  the only way the UI talks to the Bridge
     wwwroot/                app.css, terminal.js (xterm.js host, folder picker)

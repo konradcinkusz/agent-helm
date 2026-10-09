@@ -24,7 +24,7 @@ Details: [Permissions & policies](Permissions-and-Policies.md).
 
 ### The working-directory path guard
 
-When an agent asks the Bridge to read or write a file (ACP `fs/read_text_file`, `fs/write_text_file`), the path is resolved against the session's working directory and refused if it falls outside — checked both as written and after following symbolic links, so a link inside the directory cannot lead out of it. The Changes tab's git actions apply the same rule, and decide between *revert* and *delete* on the server, never from the request.
+When an agent asks the Bridge to read or write a file (ACP `fs/read_text_file`, `fs/write_text_file`), the path is resolved against the session's working directory and refused if it falls outside — checked both as written and after following symbolic links, so a link inside the directory cannot lead out of it. The Changes panel's git actions apply the same rule, and decide between *revert* and *delete* on the server, never from the request.
 
 ### Where the guard does not reach
 
@@ -36,7 +36,7 @@ These are deliberate, documented, and not vulnerabilities:
 
 | Behaviour | Why it is fine — and what to keep in mind |
 |---|---|
-| The **Terminal** tab runs shell commands as you | It *is* your terminal. Anyone who can reach the Bridge can use it, so keep the Bridge on loopback and set the token. |
+| The **Terminal** panel runs shell commands as you | It *is* your terminal. Anyone who can reach the Bridge can use it, so keep the Bridge on loopback and set the token. |
 | **YOLO** auto-allows every tool call | Explicit per-session opt-in; every decision still audited. |
 | Agents read and write inside the working directory | That is the job. |
 | The **directory browser** lists directories anywhere on the Bridge's machine | Names only, no file contents; same token and bind as everything else. |
@@ -48,7 +48,7 @@ These are deliberate, documented, and not vulnerabilities:
 - [x] Keep `AgentHelm:Urls` on `127.0.0.1`.
 - [ ] Set `AgentHelm:ApiToken` to a long random value, and the same value as `Bridge:ApiToken` for the Web UI — [how](Configuration.md#enabling-the-api-token).
 - [x] Leave new sessions on `ask`; use `auto_read` only with agents whose tool kinds you trust, and YOLO only for sessions you are watching.
-- [ ] Review the agent's changes in the [Changes](Reviewing-Changes.md) tab before committing them.
+- [ ] Review the agent's changes in the [Changes](Reviewing-Changes.md) panel before committing them.
 - [ ] **Containers:** the compose files publish ports on all interfaces and ship a sample token (`dev-secret-123`). Bind the ports to `127.0.0.1` and replace the token before running them anywhere reachable.
 - [ ] **Never** expose the Bridge to the internet. If you must reach it over a network, put it behind a reverse proxy with TLS and real authentication — see [Exposing the Bridge](Deployment-and-Topology.md#exposing-the-bridge).
 - [ ] Pin agent CLIs to known-good versions where they update themselves.
