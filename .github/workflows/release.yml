@@ -1,14 +1,63 @@
 name: release
+# Tags v* publish a GitHub Release with one self-contained executable per platform
+# (see docs/single-file-distribution-plan.md). workflow_dispatch with dry_run (the
+# default) builds all four RIDs and uploads them as run artifacts, but publishes nothing.
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build all four executables only; do not publish a release'
+        type: boolean
+        default: true
 
 permissions:
-  contents: write
+  contents: read
+
+defaults:
+  run:
+    # Windows runners run these steps with bash (Git for Windows), like the others.
+    shell: bash
 
 jobs:
-  release:
+  test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 8.0.x
+      - name: Test first — no green, no release
+        run: |
+          dotnet build AgentHelm.sln -c Release
+          dotnet test tests/AgentHelm.Tests -c Release --no-build
+
+  build:
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: linux-x64
+            os: ubuntu-latest
+            ext: ''
+            smoke: true
+          - rid: win-x64
+            os: windows-latest
+            ext: '.exe'
+            smoke: false
+          - rid: osx-arm64
+            os: macos-latest
+            ext: ''
+            smoke: true
+          - rid: osx-x64
+            # Cross-published from the arm64 runner (-r osx-x64); it is not run here.
+            os: macos-latest
+            ext: ''
+            smoke: false
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
@@ -16,23 +65,62 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Test first — no green, no release
+      - name: Build the single file
+        run: bash scripts/build-single-file.sh ${{ matrix.rid }} out
+
+      # Ad-hoc signature: Apple silicon refuses to run unsigned binaries, and this gives the
+      # file a stable identity. It is not a Developer ID, so Gatekeeper still warns on download.
+      - name: Ad-hoc sign (macOS)
+        if: runner.os == 'macOS'
         run: |
-          dotnet build AgentHelm.sln -c Release
-          dotnet test tests/AgentHelm.Tests -c Release --no-build
+          codesign --force --sign - out/agenthelm
+          codesign --verify --verbose=2 out/agenthelm
 
-      # Portable (framework-dependent) publish: ONE zip for every OS with the
-      # .NET 8 / ASP.NET Core runtime. Agents need their own runtimes anyway,
-      # so requiring dotnet is not an extra burden for this audience. The
-      # layout comes from the same script ci.yml smoke-tests on every PR.
-      - name: Build the release layout
-        run: bash scripts/build-release-layout.sh dist
+      # Smoke test the exact file that is released (before it is renamed). Only the
+      # platforms that can run here: linux and macOS arm64 (verified on a real run).
+      - name: Smoke-test the single file
+        if: matrix.smoke
+        run: bash scripts/smoke-single-file.sh out
 
-      - name: Assemble zip
-        run: cd dist && zip -rq ../agenthelm-${GITHUB_REF_NAME}.zip .
+      - name: Name the release file
+        env:
+          # Branch names may contain '/', which is not allowed in a file name.
+          VERSION: ${{ github.ref_name }}
+        run: |
+          version="${VERSION//\//-}"
+          mkdir -p dist
+          mv "out/agenthelm${{ matrix.ext }}" "dist/agenthelm-${version}-${{ matrix.rid }}${{ matrix.ext }}"
+          ls -l dist
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: binary-${{ matrix.rid }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v') && !(github.event_name == 'workflow_dispatch' && inputs.dry_run)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: binary-*
+          path: release
+          merge-multiple: true
+
+      - name: SHA256SUMS
+        run: |
+          cd release
+          sha256sum agenthelm-* > SHA256SUMS
+          cat SHA256SUMS
 
       - name: GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          files: agenthelm-*.zip
+          files: release/*
           generate_release_notes: true
