@@ -104,7 +104,7 @@ A prompt was sent while the previous turn was still running. Wait for it to fini
 
 ## Features
 
-### The Changes tab says "not a git repository"
+### The Changes panel says "not a git repository"
 
 The working directory is not inside a git work tree, or `git` is not on the Bridge's `PATH`. Inside the container images there is no `git` at all.
 

@@ -1,10 +1,10 @@
-The **Changes** tab turns the working directory's uncommitted changes into a review queue: see what the agent changed, file by file, and keep or undo each change. It works in any session whose working directory is inside a git repository, with `git` on the Bridge's `PATH`.
+The **Changes** panel, in the dock beside the chat, turns the working directory's uncommitted changes into a review queue: see what the agent changed, file by file, and keep or undo each change. It works in any session whose working directory is inside a git repository, with `git` on the Bridge's `PATH`.
 
-![The Changes tab with a diff](images/changes-tab.png)
+![The Changes panel with a diff](images/changes-tab.png)
 
 ## The file list
 
-Opening the tab (or clicking **Refresh**) lists every change in the working tree compared to `HEAD`, from `git status --porcelain`:
+Opening the panel (or clicking **Refresh**) lists every change in the working tree compared to `HEAD`, from `git status --porcelain`:
 
 | Status | Meaning |
 |---|---|
@@ -15,19 +15,19 @@ Opening the tab (or clicking **Refresh**) lists every change in the working tree
 | `typechange` | e.g. a file became a symlink |
 | `untracked` | new file git does not know yet |
 
-The list shows all uncommitted changes in the repository — including your own edits, not only the agent's. If the directory is not a git repository the tab says so; a clean tree shows *Working tree clean — nothing to review*.
+The list shows all uncommitted changes in the repository — including your own edits, not only the agent's. If the directory is not a git repository the panel says so; a clean tree shows *Working tree clean — nothing to review*.
 
 ## Viewing a diff
 
 Click a file's name (or its **▸** arrow) to expand its diff under the row. The diff is against `HEAD` (`git diff HEAD -- <path>`), with old and new line numbers and green/red backgrounds for added and removed lines; the row shows the added and removed line counts once its diff has been opened. Click again to collapse it. Only one file is expanded at a time. Untracked files have no diff, so AgentHelm shows their whole content as added lines.
 
-**Ask agent to change this** puts the file's path into the composer and switches to the Chat tab, so you can describe the change you want.
+**Ask agent to change this** puts the file's path into the composer. The chat stays in view, so you can describe the change you want.
 
 ## Accept
 
 **Accept** stages the file: `git add -- <path>`. The change stays in your working tree and is marked as reviewed in git's index; nothing is committed. The transcript records *Accepted (staged) changes: `<path>`*.
 
-Commit when you are ready — from the [Terminal](Terminal.md) tab or your usual tools.
+Commit when you are ready — from the [Terminal](Terminal.md) panel or your usual tools.
 
 ## Reject
 

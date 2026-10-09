@@ -95,7 +95,7 @@ dotnet run --project src/AgentHelm.Web      # UI (memory-only history)
 AgentHelm ships with a built-in **echo** agent that speaks ACP, so you can see
 the whole loop before installing anything:
 
-1. Click **＋ New**, pick *Echo (built-in demo agent)*, set any existing
+1. Click **+** next to *Sessions*, pick *Echo (built-in demo agent)*, set any existing
    directory as the working directory, **Start session**.
 2. Type a prompt — watch it stream back.
 3. Type a prompt containing the word **"tool"** — the agent will request
@@ -147,13 +147,14 @@ without them, starting such an agent fails with instructions, not silence).
   demonstrates it).
 - **History browser** — the rail's History view lists archived sessions from
   Postgres with a read-only transcript viewer and the Resume button.
-- **Git diff viewer (Changes tab)** — working-tree changes vs HEAD with
+- **Workbench UI** — a start page (**My work**) that sorts sessions by what needs you; a session rail grouped by repository, with quick chats that need no repository; Search over live and archived sessions; and a right-hand dock beside the chat for **Changes** and several **Terminal** tabs.
+- **Git diff viewer (Changes panel)** — working-tree changes vs HEAD with
   per-file diffs and +/− counts. **Accept** stages the file (`git add`);
   **Reject** makes it not have happened (`git checkout HEAD --` for tracked
   files, delete for untracked — the tracked/untracked decision is re-derived
   server-side, never trusted from the request). Both actions are audited in
   the session transcript, and every path is guarded to the session cwd.
-- **Integrated terminal (Terminal tab)** — a shell next to the agent session,
+- **Integrated terminal (Terminal panel)** — a shell next to the agent session,
   rendered by xterm.js, with "→ Prompt" to attach recent output to the chat
   composer. Honest scope note: this is a shell *pipe*, not a PTY — full-screen
   TUI apps won't render, and some tools disable colors when they detect no
@@ -165,7 +166,7 @@ without them, starting such an agent fails with instructions, not silence).
 - **Attachments** — images (sent as ACP `image` content blocks) and text
   files (embedded as `resource` blocks) travel with the prompt; up to 4 files,
   2 MB each, binary non-image files are refused client-side.
-- **Session rename** — the pencil next to the title; Enter saves, Escape
+- **Session rename** — **⋯ › Rename** in the session header; Enter saves, Escape
   cancels, the change propagates live and persists with the snapshot.
 - **Agent handoff** — continue a conversation with a different agent: Helm
   opens a new session in the same directory and prefills its composer with a
@@ -175,7 +176,7 @@ without them, starting such an agent fails with instructions, not silence).
 - **Capability hints** — chips in the session header (resume / images /
   files) parsed from the agent's ACP `initialize` response; the attach button
   warns when the agent advertises no attachment support.
-- **CopilotScope inline** — the Scope button shows quality scores of Scope
+- **CopilotScope inline** — **⋯ › Scope** shows quality scores of Scope
   sessions whose activity overlaps this session (`AgentHelm:Scope:BaseUrl`,
   default `http://localhost:4318`). Honest caveat, also shown in the UI: the
   match is time-based best-effort — exact correlation needs telemetry tagging
@@ -211,7 +212,7 @@ please report it privately rather than in a public issue.
   requests at localhost.
 - Agents only touch files under the session working directory (hard path
   guard in the ACP client); the git endpoints enforce the same guard.
-- The Terminal tab executes arbitrary shell commands **as you, on your
+- The Terminal panel executes arbitrary shell commands **as you, on your
   machine** — it is exactly as powerful as your own terminal. It rides the
   same loopback bind and `x-helm-token` gate as everything else; that gate is
   worth enabling if anything beyond your browser can reach the port.

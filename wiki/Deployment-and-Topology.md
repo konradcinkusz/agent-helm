@@ -70,13 +70,13 @@ services:
       # - C:\Repos:/repos           # Windows
 ```
 
-…and use `/repos/<name>` as the working directory. The Terminal tab then operates on the mounted files as the container's user. The image is based on the plain ASP.NET Core runtime image, which has no `git`, so the Changes tab reports every directory as *not a git repository* inside the container.
+…and use `/repos/<name>` as the working directory. The Terminal panel then operates on the mounted files as the container's user. The image is based on the plain ASP.NET Core runtime image, which has no `git`, so the Changes panel reports every directory as *not a git repository* inside the container.
 
 Building your own image that also contains an agent CLI is possible, but you then own its installation, its credentials inside the container and their protection.
 
 ## Exposing the Bridge
 
-By default the Bridge listens on `127.0.0.1:5199` only. It executes agent tools, runs shell commands in the Terminal tab and reads and writes files in working directories, so **anything that can reach the Bridge can do all of that as the user running it**. Before changing `AgentHelm:Urls` to anything but loopback:
+By default the Bridge listens on `127.0.0.1:5199` only. It executes agent tools, runs shell commands in the Terminal panel and reads and writes files in working directories, so **anything that can reach the Bridge can do all of that as the user running it**. Before changing `AgentHelm:Urls` to anything but loopback:
 
 1. Set a strong `AgentHelm:ApiToken` (and the same value as `Bridge:ApiToken` on the Web UI).
 2. Put the Bridge — and the Web UI — behind a reverse proxy with TLS and real authentication; the shared token is a speed bump, not an identity system.

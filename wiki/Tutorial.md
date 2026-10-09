@@ -49,7 +49,7 @@ All options, including containers, are described in [Installation](Installation.
 
 AgentHelm ships with a built-in **echo agent** — it speaks the full ACP protocol and is perfect for learning the interface before you connect a real agent.
 
-1. Click **＋ New** in the left rail.
+1. Click **+** next to the *Sessions* heading in the left rail.
 2. Pick **Echo (built-in demo agent)** from the agent drop-down.
 3. Set any existing directory as the working directory (for example your home folder) — type it, or pick it with the 📁 directory browser.
 4. Click **Start session**.
@@ -65,7 +65,7 @@ The session opens with the transcript in the main area.
 
 - Type any message containing the word **tool** (for example `Please use a tool here`).
 - The echo agent asks for permission to run a tool called `write_demo_file`.
-- An **amber banner** appears above the tabs. Its buttons are the options the agent offered — for the echo agent, **Allow** and **Reject**:
+- An **amber banner** appears above the transcript. Its buttons are the options the agent offered — for the echo agent, **Allow** and **Reject**:
     - **Allow** — the tool runs; *Permission granted by user* is added to the transcript.
     - **Reject** — the tool is denied; *Permission denied by user* is added to the transcript.
 
@@ -75,13 +75,13 @@ This is the core of AgentHelm's permission gateway. Every decision — human or 
 
 ## 3. Permission policies
 
-Approving every tool call manually can become tedious for long sessions. AgentHelm offers three policies you can switch per session with the **policy selector** in the session header:
+Approving every tool call manually can become tedious for long sessions. AgentHelm offers three policies. Each session has one, set with the **Mode** drop-down under the composer; the header shows the current mode:
 
 | Policy | Label in the UI | Behaviour |
 |---|---|---|
-| `ask` (default) | Ask every tool | Every tool call shows an approval prompt |
-| `auto_read` | Auto-allow reads | Read-only tool kinds (`read`, `search`, `think`) are auto-allowed; everything else — including network `fetch` — still asks |
-| `yolo` | YOLO | Everything is auto-allowed — requires an explicit confirmation per session |
+| `ask` (default) | Interactive | Every tool call shows an approval prompt |
+| `auto_read` | Plan | Read-only tool kinds (`read`, `search`, `think`) are auto-allowed; everything else — including network `fetch` — still asks |
+| `yolo` | Autopilot (YOLO) | Everything is auto-allowed — requires an explicit confirmation per session |
 
 > **Note:** Auto-read deliberately excludes `fetch` even though it does not modify anything: a fetch can exfiltrate what a file read just loaded.
 
@@ -91,7 +91,7 @@ YOLO is designed for trusted sessions where you want the agent to run uninterrup
 
 ## 4. Connecting a real agent
 
-Three real agents are preconfigured in `src/AgentHelm.Bridge/appsettings.json` under `AgentHelm:Agents` — install the CLI, authenticate it, and it appears in the **＋ New** drop-down (restart the Bridge after changing the catalog).
+Three real agents are preconfigured in `src/AgentHelm.Bridge/appsettings.json` under `AgentHelm:Agents` — install the CLI, authenticate it, and it appears in the Agent list of the New session dialog (restart the Bridge after changing the catalog).
 
 ### Claude Code
 
@@ -140,9 +140,9 @@ Any other agent that speaks ACP over stdio can be added the same way — see [Co
 
 ---
 
-## 5. The git diff viewer (Changes tab)
+## 5. The git diff viewer (Changes panel)
 
-When an agent modifies files in the working directory, you can review the changes in the **Changes** tab of the session.
+When an agent modifies files in the working directory, you can review the changes in the **Changes** panel of the session.
 
 1. Open a session whose working directory is a git repository.
 2. Ask the agent to make a change (for example `Create a file called hello.txt with the text "hello world"`).
@@ -154,17 +154,17 @@ For each file you can:
 - **Accept** — stages the file (`git add`). The action is audited in the transcript.
 - **Reject** — asks you to confirm, then reverts the change: `git checkout HEAD --` for tracked files, deletion for untracked ones. Also audited.
 
-All paths are guarded: nothing outside the session's working directory can be accepted or rejected through this tab. More in [Reviewing changes](Reviewing-Changes.md).
+All paths are guarded: nothing outside the session's working directory can be accepted or rejected through this panel. More in [Reviewing changes](Reviewing-Changes.md).
 
 ---
 
-## 6. The integrated terminal (Terminal tab)
+## 6. The integrated terminal (Terminal panel)
 
 The **Terminal** panel gives you a shell in the session's working directory, rendered with xterm.js. It lives in the same dock as Changes, next to the chat.
 
 1. Open the **Terminal** panel in the dock.
 2. Type a command in the input box under the terminal (for example `ls -la` or `git log --oneline`) and press <kbd>Enter</kbd>.
-3. Click **→ Prompt** to append the most recent terminal output to the chat composer. This lets you hand a test failure, a build error or any command output to the agent without copy-pasting.
+3. Click **→ Prompt** to append the most recent terminal output to the chat composer, which stays in view. This lets you hand a test failure, a build error or any command output to the agent without copy-pasting.
 
 > **Note:** On Linux, where util-linux `script` is available, the terminal runs inside a real PTY — prompts and colours work. On Windows and macOS it is a plain pipe: commands run and their output streams, but interactive full-screen programs do not render. See [Terminal](Terminal.md).
 
@@ -188,7 +188,7 @@ The capability chips in the session header (`images`, `files`) show what the age
 
 To continue a conversation with a *different* agent (for example from Copilot to Claude Code):
 
-1. Click **Handoff** in the session header.
+1. Open **⋯** in the session header and click **Handoff**.
 2. Pick the target agent and click **Create**. The new session opens in the **same working directory** with the same permission policy.
 3. The new session's composer is prefilled with a compact, attributed summary of the conversation so far.
 4. **Review the summary**, edit it if you like, then press **Send**. The summary is never sent automatically.
@@ -215,7 +215,7 @@ AgentHelm is designed to run on your own machine. A few things to be aware of:
 
 - The Bridge binds to `127.0.0.1` by default. If you need remote access, set `AgentHelm:Urls` explicitly — it is never widened automatically.
 - Enable the shared token (`AgentHelm:ApiToken` on the Bridge, `Bridge:ApiToken` on the UI) even on loopback: any web page open in your browser can send requests to localhost.
-- The **Terminal** tab executes shell commands as you, on your machine — it is exactly as powerful as your own terminal. Treat it accordingly.
+- The **Terminal** panel executes shell commands as you, on your machine — it is exactly as powerful as your own terminal. Treat it accordingly.
 - YOLO requires an explicit per-session opt-in and is never a global default. Every automatic decision is still audited.
 
 The [security model](Security.md) covers each boundary in depth.

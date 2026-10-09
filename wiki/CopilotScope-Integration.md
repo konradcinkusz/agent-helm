@@ -3,7 +3,7 @@
 ```mermaid
 flowchart LR
     A["Agent process<br/>(e.g. copilot --acp)"] -- "OTLP telemetry<br/>OTEL_* variables" --> S["CopilotScope<br/>collector + API<br/>:4318"]
-    H["AgentHelm Bridge"] -- "GET /api/sessions<br/>(Scope button)" --> S
+    H["AgentHelm Bridge"] -- "GET /api/sessions<br/>(Scope panel)" --> S
     H -- "starts" --> A
 ```
 

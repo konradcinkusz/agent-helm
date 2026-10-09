@@ -1,6 +1,6 @@
 The Web UI is one client of the Bridge; the API is equally usable from scripts and other tools. Everything the UI can do — start sessions, prompt, answer permission requests, review changes, drive the terminal — is an HTTP call.
 
-> **Warning:** The API is as powerful as the UI: it can run agent tools, execute shell commands and change files as the user running the Bridge. UI-only safeguards — such as the YOLO confirmation or the reject confirmation in the Changes tab — do not apply to API clients. See the [security model](Security.md).
+> **Warning:** The API is as powerful as the UI: it can run agent tools, execute shell commands and change files as the user running the Bridge. UI-only safeguards — such as the YOLO confirmation or the reject confirmation in the Changes panel — do not apply to API clients. See the [security model](Security.md).
 
 ## Conventions
 
@@ -123,7 +123,7 @@ With `allow: true`, `optionId` is passed to the agent and must be one of the pen
 | `GET` | `/history` | Up to 200 archived sessions, most recent first: `[{"id","agentId","cwd","title","createdAt","lastActivity","transcript":[…],"nativeSessionId"}]`. `[]` without persistence. |
 | `POST` | `/history/{id}/resume` | Body `{"title":null}` (a body is required). Starts a new session through ACP `session/load` → session summary. `400` without persistence or without a native session id, `404` for unknown ids, `500` if the agent cannot load it. |
 
-### Git (Changes tab)
+### Git (Changes panel)
 
 Paths are relative to the session's working directory; paths that escape it are refused with `400`.
 

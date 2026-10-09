@@ -2,7 +2,7 @@ A **session** is one conversation with one agent in one working directory. Each 
 
 ## Starting a session
 
-Click **+** next to the *Sessions* heading in the rail. The **New session** dialog opens over the page; fill it in and click **Start session** (or **Cancel** to close it):
+Click **+** next to the *Sessions* heading in the rail. The **New session** dialog opens over the Sessions page; fill it in and click **Start session**. **Cancel**, **✕**, or a click outside the dialog closes it:
 
 <img src="images/new-session.png" alt="The new-session form" width="480">
 
@@ -75,11 +75,11 @@ The capability chips in the header show what the agent advertised: `images` and 
 
 ## Renaming
 
-Click ✎ next to the title, type, and press <kbd>Enter</kbd> (or <kbd>Esc</kbd> to cancel). Titles are 1–120 characters. The new title appears everywhere at once and is saved with the session.
+Open **⋯** in the session header and click **Rename**, type, and press <kbd>Enter</kbd> (or <kbd>Esc</kbd> to cancel). Titles are 1–120 characters. The new title appears everywhere at once and is saved with the session.
 
 ## Deleting
 
-**Delete** ends the session for good: the agent process and the session's terminal are stopped, the session disappears from the rail, and — with PostgreSQL configured — its history record is deleted too. A permission request that was still waiting is answered as denied.
+**Delete** (in the **⋯** menu) ends the session for good: the agent process and the session's terminal are stopped, the session disappears from the rail, and — with PostgreSQL configured — its history record is deleted too. A permission request that was still waiting is answered as denied.
 
 > **Warning:** There is no undo. If you only want to stop the agent's current turn, use **Stop**.
 

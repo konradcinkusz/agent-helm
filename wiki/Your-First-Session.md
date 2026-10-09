@@ -10,7 +10,7 @@ AgentHelm ships with a built-in **echo agent**: a tiny program that speaks the A
 
 <img src="images/new-session.png" alt="The new-session form with the echo agent selected" width="480">
 
-The Bridge starts the echo agent as a child process in that directory, performs the ACP handshake, and the session opens. The header shows the agent, the working directory and **capability chips** — `resume`, `images`, `files` — that the agent advertised during the handshake.
+The Bridge starts the echo agent as a child process in that directory, performs the ACP handshake, and the session opens. The header shows the repository, the working directory and **capability chips** — `resume`, `images`, `files` — that the agent advertised during the handshake. The agent's name is on the session's card in the rail.
 
 > **Tip:** When you run from source, the catalog starts the echo agent with `dotnet run`, so the very first session takes a few seconds while it compiles.
 
@@ -20,7 +20,7 @@ Type `Hello!` in the composer and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> (or **S
 
 ## 3. Trigger a permission request
 
-Send a prompt that contains the word **tool**, for example `Now use a tool to write the change.` The echo agent announces a tool call (`write_demo_file`, kind `edit`) and asks for permission to run it. An amber banner appears above the tabs with the options the agent offered — here **Allow** and **Reject**:
+Send a prompt that contains the word **tool**, for example `Now use a tool to write the change.` The echo agent announces a tool call (`write_demo_file`, kind `edit`) and asks for permission to run it. An amber banner appears above the transcript with the options the agent offered — here **Allow** and **Reject**:
 
 ![A permission request from the echo agent](images/permission-banner.png)
 
@@ -32,12 +32,12 @@ Had you clicked **Reject**, the transcript would say *Permission denied by user*
 
 ## 4. Try a different policy
 
-The drop-down in the header is the session's **permission policy**. Switch it to **Auto-allow reads** and repeat the tool prompt: the echo agent's tool is an `edit`, not a read, so you are still asked. Switch to **YOLO** and AgentHelm asks you to confirm first; once enabled, the same request is allowed automatically and the transcript records *Permission auto-allowed by policy 'yolo': write_demo_file (edit)*. [Permissions & policies](Permissions-and-Policies.md) explains each policy.
+The **Mode** drop-down under the composer is the session's **permission policy**. Switch it to **Plan** (auto-allow reads) and repeat the tool prompt: the echo agent's tool is an `edit`, not a read, so you are still asked. Switch to **Autopilot** (YOLO) and AgentHelm asks you to confirm first; once enabled, the same request is allowed automatically and the transcript records *Permission auto-allowed by policy 'yolo': write_demo_file (edit)*. [Permissions & policies](Permissions-and-Policies.md) explains each policy.
 
 ## 5. Look around
 
-- **Changes** — if the working directory is a git repository, the tab lists its uncommitted changes with a diff for each file. See [Reviewing changes](Reviewing-Changes.md).
-- **Terminal** — a shell in the working directory. See [Terminal](Terminal.md).
+- **Changes** — if the working directory is a git repository, the **Changes** panel in the dock lists its uncommitted changes with a diff for each file. See [Reviewing changes](Reviewing-Changes.md).
+- **Terminal** — a shell in the working directory, in the same dock. See [Terminal](Terminal.md).
 - **History** — with PostgreSQL configured, past sessions are listed here and can be resumed. The echo agent supports resume. See [History & resume](History-and-Resume.md).
 
 ## Next steps

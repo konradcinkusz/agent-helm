@@ -1,4 +1,4 @@
-The agent catalog is the list under `AgentHelm:Agents` in the Bridge's configuration. Each entry turns a command into an agent you can pick in **＋ New**. The catalog is read **once, when the Bridge starts** — restart the Bridge after changing it.
+The agent catalog is the list under `AgentHelm:Agents` in the Bridge's configuration. Each entry turns a command into an agent you can pick in the New session dialog. The catalog is read **once, when the Bridge starts** — restart the Bridge after changing it.
 
 ## Fields
 
