@@ -1,0 +1,77 @@
+<div class="nsd-overlay" @onclick="() => OnClose.InvokeAsync()">
+    <div class="nsd" role="dialog" aria-modal="true" aria-labelledby="nsd-title" @onclick:stopPropagation>
+        <div class="nsd-head">
+            <span id="nsd-title" class="rail-label">New session</span>
+            <button class="btn" title="Close" @onclick="() => OnClose.InvokeAsync()">✕</button>
+        </div>
+
+        <div class="nsd-body">
+            <label class="nsd-field">
+                <span class="nsd-label">Agent</span>
+                <select value="@NewAgentId" @onchange="NewAgentChangedAsync">
+                    @foreach (var agent in Agents)
+                    {
+                        <option value="@agent.Id">@agent.Name</option>
+                    }
+                </select>
+            </label>
+
+            <div class="nsd-field">
+                <span class="nsd-label">Working directory</span>
+                <div class="cwd-row">
+                    <input class="cwd-input" placeholder="Repo path on the Bridge server" value="@NewCwd" @onchange="CwdChangedAsync" />
+                    <button class="btn cwd-browse" title="Browse directories" @onclick="() => OnBrowse.InvokeAsync()">📁</button>
+                </div>
+                <div class="term-note">Path on the Bridge server. Docker users: add <code>volumes:</code> to docker-compose (e.g. <code>- C:\Repos:/repos</code>) and enter the container path here.</div>
+            </div>
+
+            <label class="nsd-field">
+                <span class="nsd-label">Title <span class="nsd-hint">(optional)</span></span>
+                <input placeholder="Title (optional)" value="@NewTitle" @onchange="TitleChangedAsync" />
+            </label>
+
+            <label class="nsd-field">
+                <span class="nsd-label">Model</span>
+                @if (NewAgentModels.Count > 0)
+                {
+                    <select value="@NewModel" @onchange="ModelChangedAsync" title="Model for this session">
+                        @foreach (var m in NewAgentModels)
+                        {
+                            <option value="@m.Id">@m.Name@(m.IsDefault ? " (default)" : "")</option>
+                        }
+                    </select>
+                }
+                else
+                {
+                    <input placeholder="Model (optional)" value="@NewModel" @onchange="ModelChangedAsync" />
+                }
+            </label>
+
+            <div class="nsd-field">
+                <button class="btn preconfig-toggle @(ShowPreconfig ? "active" : "")"
+                        @onclick="() => OnTogglePreconfig.InvokeAsync()">⚙ Pre-config</button>
+                @if (ShowPreconfig)
+                {
+                    <div class="preconfig-panel">
+                        <label class="preconfig-label">OTel endpoint <span class="preconfig-hint">(GitHub Copilot / CopilotScope)</span></label>
+                        <input placeholder="http://localhost:4318" value="@PreconfigOtelUrl" @onchange="OtelUrlChangedAsync" />
+                        <div class="term-note">Where the agent exports telemetry. Applied when starting the session.</div>
+                    </div>
+                }
+            </div>
+
+            @if (CreateError is not null)
+            {
+                <div class="error-note">@CreateError</div>
+            }
+        </div>
+
+        <div class="nsd-foot">
+            <button class="btn" @onclick="() => OnClose.InvokeAsync()">Cancel</button>
+            <button class="btn primary" disabled="@(Creating || string.IsNullOrWhiteSpace(NewCwd))"
+                    @onclick="() => OnCreate.InvokeAsync()">
+                @(Creating ? "Starting…" : "Start session")
+            </button>
+        </div>
+    </div>
+</div>
