@@ -4,7 +4,7 @@
 
 ## How to hand off
 
-1. In the session header, click **Handoff**.
+1. In the session header, open **⋯** and click **Handoff**.
 2. Pick the target agent. The list preselects the first agent that differs from the current one, but any agent — including the same one — is allowed.
 3. Click **Create**.
 
