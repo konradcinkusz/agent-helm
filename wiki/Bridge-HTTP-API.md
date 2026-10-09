@@ -68,17 +68,17 @@ curl -s -X POST $B/sessions/da9ae20420d3/prompt -H 'content-type: application/js
 **Start a session** — `POST /sessions`:
 
 ```json
-{ "agentId": "echo", "cwd": "/home/dev/projects/acme-api", "title": null, "policy": "ask", "model": null }
+{ "agentId": "echo", "cwd": "/home/dev/projects/acme-api", "title": null, "policy": "ask", "model": null, "isChat": false }
 ```
 
-`agentId` and `cwd` are required; `title`, `policy` and `model` are optional. The response is a **session summary**:
+`agentId` and `cwd` are required, except for a quick chat: with `"isChat": true` and no `cwd`, the Bridge creates a scratch directory for the session. `title`, `policy`, `model` and `isChat` are optional. The response is a **session summary**:
 
 ```json
 {
   "id": "da9ae20420d3", "agentId": "echo", "cwd": "/home/dev/projects/acme-api",
   "title": "Echo (built-in demo agent) · acme-api", "status": "idle", "policy": "ask",
   "createdAt": "2026-09-22T19:13:39.1089865+00:00", "lastActivity": "2026-09-22T19:13:39.1089866+00:00",
-  "hasPendingPermission": false
+  "hasPendingPermission": false, "isChat": false
 }
 ```
 
@@ -138,10 +138,12 @@ Paths are relative to the session's working directory; paths that escape it are 
 
 | Method | Path | Description |
 |---|---|---|
-| `POST` | `/sessions/{id}/terminal/start` | Start (or reuse) the session's shell → `{"pty":true}` in PTY mode, `{"pty":false}` in pipe mode |
-| `POST` | `/sessions/{id}/terminal/input` | Body `{"text":"…"}` — written to the shell followed by a newline. `404` if not started. |
-| `GET` | `/sessions/{id}/terminal/buffer` | `{"text":"…"}` — the last 64,000 characters of output |
-| `GET` | `/sessions/{id}/terminal/stream` | Output as it arrives — see [below](#event-streams) |
+| `GET` | `/sessions/{id}/terminals` | The session's terminals, in tab order → `[{"id","pty","exited"}]` |
+| `POST` | `/sessions/{id}/terminals` | Start a new shell → `{"id","pty","exited"}`; `pty` is `true` in PTY mode, `false` in pipe mode |
+| `DELETE` | `/sessions/{id}/terminals/{terminalId}` | Stop the shell and remove the terminal. `404` if unknown. |
+| `POST` | `/sessions/{id}/terminals/{terminalId}/input` | Body `{"text":"…"}` — written to the shell followed by a newline. `404` if unknown. |
+| `GET` | `/sessions/{id}/terminals/{terminalId}/buffer` | `{"text":"…"}` — the last 64,000 characters of output |
+| `GET` | `/sessions/{id}/terminals/{terminalId}/stream` | Output as it arrives — see [below](#event-streams) |
 
 ### File system
 
@@ -167,6 +169,6 @@ data: {"Kind":"permission","Text":"write_demo_file","Data":{"RequestKey":"144be8
 
 The event kinds are listed in [Events & transcript](Events-and-Transcript.md#live-events). A stream only carries what happens after you connect — load `GET /sessions/{id}` first for the transcript so far.
 
-**Terminal stream** — `GET /sessions/{id}/terminal/stream`: `{"Kind":"out","Text":"<output chunk>","Data":null}`. Output can contain ANSI escape sequences.
+**Terminal stream** — `GET /sessions/{id}/terminals/{terminalId}/stream`: `{"Kind":"out","Text":"<output chunk>","Data":null}`. Output can contain ANSI escape sequences.
 
 **Login stream** — `GET /providers/{id}/login/stream`: camelCase `{"kind":"output","text":"<line>"}` for each output line (replayed from the start for late subscribers), then `{"kind":"done","exitCode":0}`.
