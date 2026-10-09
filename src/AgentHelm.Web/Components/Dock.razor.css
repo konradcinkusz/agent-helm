@@ -1,7 +1,6 @@
 .dock {
   position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0;
   width: var(--dock-w, 440px); flex-shrink: 0;
-  background: var(--panel); border-left: 1px solid var(--line);
 }
 .dock.closed { width: 40px; }
 .dock-splitter {

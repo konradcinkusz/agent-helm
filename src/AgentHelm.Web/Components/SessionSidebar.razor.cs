@@ -34,6 +34,10 @@ public partial class SessionSidebar
     [Parameter] public EventCallback<string> OnSelectSession { get; set; }
     [Parameter] public EventCallback<ArchivedSessionDto> OnSelectArchived { get; set; }
 
+    private bool _collapsed;
+
+    private void ToggleCollapsed() => _collapsed = !_collapsed;
+
     private Task NewAgentChangedAsync(ChangeEventArgs e) => OnNewAgentChanged.InvokeAsync(e);
 
     private Task CwdChangedAsync(ChangeEventArgs e) => NewCwdChanged.InvokeAsync(e.Value?.ToString() ?? "");
