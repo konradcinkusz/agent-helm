@@ -2,7 +2,7 @@ A **session** is one conversation with one agent in one working directory. Each 
 
 ## Starting a session
 
-Click **＋ New** in the rail. The **New session** dialog opens over the page; fill it in and click **Start session** (or **Cancel** to close it):
+Click **+** next to the *Sessions* heading in the rail. The **New session** dialog opens over the page; fill it in and click **Start session** (or **Cancel** to close it):
 
 <img src="images/new-session.png" alt="The new-session form" width="480">
 
@@ -36,8 +36,9 @@ A form that stays on *Starting…* means the agent started but never answered th
 
 Type in the composer at the bottom and press <kbd>Ctrl</kbd>+<kbd>Enter</kbd> or **Send**. Under the prompt box, the **Mode** drop-down sets the session's permission policy (Interactive, Plan or Autopilot — see [Permissions & policies](Permissions-and-Policies.md)), and the model field shows the model the session runs with. While the agent works:
 
-- its reply streams into a bubble marked *assistant · streaming*;
-- tool calls appear as `tool` entries, and permission requests as banners ([Permissions & policies](Permissions-and-Policies.md));
+- its reply streams in as plain text, marked *streaming*;
+- tool calls collect into a collapsible *N tool calls* card, and permission requests appear as banners ([Permissions & policies](Permissions-and-Policies.md));
+- the view follows the newest message until you scroll up;
 - the status badge reads `running`, and **Send** is disabled — one turn at a time per session.
 
 When the turn ends, the streamed text becomes a permanent `assistant` entry and the status returns to `idle`. If the Bridge refuses a prompt — it cannot be reached, or the attachments are too large — the reason appears above the composer and your prompt stays in it. **Stop** asks the agent to cancel the turn (ACP `session/cancel`); the agent decides how quickly it stops.
@@ -50,6 +51,8 @@ When the turn ends, the streamed text becomes a permanent `assistant` entry and 
 | `assistant` | The agent's replies, one entry per stretch of text. |
 | `tool` | Each tool call the agent announces, by title. |
 | `system` | Audit entries: permission requests and decisions, policy changes, git accept/reject, handoffs, and agent errors. |
+
+Agent replies are rendered as Markdown (headings, lists, code blocks, links, bold and italics); your prompts are shown as typed.
 
 The agent's "thinking" stream and tool-status updates are shown live but not recorded. The full list of entry kinds and audit texts is in [Events & transcript](Events-and-Transcript.md).
 

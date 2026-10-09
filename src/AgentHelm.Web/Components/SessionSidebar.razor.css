@@ -24,7 +24,6 @@
 .rail.collapsed .rail-nav-item { justify-content: center; padding: 8px 0; }
 .rail.collapsed .rail-nav-label,
 .rail.collapsed .rail-head,
-.rail.collapsed .new-session,
 .rail.collapsed .session-card,
 .rail.collapsed .empty { display: none; }
 
@@ -37,3 +36,13 @@
 .session-card.active { border-color: var(--copper); background: var(--ink); }
 .session-title { font-weight: 600; font-size: 13px; }
 .session-meta { font-family: var(--mono); font-size: 10px; color: var(--dim); }
+
+.new-btn { font-size: 16px; line-height: 1; padding: 4px 10px; }
+
+.session-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.session-row .session-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--dim); }
+.status-dot.status-running { background: var(--copper); }
+.status-dot.status-error { background: var(--err); }
+.status-dot.status-idle { background: var(--ok); }
+.permission-badge { font-size: 11px; flex-shrink: 0; }
