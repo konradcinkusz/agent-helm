@@ -19,7 +19,9 @@ The list shows all uncommitted changes in the repository — including your own 
 
 ## Viewing a diff
 
-**View** shows the file's diff against `HEAD` (`git diff HEAD -- <path>`) with added and removed line counts. Untracked files have no diff, so AgentHelm shows their whole content as added lines.
+Click a file's name (or its **▸** arrow) to expand its diff under the row. The diff is against `HEAD` (`git diff HEAD -- <path>`), with old and new line numbers and green/red backgrounds for added and removed lines; the row shows the added and removed line counts once its diff has been opened. Click again to collapse it. Only one file is expanded at a time. Untracked files have no diff, so AgentHelm shows their whole content as added lines.
+
+**Ask agent to change this** puts the file's path into the composer and switches to the Chat tab, so you can describe the change you want.
 
 ## Accept
 
