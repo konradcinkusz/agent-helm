@@ -76,11 +76,10 @@ jobs:
           codesign --force --sign - out/agenthelm
           codesign --verify --verbose=2 out/agenthelm
 
-      # Smoke test the exact file that is released (before it is renamed). macOS is
-      # non-blocking until it has been verified on a real run; linux always blocks.
+      # Smoke test the exact file that is released (before it is renamed). Only the
+      # platforms that can run here: linux and macOS arm64 (verified on a real run).
       - name: Smoke-test the single file
         if: matrix.smoke
-        continue-on-error: ${{ runner.os == 'macOS' }}
         run: bash scripts/smoke-single-file.sh out
 
       - name: Name the release file
