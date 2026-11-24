@@ -6,7 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- The ONLY NuGet dependency, mirroring the CopilotScope pattern. -->
-    <PackageReference Include="Npgsql" Version="8.0.5" />
+    <PackageReference Include="Npgsql" Version="10.0.4" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="AgentHelm.Tests" />
